@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+/* 让 .dark 类可以驱动暗色变体（Tailwind v4 默认跟随系统偏好） */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * 设计令牌（Tailwind v4 CSS-first 配置）
+ * @theme 中的变量会自动生成对应的工具类，例如：
+ *   --color-brand-600      ->  bg-brand-600 / text-brand-600 / border-brand-600
+ *   --color-status-approved ->  text-status-approved
+ */
+@theme {
+	/* 品牌主色：沉稳的靛蓝，用于主按钮、选中态、链接 */
+	--color-brand-50: oklch(0.97 0.014 254.6);
+	--color-brand-100: oklch(0.93 0.032 255.5);
+	--color-brand-200: oklch(0.88 0.059 254.1);
+	--color-brand-300: oklch(0.81 0.095 251.8);
+	--color-brand-400: oklch(0.71 0.143 254.6);
+	--color-brand-500: oklch(0.62 0.185 259.8);
+	--color-brand-600: oklch(0.55 0.216 263.4);
+	--color-brand-700: oklch(0.49 0.202 264.1);
+	--color-brand-800: oklch(0.42 0.166 265.6);
+	--color-brand-900: oklch(0.38 0.13 265.5);
+
+	/* 状态色：与审批状态机一一对应，保证列表 / 详情 / 图表三处用色一致 */
+	--color-status-draft: oklch(0.55 0.014 264.4);
+	--color-status-pending: oklch(0.68 0.157 65.5);
+	--color-status-approved: oklch(0.63 0.153 152.5);
+	--color-status-rejected: oklch(0.59 0.216 27.3);
+	--color-status-cancelled: oklch(0.71 0.011 264.5);
+
+	/* 圆角与阴影：全站统一的卡片观感 */
+	--radius-card: 0.75rem;
+	--shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+	--shadow-card-hover: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.05);
+
+	/* 中文优先的字体栈，避免 Windows / macOS 下中文回退到宋体 */
+	--font-sans:
+		system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+		'Noto Sans SC', sans-serif;
+	--font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+}
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		/* 数字等宽，金额 / 天数在表格中对齐 */
+		font-variant-numeric: tabular-nums;
+	}
+
+	body {
+		@apply bg-slate-50 text-slate-900 antialiased;
+	}
+
+	/* 统一键盘可达性：全站聚焦环 */
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-brand-600;
+	}
+}
