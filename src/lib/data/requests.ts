@@ -85,6 +85,28 @@ export function getAllRequests(): readonly TravelRequest[] {
 	return get(requestsStore);
 }
 
+/** 按业务单号取单条；不存在返回 undefined（详情页据此走「未找到」分支） */
+export function getRequestById(
+	id: string,
+	requests: readonly TravelRequest[] = get(requestsStore)
+): TravelRequest | undefined {
+	return requests.find((r) => r.id === id);
+}
+
+/**
+ * 用流转后的新对象替换工作数据集里的旧记录，并同步 localStorage 缓存。
+ *
+ * 写操作只落本地（与 loadRequests 的缓存策略一致）：云端 Mock 是只读的，
+ * 这里改了不会回写，刷新后若 Mock 优先加载会丢掉改动 —— 演示范围内可接受。
+ */
+export function updateRequest(updated: TravelRequest): void {
+	requestsStore.update((list) => {
+		const next = list.map((r) => (r.id === updated.id ? updated : r));
+		writeStorage(next);
+		return next;
+	});
+}
+
 /** 某用户发起的全部申请（我的申请 / 待我审批都从这里再按角色筛） */
 export function getRequestsByApplicant(
 	applicantId: UserId,

@@ -1,4 +1,12 @@
-import type { AuditAction, AuditEntry, RequestStatus, TravelRequest, User } from './types';
+import type {
+	AuditAction,
+	AuditEntry,
+	RequestStatus,
+	Transport,
+	TravelRequest,
+	Urgency,
+	User
+} from './types';
 
 /**
  * 审批状态机。
@@ -28,6 +36,30 @@ export const ACTION_LABELS: Record<AuditAction, string> = {
 	cancel: '撤销',
 	reedit: '重新编辑'
 };
+
+/** 交通方式在 UI 上的中文名，行程表与详情页共用 */
+export const TRANSPORT_LABELS: Record<Transport, string> = {
+	train: '动车',
+	flight: '飞机',
+	car: '汽车',
+	other: '其他'
+};
+
+/** 紧急程度的中文名，详情页与列表徽章共用 */
+export const URGENCY_LABELS: Record<Urgency, string> = {
+	normal: '普通',
+	urgent: '紧急'
+};
+
+/**
+ * 该动作是否必须填写意见。
+ *
+ * 直接问流转表而非在页面里写 `action === 'reject'` —— 若以后新增一个
+ * 也需要意见的动作，只改 TRANSITIONS 即可，详情页/审批页的弹窗逻辑不用动。
+ */
+export function actionRequiresComment(action: AuditAction): boolean {
+	return TRANSITIONS[action].some((rule) => rule.commentRequired);
+}
 
 /** 谁有资格执行该动作 */
 type ActorRule =
