@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { EMPLOYEE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
 import type { AuditAction, RequestStatus, TravelRequest } from '../../domain/types';
-import { availableActions, isDeletable, isEditable, transition } from '../../domain/workflow';
+import {
+	availableActions,
+	canViewRequest,
+	isDeletable,
+	isEditable,
+	REJECT_COMMENT_MAX_LENGTH,
+	transition
+} from '../../domain/workflow';
 
 const zhangsan = requireUser(EMPLOYEE_ID);
 const lijingli = requireUser(MANAGER_ID);
@@ -229,6 +236,30 @@ describe('transition — 审批意见', () => {
 		});
 
 		expect(result.ok && result.request.audit.at(-1)?.comment).toBe('预算超标，请压缩住宿费');
+	});
+
+	it(`意见超过 ${REJECT_COMMENT_MAX_LENGTH} 字被拒绝`, () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_manager' }),
+			action: 'reject',
+			actor: lijingli,
+			comment: 'x'.repeat(REJECT_COMMENT_MAX_LENGTH + 1),
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: false, code: 'comment_too_long' });
+	});
+
+	it(`恰为 ${REJECT_COMMENT_MAX_LENGTH} 字的意见可正常驳回`, () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_manager' }),
+			action: 'reject',
+			actor: lijingli,
+			comment: 'x'.repeat(REJECT_COMMENT_MAX_LENGTH),
+			now: NOW
+		});
+
+		expect(result.ok).toBe(true);
 	});
 
 	it('通过时不填意见也可以', () => {

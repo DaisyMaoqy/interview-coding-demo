@@ -61,6 +61,9 @@ export function actionRequiresComment(action: AuditAction): boolean {
 	return TRANSITIONS[action].some((rule) => rule.commentRequired);
 }
 
+/** 必填审批意见（驳回理由）的最大长度；超出时 transition 直接拒绝，避免意见无限拉长 */
+export const REJECT_COMMENT_MAX_LENGTH = 200;
+
 /** 谁有资格执行该动作 */
 type ActorRule =
 	/** 仅申请人本人 */
@@ -115,7 +118,9 @@ export type TransitionFailureCode =
 	/** 当前用户没有执行该动作的资格 */
 	| 'forbidden'
 	/** 缺少必填的审批意见 */
-	| 'comment_required';
+	| 'comment_required'
+	/** 审批意见超出长度上限 */
+	| 'comment_too_long';
 
 export type TransitionResult =
 	| { ok: true; request: TravelRequest }
@@ -203,6 +208,14 @@ export function transition({
 			ok: false,
 			code: 'comment_required',
 			message: `${ACTION_LABELS[action]}时必须填写意见`
+		};
+	}
+
+	if (rule.commentRequired && trimmed && trimmed.length > REJECT_COMMENT_MAX_LENGTH) {
+		return {
+			ok: false,
+			code: 'comment_too_long',
+			message: `${ACTION_LABELS[action]}意见不能超过 ${REJECT_COMMENT_MAX_LENGTH} 字`
 		};
 	}
 

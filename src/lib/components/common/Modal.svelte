@@ -101,6 +101,16 @@
 		font-size: 0.8125rem;
 		color: var(--color-rose-700);
 	}
+	/* 字数计数器：由调用方 snippet 注入，故同样用 :global */
+	:global(.modal__counter) {
+		margin: 0.25rem 0 0;
+		text-align: right;
+		font-size: 0.75rem;
+		color: var(--color-slate-400);
+	}
+	:global(.modal__counter--max) {
+		color: var(--color-rose-500);
+	}
 	.modal__actions {
 		margin-top: 1rem;
 		display: flex;
