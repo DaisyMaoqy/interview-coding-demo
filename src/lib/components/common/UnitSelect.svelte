@@ -17,17 +17,11 @@
 	let { value = $bindable(), options, unit, ariaLabel }: Props = $props();
 </script>
 
-<div
-	class="flex h-9 items-center gap-1.5 rounded-lg border-0 bg-slate-100 px-2.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand-500"
->
-	<select
-		bind:value
-		aria-label={ariaLabel}
-		class="h-full w-auto border-0 bg-transparent text-sm text-slate-800 outline-none focus-visible:text-brand-600"
-	>
+<div class="unit-select">
+	<select bind:value aria-label={ariaLabel} class="unit-select__field">
 		{#each options as opt (opt.value)}
 			<option value={opt.value}>{opt.label}</option>
 		{/each}
 	</select>
-	<span class="text-xs text-slate-400">{unit}</span>
+	<span class="unit-select__unit">{unit}</span>
 </div>

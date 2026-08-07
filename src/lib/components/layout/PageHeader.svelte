@@ -20,16 +20,16 @@
 	<title>{pageTitle(title)}</title>
 </svelte:head>
 
-<div class="mb-6 flex items-start justify-between gap-4">
-	<div>
-		<h1 class="text-xl font-semibold tracking-tight text-slate-900">{title}</h1>
+<div class="page-header">
+	<div class="page-header__heading">
+		<h1 class="page-header__title">{title}</h1>
 		{#if description}
-			<p class="mt-1 text-sm text-slate-500">{description}</p>
+			<p class="page-header__description">{description}</p>
 		{/if}
 	</div>
 
 	{#if actions}
-		<div class="flex shrink-0 items-center gap-2">
+		<div class="page-header__actions">
 			{@render actions()}
 		</div>
 	{/if}

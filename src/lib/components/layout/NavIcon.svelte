@@ -27,7 +27,7 @@
 	stroke-width="1.75"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	class="size-5 shrink-0"
+	class="nav-icon"
 	aria-hidden="true"
 >
 	<path d={PATHS[name]} />

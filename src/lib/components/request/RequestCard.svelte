@@ -20,16 +20,13 @@
 	}
 </script>
 
-<a
-	href={resolve('/travel/requests/[id]', { id: request.id })}
-	class="block rounded-card border border-slate-200 bg-white p-4 transition-shadow hover:shadow-card"
->
-	<div class="flex items-start justify-between gap-4">
-		<div class="min-w-0">
-			<p class="truncate font-medium text-slate-900">
+<a class="request-card" href={resolve('/travel/requests/[id]', { id: request.id })}>
+	<div class="request-card__top">
+		<div class="request-card__main">
+			<p class="request-card__reason">
 				<HighlightText text={request.reason} {keyword} />
 			</p>
-			<p class="mt-1 text-xs text-slate-500">
+			<p class="request-card__meta">
 				{request.id} · <HighlightText text={summarizeLegs(request)} {keyword} /> ·
 				{toDate(request.createdAt)}
 			</p>
@@ -37,8 +34,60 @@
 		<StatusBadge status={request.status} />
 	</div>
 
-	<div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-		<span class="text-xs text-slate-400">预算合计</span>
-		<span class="text-sm font-semibold text-slate-900">¥{formatYuan(requestTotal(request))}</span>
+	<div class="request-card__footer">
+		<span class="request-card__amount-label">预算合计</span>
+		<span class="request-card__amount">¥{formatYuan(requestTotal(request))}</span>
 	</div>
 </a>
+
+<style>
+	.request-card {
+		display: block;
+		border-radius: var(--radius-card);
+		border: 1px solid var(--color-slate-200);
+		background-color: #fff;
+		padding: 1rem;
+		transition: box-shadow 150ms ease;
+	}
+	.request-card:hover {
+		box-shadow: var(--shadow-card);
+	}
+	.request-card__top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.request-card__main {
+		min-width: 0;
+	}
+	.request-card__reason {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 500;
+		color: var(--color-slate-900);
+	}
+	.request-card__meta {
+		margin-top: 0.25rem;
+		font-size: 0.75rem;
+		color: var(--color-slate-500);
+	}
+	.request-card__footer {
+		margin-top: 0.75rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-top: 1px solid var(--color-slate-100);
+		padding-top: 0.75rem;
+	}
+	.request-card__amount-label {
+		font-size: 0.75rem;
+		color: var(--color-slate-400);
+	}
+	.request-card__amount {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-slate-900);
+	}
+</style>

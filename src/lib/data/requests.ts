@@ -1,6 +1,8 @@
 import seed from './seed.json' with { type: 'json' };
 import type { RequestStatus, TravelRequest, UserId } from '$lib/domain/types';
 import { budgetTotal } from '$lib/domain/money';
+import { writable, get } from 'svelte/store';
+import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
 
 /**
  * 列表筛选维度。
@@ -14,21 +16,81 @@ export type StatusFilter = 'all' | RequestStatus | 'pending';
 /**
  * 申请单数据源（演示用）。
  *
- * 当前直接读本地 seed.json —— 它是 Apifox Mock 响应的副本。这里集中成一个函数，
- * 是为了把「数据从哪来」这一处变化点收口：将来换成 Apifox HTTP 读取 +
- * localStorage 草稿，页面层不需要改动，只需改这里。
+ * 数据获取策略（单一变化点，页面层不关心数据从哪来）：
  *
+ * 1. 工作数据集 `requestsStore` 初始为「localStorage 缓存 → seed.json 兜底」。
+ * 2. 应用启动（浏览器端 `loadRequests()`）尝试从 Apifox 云端 Mock 拉取
+ *    `GET {PUBLIC_MOCK_BASE_URL}/api/travel/applications`，**3 秒超时**。
+ * 3. 成功：写入 localStorage 缓存，替换工作数据集。
+ * 4. 超时 / 失败：回退到 localStorage 缓存，再不行用 seed.json。
+ *
+ * 写操作（新建 / 流转）目前只落到 `requestsStore` + localStorage，不回写 Mock。
  * 注意返回的是引用共享的数组，调用方若需要不可变语义请自行浅拷贝。
  */
+const STORAGE_KEY = 'travel-requests';
 
-/** 全部申请单（已按更新时间倒序，与 seed.json 内顺序一致） */
+function readStorage(): TravelRequest[] | null {
+	if (typeof localStorage === 'undefined') return null;
+	try {
+		const raw = localStorage.getItem(STORAGE_KEY);
+		return raw ? (JSON.parse(raw) as TravelRequest[]) : null;
+	} catch {
+		return null;
+	}
+}
+
+function writeStorage(list: TravelRequest[]): void {
+	if (typeof localStorage === 'undefined') return;
+	try {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+	} catch {
+		// 隐私模式 / 配额满：忽略，下次从远端或 seed 取
+	}
+}
+
+/** 工作数据集：随加载结果变化，页面通过 store 订阅自动更新 */
+export const requestsStore = writable<TravelRequest[]>(readStorage() ?? (seed as TravelRequest[]));
+
+function byUpdatedDesc(a: TravelRequest, b: TravelRequest): number {
+	return b.updatedAt.localeCompare(a.updatedAt);
+}
+
+/** 启动加载：Apifox Mock → localStorage 缓存 → seed.json 兜底 */
+export async function loadRequests(): Promise<void> {
+	const base = PUBLIC_MOCK_BASE_URL;
+	if (!base) {
+		requestsStore.set(readStorage() ?? (seed as TravelRequest[]));
+		return;
+	}
+
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), 3000);
+	try {
+		const res = await fetch(`${base}/api/travel/applications`, { signal: controller.signal });
+		if (!res.ok) throw new Error(`Mock 接口返回 ${res.status}`);
+		const data = (await res.json()) as TravelRequest[];
+		const sorted = [...data].sort(byUpdatedDesc);
+		writeStorage(sorted);
+		requestsStore.set(sorted);
+	} catch {
+		// 超时（AbortError）或网络错误：降级到缓存 / seed，保证页面永远有数据
+		requestsStore.set(readStorage() ?? (seed as TravelRequest[]));
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
+/** 全部申请单（按更新时间倒序，与 Mock 响应约定一致） */
 export function getAllRequests(): readonly TravelRequest[] {
-	return seed as TravelRequest[];
+	return get(requestsStore);
 }
 
 /** 某用户发起的全部申请（我的申请 / 待我审批都从这里再按角色筛） */
-export function getRequestsByApplicant(applicantId: UserId): TravelRequest[] {
-	return (seed as TravelRequest[]).filter((r) => r.applicantId === applicantId);
+export function getRequestsByApplicant(
+	applicantId: UserId,
+	requests: readonly TravelRequest[] = get(requestsStore)
+): TravelRequest[] {
+	return requests.filter((r) => r.applicantId === applicantId);
 }
 
 /**

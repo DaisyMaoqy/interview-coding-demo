@@ -9,9 +9,9 @@
 	let { value = $bindable(), placeholder = '', ariaLabel = '搜索' }: Props = $props();
 </script>
 
-<div class="relative">
+<div class="search-input">
 	<svg
-		class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+		class="search-input__icon"
 		viewBox="0 0 20 20"
 		fill="none"
 		stroke="currentColor"
@@ -26,8 +26,6 @@
 		bind:value
 		{placeholder}
 		aria-label={ariaLabel}
-		class="h-9 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-9 text-sm
-		       text-slate-800 placeholder:text-slate-400 focus-visible:border-brand-500
-		       focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-64"
+		class="search-input__field"
 	/>
 </div>

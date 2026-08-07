@@ -1,0 +1,21 @@
+/*
+ * 基础样式（全局）
+ * 全局 reset / 排版默认值 / 统一的键盘聚焦环。仅放「全站通用」的规则，
+ * 组件级样式不在此处（布局组件见 components.css，业务组件见各组件内部）。
+ */
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		/* 数字等宽，金额 / 天数在表格中对齐 */
+		font-variant-numeric: tabular-nums;
+	}
+
+	body {
+		@apply bg-slate-50 text-slate-900 antialiased;
+	}
+
+	/* 统一键盘可达性：全站聚焦环 */
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-brand-600;
+	}
+}

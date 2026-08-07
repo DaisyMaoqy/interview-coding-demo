@@ -13,13 +13,13 @@
 	let { title, description, action }: Props = $props();
 </script>
 
-<div class="rounded-card border border-dashed border-slate-300 bg-white p-10 text-center">
-	<p class="text-sm font-medium text-slate-700">{title}</p>
+<div class="empty-state">
+	<p class="empty-state__title">{title}</p>
 	{#if description}
-		<p class="mt-1 text-sm text-slate-500">{description}</p>
+		<p class="empty-state__description">{description}</p>
 	{/if}
 	{#if action}
-		<div class="mt-3">
+		<div class="empty-state__action">
 			{@render action()}
 		</div>
 	{/if}

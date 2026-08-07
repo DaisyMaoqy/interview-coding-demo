@@ -12,6 +12,7 @@
 		filterByDate,
 		filterByStatus,
 		getRequestsByApplicant,
+		requestsStore,
 		searchRequests,
 		type StatusFilter
 	} from '$lib/data/requests';
@@ -37,8 +38,9 @@
 	/** 搜索行（年/月/关键字）默认收起，点过滤器图标展开/收起 */
 	let showFilters = $state(false);
 
-	// 切角色即切登录人，依赖 identity.user（读取响应式的 role）会自动重算
-	const mine = $derived(getRequestsByApplicant(identity.user.id));
+	// 切角色即切登录人，依赖 identity.user（读取响应式的 role）会自动重算；
+	// 传入 $requestsStore（响应式）让列表随远端加载 / 缓存回退自动刷新
+	const mine = $derived(getRequestsByApplicant(identity.user.id, $requestsStore));
 	const years = $derived(distinctYears(mine));
 	// 三个维度正交：状态 → 年/月 → 关键字，叠加生效
 	const visible = $derived(

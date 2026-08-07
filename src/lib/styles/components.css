@@ -1,0 +1,178 @@
+/*
+ * 通用组件样式（BEM，全局集中管理）
+ *
+ * 约定：block 用中划线（page-header），元素用双下划线（page-header__title），
+ * 修饰态用双连字符（filter-tabs__tab--active）。标记只保留 BEM 类名。
+ *
+ * 范围：布局组件 + 通用（复用）组件。业务组件（request/）的样式放在组件内部
+ * 的 scoped <style>，不在此处定义。
+ *
+ * 每个 block 上方标注它对应的组件文件，便于定位。
+ */
+@layer components {
+	/* ===== PageHeader（src/lib/components/layout/PageHeader.svelte） ===== */
+	.page-header {
+		@apply mb-6 flex items-start justify-between gap-4;
+	}
+	.page-header__heading {
+		@apply flex min-w-0 flex-col;
+	}
+	.page-header__title {
+		@apply text-xl font-semibold tracking-tight text-slate-900;
+	}
+	.page-header__description {
+		@apply mt-1 text-sm text-slate-500;
+	}
+	.page-header__actions {
+		@apply flex shrink-0 items-center gap-2;
+	}
+
+	/* ===== PagePlaceholder（src/lib/components/layout/PagePlaceholder.svelte） ===== */
+	.page-placeholder {
+		@apply rounded-card border border-dashed border-slate-300 bg-white p-8;
+	}
+	.page-placeholder__title {
+		@apply text-sm font-medium text-slate-500;
+	}
+	.page-placeholder__list {
+		@apply mt-3 space-y-1.5;
+	}
+	.page-placeholder__item {
+		@apply flex gap-2 text-sm text-slate-600;
+	}
+	.page-placeholder__bullet {
+		@apply text-slate-300;
+	}
+
+	/* ===== IdentitySwitcher（src/lib/components/layout/IdentitySwitcher.svelte） ===== */
+	.identity-switcher {
+		@apply flex items-center gap-3;
+	}
+	.identity-switcher__user {
+		@apply hidden text-right sm:block;
+	}
+	.identity-switcher__name {
+		@apply text-sm font-medium text-slate-800;
+	}
+	.identity-switcher__meta {
+		@apply text-xs text-slate-500;
+	}
+	.identity-switcher__switch {
+		@apply flex gap-0.5 rounded-lg bg-slate-100 p-0.5;
+	}
+	.identity-switcher__option {
+		@apply rounded-md px-3 py-1.5 text-sm text-slate-500 transition-colors hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+	}
+	.identity-switcher__option--active {
+		@apply bg-white font-medium text-slate-900 shadow-sm;
+	}
+
+	/* ===== SideNav（src/lib/components/layout/SideNav.svelte） ===== */
+	.side-nav {
+		@apply flex h-full flex-col gap-6 px-3 py-4;
+	}
+	.side-nav__brand {
+		@apply flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+	}
+	.side-nav__brand-mark {
+		@apply grid size-8 place-items-center rounded-lg bg-brand-600 text-sm font-semibold text-white;
+	}
+	.side-nav__brand-name {
+		@apply text-[15px] font-semibold tracking-tight text-slate-800;
+	}
+	.side-nav__section {
+		@apply flex flex-col gap-1;
+	}
+	.side-nav__section-title {
+		@apply px-2 pb-1 text-xs font-medium tracking-wider text-slate-400;
+	}
+	.side-nav__link {
+		@apply flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+	}
+	.side-nav__link--active {
+		@apply bg-brand-50 font-medium text-brand-700;
+	}
+
+	/* ===== NavIcon（src/lib/components/layout/NavIcon.svelte） ===== */
+	.nav-icon {
+		@apply size-5 shrink-0;
+	}
+
+	/* ===== AppLayout（src/routes/+layout.svelte） ===== */
+	.app-layout {
+		@apply flex min-h-screen;
+	}
+	.app-layout__sidebar {
+		@apply hidden w-56 shrink-0 border-r border-slate-200 bg-white md:block;
+	}
+	.app-layout__sidebar-inner {
+		@apply sticky top-0 h-screen overflow-y-auto;
+	}
+	.app-layout__main-col {
+		@apply flex min-w-0 flex-1 flex-col;
+	}
+	.app-layout__header {
+		@apply sticky top-0 z-10 flex h-14 items-center justify-end gap-4 border-b border-slate-200 bg-white/80 px-6 backdrop-blur;
+	}
+	.app-layout__main {
+		@apply flex-1 px-6 py-6;
+	}
+	.app-layout__skip-link {
+		@apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-card;
+	}
+
+	/* ===== SearchInput（src/lib/components/common/SearchInput.svelte） ===== */
+	.search-input {
+		@apply relative;
+	}
+	.search-input__icon {
+		@apply pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400;
+	}
+	.search-input__field {
+		@apply h-9 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-9 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:border-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-64;
+	}
+
+	/* ===== FilterTabs（src/lib/components/common/FilterTabs.svelte） ===== */
+	.filter-tabs {
+		@apply flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1;
+	}
+	.filter-tabs__tab {
+		@apply rounded-md px-3 py-1.5 text-sm text-slate-500 transition-colors hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+	}
+	.filter-tabs__tab--active {
+		@apply bg-white font-medium text-slate-900 shadow-sm;
+	}
+	.filter-tabs__count {
+		@apply ml-1 text-xs text-slate-400;
+	}
+
+	/* ===== UnitSelect（src/lib/components/common/UnitSelect.svelte） ===== */
+	.unit-select {
+		@apply flex h-9 items-center gap-1.5 rounded-lg border-0 bg-slate-100 px-2.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand-500;
+	}
+	.unit-select__field {
+		@apply h-full w-auto border-0 bg-transparent text-sm text-slate-800 outline-none focus-visible:text-brand-600;
+	}
+	.unit-select__unit {
+		@apply text-xs text-slate-400;
+	}
+
+	/* ===== EmptyState（src/lib/components/common/EmptyState.svelte） ===== */
+	.empty-state {
+		@apply rounded-card border border-dashed border-slate-300 bg-white p-10 text-center;
+	}
+	.empty-state__title {
+		@apply text-sm font-medium text-slate-700;
+	}
+	.empty-state__description {
+		@apply mt-1 text-sm text-slate-500;
+	}
+	.empty-state__action {
+		@apply mt-3;
+	}
+
+	/* ===== HighlightText（src/lib/components/common/HighlightText.svelte） ===== */
+	.highlight-text__mark {
+		@apply rounded bg-brand-100 px-0.5 font-medium text-brand-700;
+	}
+}

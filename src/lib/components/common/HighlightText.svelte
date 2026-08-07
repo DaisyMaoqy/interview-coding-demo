@@ -42,7 +42,7 @@
 
 {#each parts as part, i (i)}
 	{#if part.hit}
-		<span class="rounded bg-brand-100 px-0.5 font-medium text-brand-700">{part.text}</span>
+		<span class="highlight-text__mark">{part.text}</span>
 	{:else}
 		{part.text}
 	{/if}
