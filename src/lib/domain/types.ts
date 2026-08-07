@@ -7,6 +7,13 @@
  *    时间戳则用完整 ISO 字符串。
  */
 
+/**
+ * 用户主键，UUID。
+ *
+ * 用 UUID 而非自增数字：主键不该携带业务含义，
+ * ID 不能动，一旦被引用（申请单、审批留痕）就改不动了。
+ * 对外展示工号 `employeeId`。
+ */
 export type UserId = string;
 
 /** 角色决定能看到哪些导航与页面，不决定身份 —— 切角色即切当前登录人 */
@@ -14,12 +21,14 @@ export type Role = 'employee' | 'manager';
 
 export interface User {
 	id: UserId;
+	/** 工号，对外展示与人工检索用，例如「EMP10086」 */
+	employeeId: string;
 	name: string;
-	/** 职位，用于身份卡片展示，例如「软件工程师」 */
+	/** 职位，例如「软件工程师」 */
 	title: string;
 	department: string;
 	role: Role;
-	/** 直属主管；主管本人为 null */
+	/** 直属主管的 `User.id`（UUID）；本人即最高层级时为 null */
 	managerId: UserId | null;
 }
 

@@ -45,6 +45,39 @@ npm run dev
 
 ## 关键设计
 
+### 路由划分为两个业务入口
+
+```
+/travel                     差旅申请（业务入口，重定向到「我的申请」）
+├── /travel/requests        我的申请
+│   └── /:id                申请详情
+├── /travel/approvals       待我审批（仅主管可见）
+└── /travel/apply           发起申请（重定向到向导首步）
+    └── /:step              basic | trips | budget | preview
+
+/reports                    统计看板
+```
+
+差旅相关页面全部收敛到 `/travel` 下，统计独立为 `/reports`。
+入口之下用**平铺的顶级路由**区分三个核心页面，而不是继续嵌套 ——
+「我的申请」「待我审批」「发起申请」职责彼此独立，平铺让每个页面
+只对自己负责，也便于按角色逐项做权限控制。
+
+这样划分的收益是可扩展：未来接入第二条业务线（如报销），
+与 `/travel` 平级新增即可，既有路径无需改动。
+
+路径统一由 SvelteKit 的 `resolve()` 生成，它接受 route ID 并做类型检查，
+路由拼错或缺少参数在编译期就会报错 —— 比自行维护一份路径常量更可靠。
+
+### 统一的左侧导航
+
+导航结构定义在 `src/lib/components/layout/navigation.ts`，
+每个菜单项声明自己对哪些角色可见，过滤逻辑集中在 `visibleSections()` 一处，
+而不是在模板里散落 `{#if role === 'manager'}`。
+
+选中态用前缀匹配，详情页 `/travel/requests/TR-0001` 也会让「我的申请」保持高亮；
+匹配时要求下一个字符是 `/`，避免 `/travel/requests-archive` 这类兄弟路径被误点亮。
+
 ### 切角色即切身份
 
 演示提供两个身份：**张三**（工程师）与**李经理**（研发部主管），
@@ -53,6 +86,9 @@ npm run dev
 
 李经理本人也可以提交申请。由于他是系统中唯一的审批人，其申请只会停留在
 待审批状态（等待更上级处理），不会出现在他自己的待办列表中。
+
+身份状态用 Svelte context 持有而非模块级 `$state` —— 模块级状态在 SSR 下
+由所有请求共享，会造成用户之间串号；context 的生命周期跟随组件树，每个请求各自独立。
 
 ### 校验规则的唯一真相
 
@@ -94,15 +130,20 @@ npm run dev
 ```
 src/
 ├── lib/
-│   ├── domain/       领域层：类型、状态机、校验 schema、金额与聚合（纯函数，无 UI 依赖）
-│   ├── data/         数据层：远程读取、离线兜底、localStorage 仓储
-│   ├── state/        客户端状态：当前身份、草稿
-│   └── components/   ui / form / request / wizard / chart
+│   ├── domain/         领域层：类型、状态机、校验 schema、金额与聚合（纯函数，无 UI 依赖）
+│   ├── data/           数据层：远程读取、离线兜底、localStorage 仓储
+│   ├── state/          客户端状态：当前身份、草稿
+│   ├── components/
+│   │   ├── layout/     全局壳：侧栏导航、身份切换、页头
+│   │   └── ui/ form/ request/ wizard/ chart/
+│   ├── vitest/         单元测试，目录结构镜像被测源码
+│   └── routes.ts       落地页常量
 └── routes/
-    ├── requests/     我的申请：列表与详情
-    ├── apply/        新建向导
-    ├── approvals/    待我审批
-    └── reports/      统计报表
+    ├── travel/         差旅业务入口
+    │   ├── requests/   我的申请：列表与详情
+    │   ├── approvals/  待我审批
+    │   └── apply/      新建向导
+    └── reports/        统计看板
 ```
 
 ## 测试
@@ -111,6 +152,10 @@ src/
 
 - **领域逻辑** —— 状态流转矩阵、校验规则边界、金额精度、数据聚合
 - **组件** —— 渲染输出、交互行为、状态驱动的差异
+
+测试文件放在 `src/lib/vitest/` 下，目录结构镜像被测源码
+（`domain/money.ts` → `vitest/domain/money.test.ts`），
+测试与实现分离，源码目录保持干净。
 
 ```sh
 npm test

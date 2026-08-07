@@ -125,13 +125,9 @@ yuanToCents(19.99); // 1999，而非浮点直乘得到的 1998.9999999999998
 
 ## 三、状态机校验
 
-```
-draft ──submit──▶ pending_manager ──approve──▶ pending_finance ──approve──▶ approved
-                       │                              │
-                       ├──reject──▶ rejected ◀─reject─┤
-                       └──cancel──▶ cancelled ◀─cancel┘
-
-rejected ──reedit──▶ draft
+```html
+draft ──submit──▶ pending_manager ──approve──▶ pending_finance ──approve──▶ approved │ │
+├──reject──▶ rejected ◀─reject─┤ └──cancel──▶ cancelled ◀─cancel┘ rejected ──reedit──▶ draft
 ```
 
 每次流转依次通过三道关卡，任一不过即返回失败：

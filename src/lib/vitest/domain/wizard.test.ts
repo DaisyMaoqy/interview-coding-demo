@@ -75,15 +75,17 @@ describe('stepIndex', () => {
 
 describe('stepHref', () => {
 	it('生成步骤地址', () => {
-		expect(stepHref('trips')).toBe('/apply/trips');
+		expect(stepHref('trips')).toBe('/travel/apply/trips');
 	});
 
 	it('带 focus 参数用于预览页跳回并定位字段', () => {
-		expect(stepHrefWithFocus('trips', 'leg-1')).toBe('/apply/trips?focus=leg-1');
+		expect(stepHrefWithFocus('trips', 'leg-1')).toBe('/travel/apply/trips?focus=leg-1');
 	});
 
 	it('对 focus 做 URL 编码', () => {
-		expect(stepHrefWithFocus('budget', 'budget.hotel')).toBe('/apply/budget?focus=budget.hotel');
+		expect(stepHrefWithFocus('budget', 'budget.hotel')).toBe(
+			'/travel/apply/budget?focus=budget.hotel'
+		);
 	});
 });
 

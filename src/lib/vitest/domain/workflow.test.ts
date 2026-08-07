@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { requireUser } from '../../domain/org';
+import { EMPLOYEE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
 import type { AuditAction, RequestStatus, TravelRequest } from '../../domain/types';
 import { availableActions, isDeletable, isEditable, transition } from '../../domain/workflow';
 
-const zhangsan = requireUser('u-zhangsan');
-const wangfang = requireUser('u-wangfang');
-const lijingli = requireUser('u-lijingli');
+const zhangsan = requireUser(EMPLOYEE_ID);
+const lijingli = requireUser(MANAGER_ID);
+const wangfang = USERS.find((u) => u.name === '王芳')!;
 
 const NOW = new Date('2026-03-10T02:00:00.000Z');
 

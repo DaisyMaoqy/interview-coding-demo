@@ -1,7 +1,7 @@
 [
 	{
 		"id": "TR-0040",
-		"applicantId": "u-lijingli",
+		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
 		"reason": "对接分公司完成需求调研",
@@ -37,7 +37,7 @@
 			{
 				"id": "TR-0040-audit-1",
 				"at": "2026-08-19T14:57:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
 				"from": "draft",
@@ -48,7 +48,7 @@
 	},
 	{
 		"id": "TR-0039",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -76,7 +76,7 @@
 			{
 				"id": "TR-0039-audit-1",
 				"at": "2026-08-09T12:36:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -85,7 +85,7 @@
 			{
 				"id": "TR-0039-audit-2",
 				"at": "2026-08-11T08:36:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "cancel",
 				"from": "pending_manager",
@@ -96,7 +96,7 @@
 	},
 	{
 		"id": "TR-0038",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "新签客户的实施方案交付培训",
@@ -132,7 +132,7 @@
 			{
 				"id": "TR-0038-audit-1",
 				"at": "2026-08-05T22:29:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -141,7 +141,7 @@
 			{
 				"id": "TR-0038-audit-2",
 				"at": "2026-08-07T03:29:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -150,7 +150,7 @@
 			{
 				"id": "TR-0038-audit-3",
 				"at": "2026-08-09T01:29:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -161,7 +161,7 @@
 	},
 	{
 		"id": "TR-0037",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -197,7 +197,7 @@
 	},
 	{
 		"id": "TR-0036",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "新签客户的实施方案交付培训",
@@ -225,7 +225,7 @@
 			{
 				"id": "TR-0036-audit-1",
 				"at": "2026-08-01T15:30:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -236,7 +236,7 @@
 	},
 	{
 		"id": "TR-0035",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "新签客户的实施方案交付培训",
@@ -272,7 +272,7 @@
 			{
 				"id": "TR-0035-audit-1",
 				"at": "2026-07-23T04:15:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -281,7 +281,7 @@
 			{
 				"id": "TR-0035-audit-2",
 				"at": "2026-07-24T23:15:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -291,7 +291,7 @@
 			{
 				"id": "TR-0035-audit-3",
 				"at": "2026-07-27T11:15:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -302,7 +302,7 @@
 	},
 	{
 		"id": "TR-0034",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -330,7 +330,7 @@
 			{
 				"id": "TR-0034-audit-1",
 				"at": "2026-07-21T03:00:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -339,7 +339,7 @@
 			{
 				"id": "TR-0034-audit-2",
 				"at": "2026-07-22T01:00:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
@@ -351,7 +351,7 @@
 	},
 	{
 		"id": "TR-0033",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "赴客户现场进行系统上线支持",
@@ -379,7 +379,7 @@
 			{
 				"id": "TR-0033-audit-1",
 				"at": "2026-07-08T18:49:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -390,7 +390,7 @@
 	},
 	{
 		"id": "TR-0032",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -427,7 +427,7 @@
 			{
 				"id": "TR-0032-audit-1",
 				"at": "2026-06-11T06:28:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
 				"from": "draft",
@@ -436,7 +436,7 @@
 			{
 				"id": "TR-0032-audit-2",
 				"at": "2026-06-12T20:28:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
@@ -448,7 +448,7 @@
 	},
 	{
 		"id": "TR-0031",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "参加年度技术大会并做主题分享",
@@ -476,7 +476,7 @@
 			{
 				"id": "TR-0031-audit-1",
 				"at": "2026-06-10T17:04:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
 				"from": "draft",
@@ -485,7 +485,7 @@
 			{
 				"id": "TR-0031-audit-2",
 				"at": "2026-06-11T04:04:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "cancel",
 				"from": "pending_manager",
@@ -496,7 +496,7 @@
 	},
 	{
 		"id": "TR-0030",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -532,7 +532,7 @@
 			{
 				"id": "TR-0030-audit-1",
 				"at": "2026-05-26T20:58:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -541,7 +541,7 @@
 			{
 				"id": "TR-0030-audit-2",
 				"at": "2026-05-27T23:58:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -550,7 +550,7 @@
 			{
 				"id": "TR-0030-audit-3",
 				"at": "2026-05-29T13:58:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -561,7 +561,7 @@
 	},
 	{
 		"id": "TR-0029",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "参加年度技术大会并做主题分享",
@@ -589,7 +589,7 @@
 			{
 				"id": "TR-0029-audit-1",
 				"at": "2026-05-23T15:37:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -600,7 +600,7 @@
 	},
 	{
 		"id": "TR-0028",
-		"applicantId": "u-lijingli",
+		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -628,7 +628,7 @@
 	},
 	{
 		"id": "TR-0027",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -664,7 +664,7 @@
 			{
 				"id": "TR-0027-audit-1",
 				"at": "2026-05-06T09:00:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -675,7 +675,7 @@
 	},
 	{
 		"id": "TR-0026",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "参与合作伙伴季度业务复盘会议",
@@ -703,7 +703,7 @@
 			{
 				"id": "TR-0026-audit-1",
 				"at": "2026-04-19T06:28:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -712,7 +712,7 @@
 			{
 				"id": "TR-0026-audit-2",
 				"at": "2026-04-21T09:28:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -724,7 +724,7 @@
 	},
 	{
 		"id": "TR-0025",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "赴客户现场进行系统上线支持",
@@ -752,7 +752,7 @@
 			{
 				"id": "TR-0025-audit-1",
 				"at": "2026-04-07T06:46:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -761,7 +761,7 @@
 			{
 				"id": "TR-0025-audit-2",
 				"at": "2026-04-09T03:46:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -770,7 +770,7 @@
 			{
 				"id": "TR-0025-audit-3",
 				"at": "2026-04-12T04:46:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -781,7 +781,7 @@
 	},
 	{
 		"id": "TR-0024",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -809,7 +809,7 @@
 			{
 				"id": "TR-0024-audit-1",
 				"at": "2026-04-02T23:35:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -820,7 +820,7 @@
 	},
 	{
 		"id": "TR-0023",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "对接分公司完成需求调研",
@@ -848,7 +848,7 @@
 			{
 				"id": "TR-0023-audit-1",
 				"at": "2026-03-13T01:45:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -857,7 +857,7 @@
 			{
 				"id": "TR-0023-audit-2",
 				"at": "2026-03-13T21:45:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -868,7 +868,7 @@
 	},
 	{
 		"id": "TR-0022",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "参与合作伙伴季度业务复盘会议",
@@ -896,7 +896,7 @@
 			{
 				"id": "TR-0022-audit-1",
 				"at": "2026-03-06T01:36:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -905,7 +905,7 @@
 			{
 				"id": "TR-0022-audit-2",
 				"at": "2026-03-06T21:36:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -914,7 +914,7 @@
 			{
 				"id": "TR-0022-audit-3",
 				"at": "2026-03-08T01:36:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_finance",
@@ -926,7 +926,7 @@
 	},
 	{
 		"id": "TR-0021",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "新签客户的实施方案交付培训",
@@ -954,7 +954,7 @@
 	},
 	{
 		"id": "TR-0020",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -982,7 +982,7 @@
 			{
 				"id": "TR-0020-audit-1",
 				"at": "2026-02-07T22:00:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
 				"from": "draft",
@@ -991,7 +991,7 @@
 			{
 				"id": "TR-0020-audit-2",
 				"at": "2026-02-08T19:00:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1000,7 +1000,7 @@
 			{
 				"id": "TR-0020-audit-3",
 				"at": "2026-02-09T23:00:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1011,7 +1011,7 @@
 	},
 	{
 		"id": "TR-0019",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "对接分公司完成需求调研",
@@ -1047,7 +1047,7 @@
 	},
 	{
 		"id": "TR-0017",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "参加年度技术大会并做主题分享",
@@ -1075,7 +1075,7 @@
 			{
 				"id": "TR-0017-audit-1",
 				"at": "2026-02-02T15:46:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
 				"from": "draft",
@@ -1084,7 +1084,7 @@
 			{
 				"id": "TR-0017-audit-2",
 				"at": "2026-02-04T04:46:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
@@ -1096,7 +1096,7 @@
 	},
 	{
 		"id": "TR-0018",
-		"applicantId": "u-lijingli",
+		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -1133,7 +1133,7 @@
 			{
 				"id": "TR-0018-audit-1",
 				"at": "2026-02-03T15:24:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
 				"from": "draft",
@@ -1144,7 +1144,7 @@
 	},
 	{
 		"id": "TR-0016",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -1172,7 +1172,7 @@
 			{
 				"id": "TR-0016-audit-1",
 				"at": "2026-01-18T16:39:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1183,7 +1183,7 @@
 	},
 	{
 		"id": "TR-0015",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -1219,7 +1219,7 @@
 			{
 				"id": "TR-0015-audit-1",
 				"at": "2026-01-08T11:34:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1228,7 +1228,7 @@
 			{
 				"id": "TR-0015-audit-2",
 				"at": "2026-01-10T00:34:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1237,7 +1237,7 @@
 			{
 				"id": "TR-0015-audit-3",
 				"at": "2026-01-11T21:34:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1248,7 +1248,7 @@
 	},
 	{
 		"id": "TR-0014",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "对接分公司完成需求调研",
@@ -1276,7 +1276,7 @@
 			{
 				"id": "TR-0014-audit-1",
 				"at": "2026-01-04T05:22:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1285,7 +1285,7 @@
 			{
 				"id": "TR-0014-audit-2",
 				"at": "2026-01-06T02:22:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1295,7 +1295,7 @@
 			{
 				"id": "TR-0014-audit-3",
 				"at": "2026-01-09T01:22:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1306,7 +1306,7 @@
 	},
 	{
 		"id": "TR-0013",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -1343,7 +1343,7 @@
 			{
 				"id": "TR-0013-audit-1",
 				"at": "2025-12-21T12:45:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -1352,7 +1352,7 @@
 			{
 				"id": "TR-0013-audit-2",
 				"at": "2025-12-23T13:45:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1361,7 +1361,7 @@
 			{
 				"id": "TR-0013-audit-3",
 				"at": "2025-12-26T02:45:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1372,7 +1372,7 @@
 	},
 	{
 		"id": "TR-0011",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "赴客户现场进行系统上线支持",
@@ -1400,7 +1400,7 @@
 			{
 				"id": "TR-0011-audit-1",
 				"at": "2025-12-09T02:20:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -1409,7 +1409,7 @@
 			{
 				"id": "TR-0011-audit-2",
 				"at": "2025-12-10T19:20:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1419,7 +1419,7 @@
 			{
 				"id": "TR-0011-audit-3",
 				"at": "2025-12-13T03:20:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1430,7 +1430,7 @@
 	},
 	{
 		"id": "TR-0012",
-		"applicantId": "u-zhangsan",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -1458,7 +1458,7 @@
 			{
 				"id": "TR-0012-audit-1",
 				"at": "2025-12-10T20:46:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
 				"from": "draft",
@@ -1467,7 +1467,7 @@
 			{
 				"id": "TR-0012-audit-2",
 				"at": "2025-12-11T04:46:00.000Z",
-				"actorId": "u-zhangsan",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "cancel",
 				"from": "pending_manager",
@@ -1478,7 +1478,7 @@
 	},
 	{
 		"id": "TR-0010",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -1514,7 +1514,7 @@
 			{
 				"id": "TR-0010-audit-1",
 				"at": "2025-11-22T19:29:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -1523,7 +1523,7 @@
 			{
 				"id": "TR-0010-audit-2",
 				"at": "2025-11-23T19:29:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1532,7 +1532,7 @@
 			{
 				"id": "TR-0010-audit-3",
 				"at": "2025-11-25T02:29:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1543,7 +1543,7 @@
 	},
 	{
 		"id": "TR-0009",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "参与合作伙伴季度业务复盘会议",
@@ -1571,7 +1571,7 @@
 			{
 				"id": "TR-0009-audit-1",
 				"at": "2025-11-17T16:16:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -1580,7 +1580,7 @@
 			{
 				"id": "TR-0009-audit-2",
 				"at": "2025-11-18T20:16:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1590,7 +1590,7 @@
 			{
 				"id": "TR-0009-audit-3",
 				"at": "2025-11-21T05:16:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",
@@ -1601,7 +1601,7 @@
 	},
 	{
 		"id": "TR-0008",
-		"applicantId": "u-wangfang",
+		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -1637,7 +1637,7 @@
 			{
 				"id": "TR-0008-audit-1",
 				"at": "2025-11-14T01:44:00.000Z",
-				"actorId": "u-wangfang",
+				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
 				"from": "draft",
@@ -1646,7 +1646,7 @@
 			{
 				"id": "TR-0008-audit-2",
 				"at": "2025-11-15T08:44:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1657,7 +1657,7 @@
 	},
 	{
 		"id": "TR-0007",
-		"applicantId": "u-lijingli",
+		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
 		"reason": "对接分公司完成需求调研",
@@ -1685,7 +1685,7 @@
 			{
 				"id": "TR-0007-audit-1",
 				"at": "2025-11-10T19:34:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
 				"from": "draft",
@@ -1694,7 +1694,7 @@
 			{
 				"id": "TR-0007-audit-2",
 				"at": "2025-11-12T03:34:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "cancel",
 				"from": "pending_manager",
@@ -1705,7 +1705,7 @@
 	},
 	{
 		"id": "TR-0006",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -1733,7 +1733,7 @@
 	},
 	{
 		"id": "TR-0005",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "参与合作伙伴季度业务复盘会议",
@@ -1761,7 +1761,7 @@
 	},
 	{
 		"id": "TR-0004",
-		"applicantId": "u-chenjing",
+		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -1789,7 +1789,7 @@
 			{
 				"id": "TR-0004-audit-1",
 				"at": "2025-10-01T20:46:00.000Z",
-				"actorId": "u-chenjing",
+				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
 				"from": "draft",
@@ -1798,7 +1798,7 @@
 			{
 				"id": "TR-0004-audit-2",
 				"at": "2025-10-02T10:46:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1809,7 +1809,7 @@
 	},
 	{
 		"id": "TR-0003",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "参加行业展会并考察竞品方案",
@@ -1837,7 +1837,7 @@
 			{
 				"id": "TR-0003-audit-1",
 				"at": "2025-09-27T06:58:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1846,7 +1846,7 @@
 			{
 				"id": "TR-0003-audit-2",
 				"at": "2025-09-28T23:58:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
@@ -1858,7 +1858,7 @@
 	},
 	{
 		"id": "TR-0002",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "现场排查生产环境性能问题",
@@ -1887,7 +1887,7 @@
 			{
 				"id": "TR-0002-audit-1",
 				"at": "2025-09-19T16:14:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1898,7 +1898,7 @@
 	},
 	{
 		"id": "TR-0001",
-		"applicantId": "u-liuyang",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
 		"reason": "配合审计部门完成现场资料核查",
@@ -1926,7 +1926,7 @@
 			{
 				"id": "TR-0001-audit-1",
 				"at": "2025-09-01T14:06:00.000Z",
-				"actorId": "u-liuyang",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
@@ -1935,7 +1935,7 @@
 			{
 				"id": "TR-0001-audit-2",
 				"at": "2025-09-02T16:06:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
@@ -1945,7 +1945,7 @@
 			{
 				"id": "TR-0001-audit-3",
 				"at": "2025-09-04T06:06:00.000Z",
-				"actorId": "u-lijingli",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_finance",

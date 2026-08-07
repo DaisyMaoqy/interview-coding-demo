@@ -1,3 +1,4 @@
+import { resolve } from '$app/paths';
 import type { z } from 'zod';
 import { basicSchema, budgetSchema, tripsSchema } from './schema';
 
@@ -50,7 +51,7 @@ export function nextStep(slug: WizardSlug): WizardSlug | null {
 }
 
 export function stepHref(slug: WizardSlug): string {
-	return `/apply/${slug}`;
+	return resolve('/travel/apply/[step]', { step: slug });
 }
 
 /**

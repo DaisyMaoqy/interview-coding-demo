@@ -5,42 +5,54 @@ import type { Role, User, UserId } from './types';
  *
  * 这是演示用的固定编制，不随业务流转变化，因此作为本地常量而非远程数据 ——
  * 远程只提供会变的申请单列表（GET /api/travel/applications）。
+ *
+ * 主键用 UUID 且写死而非运行时 `randomUUID()` 生成：seed.json 里的
+ * `applicantId` 引用了这些值，每次启动都换一批 ID 会让存量数据全部失联。
  */
+
+/** 主管的 UUID。单独提出来是因为下面每位员工的 managerId 都要引用它 */
+const LI_JINGLI_ID = '0841d235-b926-4a41-aecd-3c5de814bd68'; // 新员工的id用randomUUID()
+
 export const USERS = [
 	{
-		id: 'u-zhangsan',
+		id: 'e61fe483-3b09-4e05-b4fe-dde3bc2a8694',
+		employeeId: 'EMP10086',
 		name: '张三',
 		title: '软件工程师',
 		department: '研发部',
 		role: 'employee',
-		managerId: 'u-lijingli'
+		managerId: LI_JINGLI_ID
 	},
 	{
-		id: 'u-wangfang',
+		id: '5170a4c5-20dc-4d18-91a9-95ba9786e3f0',
+		employeeId: 'EMP10087',
 		name: '王芳',
 		title: '高级软件工程师',
 		department: '研发部',
 		role: 'employee',
-		managerId: 'u-lijingli'
+		managerId: LI_JINGLI_ID
 	},
 	{
-		id: 'u-liuyang',
+		id: '0fc31634-c8ac-482a-8b95-4df36fdbf571',
+		employeeId: 'EMP10088',
 		name: '刘洋',
 		title: '测试工程师',
 		department: '研发部',
 		role: 'employee',
-		managerId: 'u-lijingli'
+		managerId: LI_JINGLI_ID
 	},
 	{
-		id: 'u-chenjing',
+		id: 'ba778d9f-8224-4de3-bbaa-05ca9cbcc679',
+		employeeId: 'EMP10089',
 		name: '陈静',
 		title: '产品经理',
 		department: '研发部',
 		role: 'employee',
-		managerId: 'u-lijingli'
+		managerId: LI_JINGLI_ID
 	},
 	{
-		id: 'u-lijingli',
+		id: LI_JINGLI_ID,
+		employeeId: 'EMP10001',
 		name: '李经理',
 		title: '研发部主管',
 		department: '研发部',
@@ -57,9 +69,9 @@ export type KnownUserId = (typeof USERS)[number]['id'];
 
 const USER_BY_ID = new Map<UserId, User>(USERS.map((u) => [u.id, u]));
 
-/** 演示的两个身份：切角色即切登录人 */
-export const EMPLOYEE_ID = 'u-zhangsan' satisfies KnownUserId;
-export const MANAGER_ID = 'u-lijingli' satisfies KnownUserId;
+/** 演示的两个身份：切角色即切登录人，员工用'张三' */
+export const EMPLOYEE_ID = 'e61fe483-3b09-4e05-b4fe-dde3bc2a8694' satisfies KnownUserId;
+export const MANAGER_ID = LI_JINGLI_ID satisfies KnownUserId;
 
 /** 角色 → 该角色对应的登录人。角色切换时用它换身份。 */
 export const IDENTITY_BY_ROLE: Record<Role, KnownUserId> = {
