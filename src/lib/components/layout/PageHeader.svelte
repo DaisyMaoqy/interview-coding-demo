@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { pageTitle } from '$lib/domain/title';
+	import { pageTitle } from '$lib/format';
 
 	interface Props {
 		title: string;

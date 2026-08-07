@@ -4,7 +4,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import IdentitySwitcher from '$lib/components/layout/IdentitySwitcher.svelte';
 	import SideNav from '$lib/components/layout/SideNav.svelte';
-	import { pageTitle } from '$lib/domain/title';
+	import { pageTitle } from '$lib/format';
 	import { provideIdentity } from '$lib/state/identity.svelte';
 	import { loadRequests } from '$lib/data/requests';
 

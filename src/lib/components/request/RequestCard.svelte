@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { summarizeLegs, requestTotal } from '$lib/data/requests';
 	import { formatYuan } from '$lib/domain/money';
+	import { formatDate } from '$lib/format';
 	import type { TravelRequest } from '$lib/domain/types';
 
 	interface Props {
@@ -13,11 +14,6 @@
 	}
 
 	let { request, keyword = '' }: Props = $props();
-
-	/** ISO → YYYY-MM-DD，仅用于列表展示 */
-	function toDate(iso: string): string {
-		return iso.slice(0, 10);
-	}
 </script>
 
 <a class="request-card" href={resolve('/travel/requests/[id]', { id: request.id })}>
@@ -28,7 +24,7 @@
 			</p>
 			<p class="request-card__meta">
 				{request.id} · <HighlightText text={summarizeLegs(request)} {keyword} /> ·
-				{toDate(request.createdAt)}
+				{formatDate(request.createdAt)}
 			</p>
 		</div>
 		<StatusBadge status={request.status} />

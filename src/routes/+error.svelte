@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { HOME } from '$lib/routes';
-	import { pageTitle } from '$lib/domain/title';
+	import { pageTitle } from '$lib/format';
 
 	const title = $derived(page.status === 404 ? '页面不存在' : '出错了');
 </script>
