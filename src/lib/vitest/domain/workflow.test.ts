@@ -358,6 +358,37 @@ describe('availableActions', () => {
 	});
 });
 
+describe('canViewRequest', () => {
+	it('申请人可查看自己的单（含草稿）', () => {
+		expect(canViewRequest(makeRequest({ status: 'draft' }), zhangsan)).toBe(true);
+	});
+
+	it('员工不能查看领导的单', () => {
+		const managerReq = makeRequest({ applicantId: MANAGER_ID, status: 'approved' });
+		expect(canViewRequest(managerReq, zhangsan)).toBe(false);
+	});
+
+	it('员工之间也不能互看', () => {
+		const others = makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' });
+		expect(canViewRequest(others, wangfang)).toBe(false);
+	});
+
+	it('经理可查看员工的非草稿单（含已审 / 已驳回）', () => {
+		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' }), lijingli)).toBe(
+			true
+		);
+		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'rejected' }), lijingli)).toBe(
+			true
+		);
+	});
+
+	it('经理不能查看员工的草稿单', () => {
+		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'draft' }), lijingli)).toBe(
+			false
+		);
+	});
+});
+
 describe('isEditable / isDeletable', () => {
 	it('本人的草稿可编辑可删除', () => {
 		const draft = makeRequest();

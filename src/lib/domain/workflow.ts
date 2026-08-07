@@ -7,6 +7,7 @@ import type {
 	Urgency,
 	User
 } from './types';
+import { findUser } from './org';
 
 /**
  * 审批状态机。
@@ -144,6 +145,24 @@ export function availableActions(request: TravelRequest, actor: User): AuditActi
 			(rule) => rule.from === request.status && canActAs(rule.actor, actor, request)
 		)
 	);
+}
+
+/**
+ * 当前用户能否查看这张申请单。
+ *
+ * 规则：
+ * - 自己的单（任意状态）一定可看；
+ * - 经理可查看**员工**的**非草稿**单（草稿仅申请人自己可见），便于主管掌握
+ *   团队差旅进展，员工的已审批 / 已驳回等也对他可见；
+ * - 其余（员工看他人或领导的单、经理看员工的草稿、经理看其他经理的单）一律不可看。
+ *
+ * 注意查看权限与操作权限（availableActions）是两回事：能看不代表能审批，
+ * 审批仍受「不能自审」等流转表规则约束。
+ */
+export function canViewRequest(request: TravelRequest, viewer: User): boolean {
+	if (request.applicantId === viewer.id) return true;
+	const applicant = findUser(request.applicantId);
+	return viewer.role === 'manager' && applicant?.role === 'employee' && request.status !== 'draft';
 }
 
 /** 是否可编辑内容：只有草稿可改 */
