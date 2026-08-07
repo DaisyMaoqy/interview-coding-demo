@@ -135,7 +135,13 @@
 {#if visible.length === 0}
 	<!-- 空状态：区分「真的没申请单」与「被筛选/搜索过滤没了」 -->
 	<EmptyState
-		title={mine.length === 0 ? '你还没有发起任何差旅申请' : '没有符合当前筛选或搜索条件的申请'}
+		title={
+			mine.length === 0
+				? '你还没有发起任何差旅申请'
+				: hasClearableFilter
+					? '没有符合当前筛选或搜索条件的申请'
+					: '没有符合当前状态的申请'
+		}
 	>
 		{#snippet action()}
 			{#if mine.length === 0}
@@ -145,7 +151,8 @@
 				>
 					发起第一张申请
 				</a>
-			{:else}
+			{:else if hasClearableFilter}
+				<!-- 仅状态栏导致为空时不显示「清除筛选」：该按钮只清搜索条件，对状态栏无效 -->
 				<button
 					type="button"
 					onclick={resetFilters}
