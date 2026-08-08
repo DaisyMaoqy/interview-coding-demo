@@ -78,10 +78,17 @@ export function visibleSections(role: Role): NavSection[] {
 /**
  * 判断导航项是否处于选中态。
  *
- * 用前缀匹配而非全等，详情页 `/travel/requests/TR-0001` 也要让
- * 「我的申请」保持高亮；但需防止 `/travel/requests` 意外匹配
- * `/travel/requests-archive` 这类兄弟路径，故要求下一个字符是 `/`。
+ * 用前缀匹配而非全等，详情页 `/travel/requests/TR-0001` 
+ * `search` 参数中的 `?from=approvals`用于标记「申请详情从哪个入口点击进入」
+ * 此时URL虽在 `/travel/requests` 下
+ * 但语义归属「待我审批」——点亮该项、熄掉「我的申请」，两侧互斥，避免同时高亮两个入口。
  */
-export function isActive(itemHref: string, pathname: string): boolean {
+export function isActive(itemHref: string, pathname: string, search = ''): boolean {
+	if (search.includes('from=approvals')) {
+		const underRequests = pathname.startsWith(`${resolve('/travel/requests')}/`);
+		if (itemHref === resolve('/travel/approvals')) return underRequests;
+		if (itemHref === resolve('/travel/requests')) return !underRequests;
+	}
+
 	return pathname === itemHref || pathname.startsWith(`${itemHref}/`);
 }

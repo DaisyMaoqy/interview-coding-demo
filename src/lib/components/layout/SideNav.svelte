@@ -27,7 +27,7 @@
 			<h2 class="side-nav__section-title">{section.title}</h2>
 
 			{#each section.items as item (item.href)}
-				{@const active = isActive(item.href, page.url.pathname)}
+				{@const active = isActive(item.href, page.url.pathname, page.url.search)}
 				<a
 					href={item.href}
 					title={item.description}
