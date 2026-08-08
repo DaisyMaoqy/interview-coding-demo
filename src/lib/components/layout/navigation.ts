@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import type { IconName } from '$lib/components/common/Icon.svelte';
 import type { Role } from '$lib/domain/types';
 
 /**
@@ -11,15 +12,13 @@ import type { Role } from '$lib/domain/types';
  * （`visibleSections`），而不是在模板里散落 `{#if role === 'manager'}`。
  */
 
-/** 图标名。具体 SVG 在 `NavIcon.svelte` 中映射，配置层只记名字 */
-export type NavIconName = 'inbox' | 'check' | 'plus' | 'chart';
-
 export interface NavItem {
 	href: string;
 	label: string;
 	/** 悬浮提示，同时用作无障碍描述 */
 	description: string;
-	icon: NavIconName;
+	/** 具体 SVG 在 `Icon.svelte` 中映射，配置层只记名字 */
+	icon: IconName;
 	/** 省略表示所有角色可见 */
 	visibleTo?: readonly Role[];
 }

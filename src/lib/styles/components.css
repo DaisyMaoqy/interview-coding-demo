@@ -94,7 +94,7 @@
 		@apply bg-brand-50 font-medium text-brand-700;
 	}
 
-	/* ===== NavIcon（src/lib/components/layout/NavIcon.svelte） ===== */
+	/* ===== 导航图标尺寸（SideNav 中 Icon 的 class） ===== */
 	.nav-icon {
 		@apply size-5 shrink-0;
 	}

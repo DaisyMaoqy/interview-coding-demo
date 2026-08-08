@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { HOME } from '$lib/routes';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import NavIcon from './NavIcon.svelte';
+	import Icon from '$lib/components/common/Icon.svelte';
 	import { isActive, visibleSections } from './navigation';
 
 	const identity = useIdentity();
@@ -34,7 +34,7 @@
 					aria-current={active ? 'page' : undefined}
 					class="side-nav__link {active ? 'side-nav__link--active' : ''}"
 				>
-					<NavIcon name={item.icon} />
+					<Icon name={item.icon} class="nav-icon" strokeWidth={1.75} />
 					{item.label}
 				</a>
 			{/each}

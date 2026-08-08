@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Icon from './Icon.svelte';
+
 	interface Props {
 		/** 搜索词（双向绑定） */
 		value: string;
@@ -10,17 +12,7 @@
 </script>
 
 <div class="search-input">
-	<svg
-		class="search-input__icon"
-		viewBox="0 0 20 20"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		aria-hidden="true"
-	>
-		<circle cx="9" cy="9" r="6" />
-		<path d="m17 17-3.5-3.5" stroke-linecap="round" />
-	</svg>
+	<Icon name="search" class="search-input__icon" />
 	<input
 		type="search"
 		bind:value
