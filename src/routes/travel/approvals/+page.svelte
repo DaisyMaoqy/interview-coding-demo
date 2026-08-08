@@ -86,7 +86,7 @@
 </script>
 
 {#if identity.isManager}
-	<PageHeader title="待我审批" description="等待 {identity.user.name} 处理的申请" />
+	<PageHeader title="待我审批" />
 
 	{#if todo.length === 0}
 		<EmptyState title="暂无待我审批的申请" />
