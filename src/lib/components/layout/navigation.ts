@@ -84,6 +84,13 @@ export function visibleSections(role: Role): NavSection[] {
  * 但语义归属「待我审批」——点亮该项、熄掉「我的申请」，两侧互斥，避免同时高亮两个入口。
  */
 export function isActive(itemHref: string, pathname: string, search = ''): boolean {
+	// 编辑态：在 /travel/apply 下带 ?edit=ID，语义归属「我的申请」——
+	// 点亮该项、熄掉「发起申请」，与详情页 ?from=approvals 的处理思路一致。
+	if (search.includes('edit=')) {
+		if (itemHref === resolve('/travel/requests')) return true;
+		if (itemHref === resolve('/travel/apply')) return false;
+	}
+
 	if (search.includes('from=approvals')) {
 		const underRequests = pathname.startsWith(`${resolve('/travel/requests')}/`);
 		if (itemHref === resolve('/travel/approvals')) return underRequests;

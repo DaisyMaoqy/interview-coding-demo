@@ -50,18 +50,42 @@ export function nextStep(slug: WizardSlug): WizardSlug | null {
 	return index < WIZARD_STEPS.length - 1 ? WIZARD_STEPS[index + 1].slug : null;
 }
 
-export function stepHref(slug: WizardSlug): string {
-	return resolve('/travel/apply/[step]', { step: slug });
+/**
+ * 编辑态标记：重新编辑进入向导时记下被编辑申请的 id，让向导内所有步骤跳转
+ * （上一步/下一步、预览里的「修改」）都带上 `?edit=ID`，保持编辑上下文不丢。
+ *
+ * 用模块级变量而非响应式 store，是因为步骤跳转是命令式调用；刷新时由向导外壳
+ * 读取 URL 上的 `?edit` 重新同步（见 `apply/[step]/+page.svelte`）。
+ */
+let activeEditId: string | null = null;
+
+export function setActiveEditId(id: string | null): void {
+	activeEditId = id;
+}
+
+export function getActiveEditId(): string | null {
+	return activeEditId;
+}
+
+export function stepHref(slug: WizardSlug, editId: string | null = activeEditId): string {
+	const base = resolve('/travel/apply/[step]', { step: slug });
+	return editId ? `${base}?edit=${editId}` : base;
 }
 
 /**
  * 预览页「修改」按钮的目标地址。
  *
  * `focus` 用于让目标页聚焦并滚动到具体字段，例如
- * `stepHrefWithFocus('trips', 'leg-1')` → `/apply/trips?focus=leg-1`
+ * `stepHrefWithFocus('trips', 'leg-1')` → `/apply/trips?focus=leg-1`。
+ * 编辑态下自动带上 `?edit=ID`，避免改完一步跳回「新建」上下文。
  */
-export function stepHrefWithFocus(slug: WizardSlug, focus: string): string {
-	return `${stepHref(slug)}?focus=${encodeURIComponent(focus)}`;
+export function stepHrefWithFocus(
+	slug: WizardSlug,
+	focus: string,
+	editId: string | null = activeEditId
+): string {
+	const base = stepHref(slug, editId);
+	return `${base}${base.includes('?') ? '&' : '?'}focus=${encodeURIComponent(focus)}`;
 }
 
 /**

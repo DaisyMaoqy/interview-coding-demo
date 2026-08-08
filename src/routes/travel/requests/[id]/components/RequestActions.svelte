@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import RejectDialog from '../../../components/RejectDialog.svelte';
 	import {
 		ACTION_LABELS,
@@ -7,6 +8,8 @@
 		transition
 	} from '$lib/domain/workflow';
 	import { updateRequest } from '$lib/data/requests';
+	import { setActiveEditId, stepHref } from '$lib/domain/wizard';
+	import { loadDraftForEdit } from '$lib/state/wizardDraft';
 	import type { AuditAction, TravelRequest, User } from '$lib/domain/types';
 
 	interface Props {
@@ -24,6 +27,9 @@
 	// 展示顺序：提交/通过靠前，重新编辑居中，驳回/撤销靠后
 	const ACTION_ORDER: readonly AuditAction[] = ['submit', 'approve', 'reedit', 'reject', 'cancel'];
 	const visibleActions = $derived(ACTION_ORDER.filter((a) => actions.includes(a)));
+	// 草稿页「重新编辑」与「提交申请」并存：重新编辑降为次级（ghost），让提交更突出；
+	// 被驳回时重新编辑是唯一出口，保持主按钮（primary）。
+	const reeditSecondary = $derived(visibleActions.includes('submit'));
 
 	let feedback = $state<string | null>(null);
 	let showReject = $state(false);
@@ -51,6 +57,33 @@
 		feedback = null;
 		showReject = true;
 	}
+
+	// 重新编辑：把数据回填进向导草稿并带上 ?edit=ID 跳转到发起页 —— 复用同一套排版，
+	// 只是字段都有值可改。
+	// - 草稿：本身就是可编辑态，直接回填即可，无需走状态机（不追加审计）。
+	// - 被驳回：先走状态机把 rejected → draft（记一条「重新编辑」审计）再回填。
+	function onReedit(): void {
+		if (request.status !== 'draft') {
+			const result = transition({ request, action: 'reedit', actor });
+			if (!result.ok) {
+				feedback = result.message;
+				return;
+			}
+			updateRequest(result.request);
+			setActiveEditId(result.request.id);
+			loadDraftForEdit(result.request);
+			// 目标地址由 stepHref() 内部 resolve() 生成，ESLint 无法跨模块追踪，故豁免
+			// eslint-disable-next-line svelte/no-navigation-without-resolve
+			goto(stepHref('basic', result.request.id));
+			return;
+		}
+
+		setActiveEditId(request.id);
+		loadDraftForEdit(request);
+		// 目标地址由 stepHref() 内部 resolve() 生成，ESLint 无法跨模块追踪，故豁免
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		goto(stepHref('basic', request.id));
+	}
 </script>
 
 {#if visibleActions.length > 0}
@@ -60,7 +93,15 @@
 		{/if}
 		<div class="action-bar__buttons">
 			{#each visibleActions as action (action)}
-				{#if actionRequiresComment(action)}
+				{#if action === 'reedit'}
+					<button
+						type="button"
+						class="btn {reeditSecondary ? 'btn--ghost' : 'btn--primary'}"
+						onclick={onReedit}
+					>
+						{ACTION_LABELS[action]}
+					</button>
+				{:else if actionRequiresComment(action)}
 					<button type="button" class="btn btn--danger" onclick={openReject}>
 						{ACTION_LABELS[action]}
 					</button>

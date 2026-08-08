@@ -249,3 +249,33 @@ export function addRequest(request: TravelRequest): void {
 		return next;
 	});
 }
+
+/**
+ * 重新编辑后提交：在原有申请上套用新表单数据并走 submit 流转（draft → pending_manager）。
+ *
+ * 与 {@link createRequest} 的区别是**不生成新的 TR 编号** —— 保留原单号、申请人、
+ * 创建时间、审计轨迹，只更新用户填写部分并追加一条新的提交审计。被驳回 → 草稿 →
+ * 再提交的闭环由此闭合。
+ */
+export function updateRequestFromDraft(
+	id: string,
+	input: TravelFormInput,
+	actor: User
+): TravelRequest {
+	const existing = getRequestById(id);
+	if (!existing) throw new Error('申请不存在');
+	const now = new Date().toISOString();
+	const updated: TravelRequest = {
+		...existing,
+		reason: input.reason,
+		urgency: input.urgency,
+		legs: input.legs,
+		budget: input.budget,
+		budgetNote: input.budgetNote,
+		updatedAt: now
+	};
+	const result = transition({ request: updated, action: 'submit', actor });
+	if (!result.ok) throw new Error(result.message);
+	updateRequest(result.request);
+	return result.request;
+}

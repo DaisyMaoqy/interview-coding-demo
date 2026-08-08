@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { TravelFormInput } from '$lib/domain/schema';
+import type { TravelRequest } from '$lib/domain/types';
 
 /**
  * 发起申请向导的草稿。
@@ -54,4 +55,20 @@ export function patchDraft(partial: Partial<WizardDraft>): void {
 /** 提交成功后清空，回到一份全新的默认草稿 */
 export function resetDraft(): void {
 	draft.set({ ...DEFAULT_DRAFT });
+}
+
+/**
+ * 重新编辑：把被驳回申请里「由用户填写的那部分」回填进草稿，
+ * 向导里的各步骤即可像新建一样直接改。只取可调字段（事由/紧急度/行程/预算），
+ * 原单的身份与审计信息留到提交时再合并；legs/budget 做浅拷贝，
+ * 避免编辑过程中误改 requestsStore 里的原对象。
+ */
+export function loadDraftForEdit(request: TravelRequest): void {
+	draft.set({
+		reason: request.reason,
+		urgency: request.urgency,
+		legs: request.legs.map((leg) => ({ ...leg })),
+		budget: { ...request.budget },
+		budgetNote: request.budgetNote ?? ''
+	});
 }

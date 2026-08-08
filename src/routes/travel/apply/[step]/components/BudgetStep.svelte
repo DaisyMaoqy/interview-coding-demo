@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
 	import { budgetSchema, validate, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { centsToYuan, parseYuanInput, budgetTotal, formatYuan } from '$lib/domain/money';
 	import type { Budget } from '$lib/domain/types';
 	import WizardFooter from './WizardFooter.svelte';
+
+	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
+	const editId = $derived(page.url.searchParams.get('edit'));
 
 	// 分项顺序与中文名，与 BudgetBreakdown 的 ROWS、schema 的 budgetShape 对齐（单一真相）
 	const FIELDS: ReadonlyArray<{ key: keyof Budget; label: string }> = [
@@ -68,7 +72,7 @@
 		errors = {};
 		const n = nextStep('budget');
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		if (n) goto(stepHref(n));
+		if (n) goto(stepHref(n, editId));
 	}
 </script>
 
@@ -107,4 +111,4 @@
 	<p class="amount-summary">预算合计：<strong>¥{formatYuan(total)}</strong></p>
 </section>
 
-<WizardFooter prevHref={stepHref('trips')} primaryLabel="下一步" onPrimary={onNext} />
+<WizardFooter prevHref={stepHref('trips', editId)} primaryLabel="下一步" onPrimary={onNext} />

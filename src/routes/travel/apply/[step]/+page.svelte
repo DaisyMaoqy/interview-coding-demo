@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
+	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
-	import { draft } from '$lib/state/wizardDraft';
-	import { evaluateSteps, stepHref } from '$lib/domain/wizard';
+	import { draft, loadDraftForEdit } from '$lib/state/wizardDraft';
+	import { evaluateSteps, stepHref, getActiveEditId, setActiveEditId } from '$lib/domain/wizard';
+	import { getRequestById } from '$lib/data/requests';
 	import type { PageData } from './$types';
 	import BasicStep from './components/BasicStep.svelte';
 	import TripsStep from './components/TripsStep.svelte';
@@ -21,6 +23,27 @@
 	// 防止用户跳到预算页却看到空行程。
 	const steps = $derived(evaluateSteps($draft));
 
+	// 重新编辑进入向导时 URL 带 ?edit=ID；外壳据此同步编辑态与回填草稿，
+	// 这样直接打开编辑链接或刷新也能恢复。普通新建不带该参数，则清掉编辑态。
+	const isEditing = $derived(page.url.searchParams.has('edit'));
+
+	// 从编辑页返回「我的申请」：年月 / 关键词 / 状态等筛选都已在共享 store 中（由列表页
+	// $effect 实时回写），直接跳回列表页即可原样恢复，无需任何额外处理。
+	$effect(() => {
+		const id = page.url.searchParams.get('edit');
+		if (id) {
+			if (getActiveEditId() !== id) {
+				const req = getRequestById(id);
+				if (req) {
+					setActiveEditId(id);
+					loadDraftForEdit(req);
+				}
+			}
+		} else if (getActiveEditId() !== null) {
+			setActiveEditId(null);
+		}
+	});
+
 	// 预览页「修改」链接带 ?focus=xxx 时，进入对应步骤后滚动到目标区块（如行程列表）。
 	$effect(() => {
 		const focus = page.url.searchParams.get('focus');
@@ -35,7 +58,11 @@
 	ESLint 无法跨模块追踪函数返回值，故整页豁免该规则。
 -->
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
-<PageHeader title="发起申请" description={current.description} />
+{#if isEditing}
+	<a class="edit-back" href={resolve('/travel/requests')}>← 返回我的申请</a>
+{/if}
+
+<PageHeader title={isEditing ? '编辑申请' : '发起申请'} description={current.description} />
 
 <ol class="step-nav">
 	{#each steps as item, i (item.step.slug)}
@@ -45,7 +72,7 @@
 				<a
 					class="step-nav__link"
 					class:step-nav__link--active={active}
-					href={stepHref(item.step.slug)}
+					href={stepHref(item.step.slug, page.url.searchParams.get('edit'))}
 					aria-current={active ? 'step' : undefined}
 				>
 					<span
@@ -144,5 +171,17 @@
 	}
 	.step-nav__sep {
 		color: var(--color-slate-300);
+	}
+	/* 编辑态返回入口：页面左上角，与导航高亮的「我的申请」呼应 */
+	.edit-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin-bottom: 1rem;
+		font-size: 0.875rem;
+		color: var(--color-slate-600);
+	}
+	.edit-back:hover {
+		color: var(--color-brand-600);
 	}
 </style>

@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
 	import { basicSchema, validate, REASON_MIN_LENGTH, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { URGENCY_LABELS } from '$lib/domain/workflow';
 	import type { Urgency } from '$lib/domain/types';
 	import WizardFooter from './WizardFooter.svelte';
+
+	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
+	const editId = $derived(page.url.searchParams.get('edit'));
 
 	// 紧急程度选项统一取自 workflow 的 URGENCY_LABELS，与详情页/列表徽章保持一致
 	const URGENCIES: ReadonlyArray<{ value: Urgency; label: string }> = (
@@ -23,7 +27,7 @@
 		errors = {};
 		const next = nextStep('basic');
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		if (next) goto(stepHref(next));
+		if (next) goto(stepHref(next, editId));
 	}
 </script>
 
@@ -65,4 +69,4 @@
 	</fieldset>
 </section>
 
-<WizardFooter prevHref={prevStep('basic') ? stepHref(prevStep('basic')!) : null} primaryLabel="下一步" onPrimary={onNext} />
+<WizardFooter prevHref={prevStep('basic') ? stepHref(prevStep('basic')!, editId) : null} primaryLabel="下一步" onPrimary={onNext} />

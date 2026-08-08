@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
 	import { tripsSchema, validate, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { TRANSPORT_LABELS } from '$lib/domain/workflow';
 	import type { TripLeg, Transport } from '$lib/domain/types';
 	import WizardFooter from './WizardFooter.svelte';
+
+	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
+	const editId = $derived(page.url.searchParams.get('edit'));
 
 	// 交通方式中文名统一取自 workflow 的 TRANSPORT_LABELS（行程表/详情页共用），避免各处的叫法漂移
 	const TRANSPORTS: ReadonlyArray<{ value: Transport; label: string }> = (
@@ -51,7 +55,7 @@
 		errors = {};
 		const next = nextStep('trips');
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		if (next) goto(stepHref(next));
+		if (next) goto(stepHref(next, editId));
 	}
 </script>
 
@@ -126,7 +130,7 @@
 	<button type="button" class="btn btn--ghost" onclick={addLeg}>+ 添加一段行程</button>
 </section>
 
-<WizardFooter prevHref={stepHref(prevStep('trips')!)} primaryLabel="下一步" onPrimary={onNext} />
+<WizardFooter prevHref={stepHref(prevStep('trips')!, editId)} primaryLabel="下一步" onPrimary={onNext} />
 
 <style>
 	.leg {

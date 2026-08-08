@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import { draft, resetDraft } from '$lib/state/wizardDraft';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { addRequest, createRequest } from '$lib/data/requests';
+	import { addRequest, createRequest, updateRequestFromDraft } from '$lib/data/requests';
 	import { travelFormSchema, validate } from '$lib/domain/schema';
-	import { stepHref, stepHrefWithFocus } from '$lib/domain/wizard';
+	import { stepHref, stepHrefWithFocus, setActiveEditId } from '$lib/domain/wizard';
 	import { formatYuan, budgetTotal } from '$lib/domain/money';
 	import type { TravelRequest } from '$lib/domain/types';
 	import RequestBasicInfo from '$lib/components/request/RequestBasicInfo.svelte';
@@ -14,6 +15,9 @@
 	import WizardFooter from './WizardFooter.svelte';
 
 	const identity = useIdentity();
+
+	// 编辑态由 URL 的 ?edit=ID 决定（刷新/直达都可靠），据此切换按钮文案与提交分支
+	const editId = $derived(page.url.searchParams.get('edit'));
 
 	// 预览阶段还没有真实的单号与提交时间，用占位值拼出一条「准申请」，
 	// 直接复用详情页已有的三个展示组件，避免重复排版与字段顺序漂移。
@@ -46,10 +50,19 @@
 		submitError = '';
 		submitting = true;
 		try {
-			const created = createRequest($draft, identity.user);
-			addRequest(created);
+			let targetId: string;
+			if (editId) {
+				// 编辑态：在原单上套用新数据并重新提交，沿用原单号与审计轨迹
+				const updated = updateRequestFromDraft(editId, $draft, identity.user);
+				targetId = updated.id;
+			} else {
+				const created = createRequest($draft, identity.user);
+				addRequest(created);
+				targetId = created.id;
+			}
+			setActiveEditId(null);
 			resetDraft();
-			await goto(resolve(`/travel/requests/${created.id}?from=requests`));
+			await goto(resolve(`/travel/requests/${targetId}?from=requests`));
 		} catch {
 			submitting = false;
 		}
@@ -60,19 +73,19 @@
 <section class="step-card preview">
 	<div class="preview__head">
 		<h3 class="section-title">基本信息</h3>
-		<a class="link" href={stepHref('basic')}>修改</a>
+		<a class="link" href={stepHref('basic', editId)}>修改</a>
 	</div>
 	<RequestBasicInfo request={previewRequest} showTitle={false} />
 
 	<div class="preview__head">
 		<h3 class="section-title">行程明细</h3>
-		<a class="link" href={stepHrefWithFocus('trips', 'legs')}>修改</a>
+		<a class="link" href={stepHrefWithFocus('trips', 'legs', editId)}>修改</a>
 	</div>
 	<LegsTable legs={previewRequest.legs} />
 
 	<div class="preview__head">
 		<h3 class="section-title">费用预算</h3>
-		<a class="link" href={stepHref('budget')}>修改</a>
+		<a class="link" href={stepHref('budget', editId)}>修改</a>
 	</div>
 	<BudgetBreakdown budget={previewRequest.budget} budgetNote={previewRequest.budgetNote} />
 
@@ -84,8 +97,8 @@
 </section>
 
 <WizardFooter
-	prevHref={stepHref('budget')}
-	primaryLabel="提交申请"
+	prevHref={stepHref('budget', editId)}
+	primaryLabel={editId ? '重新提交' : '提交申请'}
 	loading={submitting}
 	onPrimary={onSubmit}
 />
