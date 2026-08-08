@@ -26,6 +26,11 @@ export class IdentityState {
 		return this.role === 'manager';
 	}
 
+	/** 当前身份是否为财务审批人（二级审批） */
+	get isFinance(): boolean {
+		return this.role === 'finance';
+	}
+
 	switchTo(role: Role): void {
 		this.role = role;
 	}

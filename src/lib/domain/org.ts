@@ -13,6 +13,9 @@ import type { Role, User, UserId } from './types';
 /** 主管的 UUID。单独提出来是因为下面每位员工的 managerId 都要引用它 */
 const LI_JINGLI_ID = '0841d235-b926-4a41-aecd-3c5de814bd68'; // 新员工的id用randomUUID()
 
+/** 财务审批人的 UUID。主管通过后的二级审批由这一独立角色承接 */
+export const FINANCE_ID = 'f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c';
+
 export const USERS = [
 	{
 		id: 'e61fe483-3b09-4e05-b4fe-dde3bc2a8694',
@@ -58,6 +61,15 @@ export const USERS = [
 		department: '研发部',
 		role: 'manager',
 		managerId: null
+	},
+	{
+		id: FINANCE_ID,
+		employeeId: 'EMP20001',
+		name: '王会计',
+		title: '财务专员',
+		department: '财务部',
+		role: 'finance',
+		managerId: null
 	}
 ] as const satisfies readonly User[];
 
@@ -76,7 +88,8 @@ export const MANAGER_ID = LI_JINGLI_ID satisfies KnownUserId;
 /** 角色 → 该角色对应的登录人。角色切换时用它换身份。 */
 export const IDENTITY_BY_ROLE: Record<Role, KnownUserId> = {
 	employee: EMPLOYEE_ID,
-	manager: MANAGER_ID
+	manager: MANAGER_ID,
+	finance: FINANCE_ID
 };
 
 export function findUser(id: UserId): User | undefined {

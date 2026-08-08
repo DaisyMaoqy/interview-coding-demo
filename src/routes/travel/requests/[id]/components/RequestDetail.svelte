@@ -20,13 +20,14 @@
 	}: { request: TravelRequest; actor: User; from?: string | null } = $props();
 
 	// 返回去向随入口：?from=approvals 回待我审批，?from=requests 回我的申请；
-	// 直接输入 URL（无 from）时按身份兜底：经理回待我审批，员工回我的申请
+	// 直接输入 URL（无 from）时按身份兜底：审批人回待我审批，员工回我的申请
+	const isApprover = $derived(actor.role === 'manager' || actor.role === 'finance');
 	const backHref = $derived(
 		from === 'approvals'
 			? '/travel/approvals'
 			: from === 'requests'
 				? '/travel/requests'
-				: actor.role === 'manager'
+				: isApprover
 					? '/travel/approvals'
 					: '/travel/requests'
 	);
@@ -35,7 +36,7 @@
 			? '待我审批'
 			: from === 'requests'
 				? '我的申请'
-				: actor.role === 'manager'
+				: isApprover
 					? '待我审批'
 					: '我的申请'
 	);

@@ -15,7 +15,7 @@
 export type UserId = string;
 
 /** 角色决定能看到哪些导航与页面，不决定身份 —— 切角色即切当前登录人 */
-export type Role = 'employee' | 'manager';
+export type Role = 'employee' | 'manager' | 'finance';
 
 export interface User {
 	id: UserId;

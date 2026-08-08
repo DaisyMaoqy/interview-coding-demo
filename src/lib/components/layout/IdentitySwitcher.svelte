@@ -9,12 +9,13 @@
 
 	const OPTIONS: ReadonlyArray<{ role: Role; hint: string }> = [
 		{ role: 'employee', hint: '发起申请' },
-		{ role: 'manager', hint: '审批他人' }
+		{ role: 'manager', hint: '主管审批' },
+		{ role: 'finance', hint: '财务审批' }
 	];
 </script>
 
 <!--
-	切角色即切登录人。做成分段控件而非下拉，是因为只有两个选项，
+	切角色即切登录人。做成分段控件而非下拉，是因为选项只有三个，
 	平铺让「当前是谁、能切成谁」一眼可见，也少一次点击。
 -->
 <div class="identity-switcher">

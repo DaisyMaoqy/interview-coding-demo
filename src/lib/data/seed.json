@@ -4,39 +4,39 @@
 		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
-		"reason": "参加行业展会并考察竞品方案",
+		"reason": "对接分公司完成需求调研",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "武汉",
-				"to": "成都",
+				"from": "成都",
+				"to": "北京",
 				"departDate": "2026-08-19",
-				"returnDate": "2026-08-22",
-				"transport": "other"
+				"returnDate": "2026-08-21",
+				"transport": "train"
 			},
 			{
 				"id": "leg-2",
-				"from": "广州",
+				"from": "武汉",
 				"to": "深圳",
-				"departDate": "2026-08-27",
-				"returnDate": "2026-08-28",
-				"transport": "flight"
+				"departDate": "2026-08-26",
+				"returnDate": "2026-08-30",
+				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 167900,
-			"hotel": 297000,
-			"allowance": 120000,
-			"other": 0
+			"transport": 79300,
+			"hotel": 462400,
+			"allowance": 160000,
+			"other": 17000
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-08-19T11:57:00.000Z",
-		"updatedAt": "2026-08-20T07:57:00.000Z",
+		"updatedAt": "2026-08-19T14:57:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0040-audit-1",
-				"at": "2026-08-20T07:57:00.000Z",
+				"at": "2026-08-19T14:57:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
@@ -44,19 +44,19 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-08-20T07:57:00.000Z"
+		"submittedAt": "2026-08-19T14:57:00.000Z"
 	},
 	{
 		"id": "TR-0039",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
+		"reason": "参加行业展会并考察竞品方案",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
+				"from": "广州",
 				"to": "深圳",
 				"departDate": "2026-08-08",
 				"returnDate": "2026-08-09",
@@ -64,18 +64,18 @@
 			}
 		],
 		"budget": {
-			"transport": 197100,
-			"hotel": 74600,
+			"transport": 167900,
+			"hotel": 99000,
 			"allowance": 40000,
 			"other": 0
 		},
 		"status": "cancelled",
 		"createdAt": "2026-08-08T16:36:00.000Z",
-		"updatedAt": "2026-08-11T13:36:00.000Z",
+		"updatedAt": "2026-08-11T08:36:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0039-audit-1",
-				"at": "2026-08-09T18:36:00.000Z",
+				"at": "2026-08-09T12:36:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -84,7 +84,7 @@
 			},
 			{
 				"id": "TR-0039-audit-2",
-				"at": "2026-08-11T13:36:00.000Z",
+				"at": "2026-08-11T08:36:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "cancel",
@@ -92,42 +92,34 @@
 				"to": "cancelled"
 			}
 		],
-		"submittedAt": "2026-08-09T18:36:00.000Z"
+		"submittedAt": "2026-08-09T12:36:00.000Z"
 	},
 	{
 		"id": "TR-0038",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
+		"reason": "新签客户的实施方案交付培训",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "广州",
+				"from": "深圳",
+				"to": "北京",
 				"departDate": "2026-08-05",
-				"returnDate": "2026-08-06",
-				"transport": "car"
-			},
-			{
-				"id": "leg-2",
-				"from": "南京",
-				"to": "深圳",
-				"departDate": "2026-08-08",
-				"returnDate": "2026-08-10",
+				"returnDate": "2026-08-07",
 				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 57500,
-			"hotel": 181000,
-			"allowance": 100000,
-			"other": 0
+			"transport": 110000,
+			"hotel": 336600,
+			"allowance": 60000,
+			"other": 34900
 		},
 		"status": "approved",
 		"createdAt": "2026-08-05T13:29:00.000Z",
-		"updatedAt": "2026-08-06T16:29:00.000Z",
+		"updatedAt": "2026-08-09T11:29:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0038-audit-1",
@@ -140,13 +132,21 @@
 			},
 			{
 				"id": "TR-0038-audit-2",
-				"at": "2026-08-06T16:29:00.000Z",
+				"at": "2026-08-07T03:29:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
-				"comment": "同意，请按期提交出差总结"
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0038-audit-3",
+				"at": "2026-08-09T11:29:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
 			}
 		],
 		"submittedAt": "2026-08-05T22:29:00.000Z"
@@ -156,31 +156,31 @@
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "新签客户的实施方案交付培训",
+		"reason": "参加年度技术大会并做主题分享",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
 				"from": "南京",
-				"to": "武汉",
+				"to": "深圳",
 				"departDate": "2026-08-03",
-				"returnDate": "2026-08-06",
-				"transport": "other"
+				"returnDate": "2026-08-05",
+				"transport": "train"
 			},
 			{
 				"id": "leg-2",
-				"from": "深圳",
-				"to": "武汉",
+				"from": "成都",
+				"to": "北京",
 				"departDate": "2026-08-09",
-				"returnDate": "2026-08-11",
+				"returnDate": "2026-08-10",
 				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 72500,
-			"hotel": 446600,
-			"allowance": 140000,
-			"other": 12100
+			"transport": 80000,
+			"hotel": 229500,
+			"allowance": 100000,
+			"other": 0
 		},
 		"status": "draft",
 		"createdAt": "2026-08-03T10:00:00.000Z",
@@ -192,39 +192,31 @@
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "新签客户的实施方案交付培训",
-		"urgency": "normal",
+		"reason": "现场排查生产环境性能问题",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "南京",
-				"to": "广州",
-				"departDate": "2026-08-01",
-				"returnDate": "2026-08-05",
-				"transport": "flight"
-			},
-			{
-				"id": "leg-2",
-				"from": "武汉",
+				"from": "成都",
 				"to": "杭州",
-				"departDate": "2026-08-09",
-				"returnDate": "2026-08-13",
-				"transport": "car"
+				"departDate": "2026-08-01",
+				"returnDate": "2026-08-02",
+				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 200500,
-			"hotel": 475000,
-			"allowance": 200000,
-			"other": 17000
+			"transport": 40400,
+			"hotel": 81400,
+			"allowance": 40000,
+			"other": 8400
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-08-01T09:30:00.000Z",
-		"updatedAt": "2026-08-02T01:30:00.000Z",
+		"updatedAt": "2026-08-02T06:30:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0036-audit-1",
-				"at": "2026-08-02T01:30:00.000Z",
+				"at": "2026-08-02T06:30:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -232,38 +224,38 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-08-02T01:30:00.000Z"
+		"submittedAt": "2026-08-02T06:30:00.000Z"
 	},
 	{
 		"id": "TR-0035",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "参加行业展会并考察竞品方案",
+		"reason": "现场排查生产环境性能问题",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "武汉",
-				"to": "北京",
+				"from": "深圳",
+				"to": "上海",
 				"departDate": "2026-07-22",
-				"returnDate": "2026-07-26",
+				"returnDate": "2026-07-24",
 				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 104600,
-			"hotel": 198500,
-			"allowance": 100000,
-			"other": 38100
+			"transport": 102400,
+			"hotel": 129600,
+			"allowance": 60000,
+			"other": 0
 		},
 		"status": "approved",
 		"createdAt": "2026-07-22T12:15:00.000Z",
-		"updatedAt": "2026-07-23T23:15:00.000Z",
+		"updatedAt": "2026-07-25T14:15:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0035-audit-1",
-				"at": "2026-07-23T01:15:00.000Z",
+				"at": "2026-07-22T22:15:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -272,16 +264,25 @@
 			},
 			{
 				"id": "TR-0035-audit-2",
-				"at": "2026-07-23T23:15:00.000Z",
+				"at": "2026-07-24T00:15:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
+				"to": "pending_finance",
 				"comment": "同意，请按期提交出差总结"
+			},
+			{
+				"id": "TR-0035-audit-3",
+				"at": "2026-07-25T14:15:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
 			}
 		],
-		"submittedAt": "2026-07-23T01:15:00.000Z"
+		"submittedAt": "2026-07-22T22:15:00.000Z"
 	},
 	{
 		"id": "TR-0034",
@@ -293,26 +294,26 @@
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "杭州",
-				"to": "广州",
+				"from": "深圳",
+				"to": "武汉",
 				"departDate": "2026-07-20",
-				"returnDate": "2026-07-23",
-				"transport": "other"
+				"returnDate": "2026-07-21",
+				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 52200,
-			"hotel": 147200,
-			"allowance": 80000,
-			"other": 27000
+			"transport": 62800,
+			"hotel": 152800,
+			"allowance": 40000,
+			"other": 0
 		},
 		"status": "rejected",
 		"createdAt": "2026-07-20T14:00:00.000Z",
-		"updatedAt": "2026-07-23T00:00:00.000Z",
+		"updatedAt": "2026-07-23T06:00:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0034-audit-1",
-				"at": "2026-07-21T16:00:00.000Z",
+				"at": "2026-07-21T18:00:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -321,55 +322,56 @@
 			},
 			{
 				"id": "TR-0034-audit-2",
-				"at": "2026-07-23T00:00:00.000Z",
+				"at": "2026-07-23T06:00:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
 				"to": "rejected",
-				"comment": "预算超出部门季度额度，请压缩住宿费用后重新提交"
+				"comment": "该时间段已有同事出差同一地点，建议合并行程"
 			}
 		],
-		"submittedAt": "2026-07-21T16:00:00.000Z"
+		"submittedAt": "2026-07-21T18:00:00.000Z"
 	},
 	{
 		"id": "TR-0033",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "新签客户的实施方案交付培训",
+		"reason": "对接分公司完成需求调研",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "杭州",
+				"from": "上海",
+				"to": "成都",
 				"departDate": "2026-07-07",
-				"returnDate": "2026-07-09",
+				"returnDate": "2026-07-11",
 				"transport": "car"
 			},
 			{
 				"id": "leg-2",
-				"from": "南京",
-				"to": "北京",
-				"departDate": "2026-07-14",
-				"returnDate": "2026-07-17",
-				"transport": "car"
+				"from": "北京",
+				"to": "武汉",
+				"departDate": "2026-07-16",
+				"returnDate": "2026-07-20",
+				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 74500,
-			"hotel": 269500,
-			"allowance": 140000,
-			"other": 0
+			"transport": 97800,
+			"hotel": 696000,
+			"allowance": 200000,
+			"other": 33300
 		},
+		"budgetNote": "客户现场驻场周期较长，住宿与交通成本高于常规出差",
 		"status": "pending_manager",
 		"createdAt": "2026-07-07T15:49:00.000Z",
-		"updatedAt": "2026-07-07T20:49:00.000Z",
+		"updatedAt": "2026-07-08T12:49:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0033-audit-1",
-				"at": "2026-07-07T20:49:00.000Z",
+				"at": "2026-07-08T12:49:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -377,38 +379,46 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-07-07T20:49:00.000Z"
+		"submittedAt": "2026-07-08T12:49:00.000Z"
 	},
 	{
 		"id": "TR-0031",
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "配合审计部门完成现场资料核查",
-		"urgency": "urgent",
+		"reason": "赴客户现场进行系统上线支持",
+		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "杭州",
-				"to": "南京",
+				"from": "深圳",
+				"to": "广州",
 				"departDate": "2026-06-10",
-				"returnDate": "2026-06-13",
-				"transport": "other"
+				"returnDate": "2026-06-11",
+				"transport": "train"
+			},
+			{
+				"id": "leg-2",
+				"from": "武汉",
+				"to": "北京",
+				"departDate": "2026-06-13",
+				"returnDate": "2026-06-14",
+				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 71300,
-			"hotel": 147200,
+			"transport": 113900,
+			"hotel": 270800,
 			"allowance": 80000,
-			"other": 34400
+			"other": 0
 		},
 		"status": "cancelled",
 		"createdAt": "2026-06-10T12:04:00.000Z",
-		"updatedAt": "2026-06-12T05:04:00.000Z",
+		"updatedAt": "2026-06-12T01:04:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0031-audit-1",
-				"at": "2026-06-10T23:04:00.000Z",
+				"at": "2026-06-11T05:04:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
@@ -417,7 +427,7 @@
 			},
 			{
 				"id": "TR-0031-audit-2",
-				"at": "2026-06-12T05:04:00.000Z",
+				"at": "2026-06-12T01:04:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "cancel",
@@ -425,38 +435,38 @@
 				"to": "cancelled"
 			}
 		],
-		"submittedAt": "2026-06-10T23:04:00.000Z"
+		"submittedAt": "2026-06-11T05:04:00.000Z"
 	},
 	{
 		"id": "TR-0032",
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "赴客户现场进行系统上线支持",
-		"urgency": "urgent",
+		"reason": "参加行业展会并考察竞品方案",
+		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "深圳",
-				"to": "广州",
+				"from": "北京",
+				"to": "杭州",
 				"departDate": "2026-06-10",
-				"returnDate": "2026-06-12",
-				"transport": "car"
+				"returnDate": "2026-06-14",
+				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 42500,
-			"hotel": 211200,
-			"allowance": 60000,
-			"other": 23800
+			"transport": 79500,
+			"hotel": 620000,
+			"allowance": 100000,
+			"other": 0
 		},
 		"status": "rejected",
 		"createdAt": "2026-06-10T14:28:00.000Z",
-		"updatedAt": "2026-06-11T09:28:00.000Z",
+		"updatedAt": "2026-06-11T16:28:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0032-audit-1",
-				"at": "2026-06-10T21:28:00.000Z",
+				"at": "2026-06-11T01:28:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
@@ -465,47 +475,47 @@
 			},
 			{
 				"id": "TR-0032-audit-2",
-				"at": "2026-06-11T09:28:00.000Z",
+				"at": "2026-06-11T16:28:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
 				"to": "rejected",
-				"comment": "出差事由描述不够具体，请补充客户名称与交付目标"
+				"comment": "该时间段已有同事出差同一地点，建议合并行程"
 			}
 		],
-		"submittedAt": "2026-06-10T21:28:00.000Z"
+		"submittedAt": "2026-06-11T01:28:00.000Z"
 	},
 	{
 		"id": "TR-0030",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "赴客户现场进行系统上线支持",
-		"urgency": "urgent",
+		"reason": "参与合作伙伴季度业务复盘会议",
+		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
 				"from": "深圳",
-				"to": "武汉",
+				"to": "北京",
 				"departDate": "2026-05-26",
 				"returnDate": "2026-05-28",
-				"transport": "train"
+				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 112100,
-			"hotel": 460200,
+			"transport": 194800,
+			"hotel": 129900,
 			"allowance": 60000,
-			"other": 19700
+			"other": 0
 		},
 		"status": "approved",
 		"createdAt": "2026-05-26T09:58:00.000Z",
-		"updatedAt": "2026-05-28T08:58:00.000Z",
+		"updatedAt": "2026-05-31T00:58:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0030-audit-1",
-				"at": "2026-05-27T06:58:00.000Z",
+				"at": "2026-05-27T03:58:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
@@ -514,39 +524,48 @@
 			},
 			{
 				"id": "TR-0030-audit-2",
-				"at": "2026-05-28T08:58:00.000Z",
+				"at": "2026-05-28T13:58:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
+				"to": "pending_finance",
 				"comment": "同意，请按期提交出差总结"
+			},
+			{
+				"id": "TR-0030-audit-3",
+				"at": "2026-05-31T00:58:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
 			}
 		],
-		"submittedAt": "2026-05-27T06:58:00.000Z"
+		"submittedAt": "2026-05-27T03:58:00.000Z"
 	},
 	{
 		"id": "TR-0029",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "配合审计部门完成现场资料核查",
+		"reason": "参与合作伙伴季度业务复盘会议",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
-				"to": "北京",
+				"from": "上海",
+				"to": "杭州",
 				"departDate": "2026-05-23",
-				"returnDate": "2026-05-25",
+				"returnDate": "2026-05-24",
 				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 90700,
-			"hotel": 147900,
-			"allowance": 60000,
-			"other": 20600
+			"transport": 46300,
+			"hotel": 295000,
+			"allowance": 40000,
+			"other": 0
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-05-23T12:37:00.000Z",
@@ -569,23 +588,31 @@
 		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
-		"reason": "参与合作伙伴季度业务复盘会议",
+		"reason": "参加年度技术大会并做主题分享",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "上海",
+				"from": "上海",
+				"to": "深圳",
 				"departDate": "2026-05-19",
 				"returnDate": "2026-05-21",
+				"transport": "car"
+			},
+			{
+				"id": "leg-2",
+				"from": "杭州",
+				"to": "武汉",
+				"departDate": "2026-05-23",
+				"returnDate": "2026-05-25",
 				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 44800,
-			"hotel": 129300,
-			"allowance": 60000,
-			"other": 38400
+			"transport": 67300,
+			"hotel": 471600,
+			"allowance": 120000,
+			"other": 23700
 		},
 		"status": "draft",
 		"createdAt": "2026-05-19T18:20:00.000Z",
@@ -597,31 +624,39 @@
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "配合审计部门完成现场资料核查",
+		"reason": "参加行业展会并考察竞品方案",
 		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "广州",
+				"from": "上海",
 				"to": "深圳",
 				"departDate": "2026-05-05",
-				"returnDate": "2026-05-06",
-				"transport": "car"
+				"returnDate": "2026-05-08",
+				"transport": "flight"
+			},
+			{
+				"id": "leg-2",
+				"from": "上海",
+				"to": "北京",
+				"departDate": "2026-05-12",
+				"returnDate": "2026-05-13",
+				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 49200,
-			"hotel": 130000,
-			"allowance": 40000,
+			"transport": 274500,
+			"hotel": 367200,
+			"allowance": 120000,
 			"other": 0
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-05-05T10:00:00.000Z",
-		"updatedAt": "2026-05-06T04:00:00.000Z",
+		"updatedAt": "2026-05-06T00:00:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0027-audit-1",
-				"at": "2026-05-06T04:00:00.000Z",
+				"at": "2026-05-06T00:00:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
@@ -629,38 +664,46 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-05-06T04:00:00.000Z"
+		"submittedAt": "2026-05-06T00:00:00.000Z"
 	},
 	{
 		"id": "TR-0026",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
-		"urgency": "normal",
+		"reason": "配合审计部门完成现场资料核查",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "上海",
-				"to": "广州",
+				"from": "深圳",
+				"to": "武汉",
 				"departDate": "2026-04-18",
-				"returnDate": "2026-04-19",
+				"returnDate": "2026-04-21",
+				"transport": "car"
+			},
+			{
+				"id": "leg-2",
+				"from": "广州",
+				"to": "深圳",
+				"departDate": "2026-04-25",
+				"returnDate": "2026-04-26",
 				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 113300,
-			"hotel": 150200,
-			"allowance": 40000,
+			"transport": 49200,
+			"hotel": 390000,
+			"allowance": 120000,
 			"other": 0
 		},
-		"status": "approved",
+		"status": "pending_finance",
 		"createdAt": "2026-04-18T09:28:00.000Z",
-		"updatedAt": "2026-04-21T16:28:00.000Z",
+		"updatedAt": "2026-04-20T02:28:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0026-audit-1",
-				"at": "2026-04-19T14:28:00.000Z",
+				"at": "2026-04-19T03:28:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -669,46 +712,46 @@
 			},
 			{
 				"id": "TR-0026-audit-2",
-				"at": "2026-04-21T16:28:00.000Z",
+				"at": "2026-04-20T02:28:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved"
+				"to": "pending_finance"
 			}
 		],
-		"submittedAt": "2026-04-19T14:28:00.000Z"
+		"submittedAt": "2026-04-19T03:28:00.000Z"
 	},
 	{
 		"id": "TR-0025",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
+		"reason": "赴客户现场进行系统上线支持",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "广州",
-				"to": "成都",
+				"from": "成都",
+				"to": "广州",
 				"departDate": "2026-04-06",
-				"returnDate": "2026-04-07",
-				"transport": "flight"
+				"returnDate": "2026-04-09",
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 309600,
-			"hotel": 84800,
-			"allowance": 40000,
-			"other": 0
+			"transport": 109800,
+			"hotel": 615600,
+			"allowance": 80000,
+			"other": 26100
 		},
 		"status": "approved",
 		"createdAt": "2026-04-06T12:46:00.000Z",
-		"updatedAt": "2026-04-09T12:46:00.000Z",
+		"updatedAt": "2026-04-12T02:46:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0025-audit-1",
-				"at": "2026-04-07T10:46:00.000Z",
+				"at": "2026-04-07T06:46:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -717,47 +760,55 @@
 			},
 			{
 				"id": "TR-0025-audit-2",
-				"at": "2026-04-09T12:46:00.000Z",
+				"at": "2026-04-09T03:46:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
-				"comment": "同意，注意留存票据"
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0025-audit-3",
+				"at": "2026-04-12T02:46:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
 			}
 		],
-		"submittedAt": "2026-04-07T10:46:00.000Z"
+		"submittedAt": "2026-04-07T06:46:00.000Z"
 	},
 	{
 		"id": "TR-0024",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "新签客户的实施方案交付培训",
+		"reason": "配合审计部门完成现场资料核查",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "南京",
-				"to": "成都",
+				"from": "上海",
+				"to": "南京",
 				"departDate": "2026-04-01",
-				"returnDate": "2026-04-04",
+				"returnDate": "2026-04-05",
 				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 91500,
-			"hotel": 197600,
-			"allowance": 80000,
-			"other": 35100
+			"transport": 100000,
+			"hotel": 304500,
+			"allowance": 100000,
+			"other": 16300
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-04-01T18:35:00.000Z",
-		"updatedAt": "2026-04-02T18:35:00.000Z",
+		"updatedAt": "2026-04-02T01:35:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0024-audit-1",
-				"at": "2026-04-02T18:35:00.000Z",
+				"at": "2026-04-02T01:35:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -765,38 +816,38 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-04-02T18:35:00.000Z"
+		"submittedAt": "2026-04-02T01:35:00.000Z"
 	},
 	{
 		"id": "TR-0023",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
+		"reason": "参加行业展会并考察竞品方案",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "深圳",
-				"to": "南京",
+				"from": "上海",
+				"to": "深圳",
 				"departDate": "2026-03-12",
-				"returnDate": "2026-03-15",
-				"transport": "other"
+				"returnDate": "2026-03-13",
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 99500,
-			"hotel": 202400,
-			"allowance": 80000,
-			"other": 17400
+			"transport": 114700,
+			"hotel": 268200,
+			"allowance": 40000,
+			"other": 34500
 		},
-		"status": "approved",
+		"status": "pending_finance",
 		"createdAt": "2026-03-12T14:45:00.000Z",
-		"updatedAt": "2026-03-15T15:45:00.000Z",
+		"updatedAt": "2026-03-14T19:45:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0023-audit-1",
-				"at": "2026-03-13T12:45:00.000Z",
+				"at": "2026-03-13T11:45:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -805,55 +856,47 @@
 			},
 			{
 				"id": "TR-0023-audit-2",
-				"at": "2026-03-15T15:45:00.000Z",
+				"at": "2026-03-14T19:45:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
-				"comment": "同意"
+				"to": "pending_finance",
+				"comment": "同意，请按期提交出差总结"
 			}
 		],
-		"submittedAt": "2026-03-13T12:45:00.000Z"
+		"submittedAt": "2026-03-13T11:45:00.000Z"
 	},
 	{
 		"id": "TR-0022",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
+		"reason": "现场排查生产环境性能问题",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
+				"from": "上海",
 				"to": "杭州",
 				"departDate": "2026-03-05",
 				"returnDate": "2026-03-06",
 				"transport": "car"
-			},
-			{
-				"id": "leg-2",
-				"from": "成都",
-				"to": "杭州",
-				"departDate": "2026-03-09",
-				"returnDate": "2026-03-13",
-				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 107200,
-			"hotel": 431900,
-			"allowance": 140000,
+			"transport": 68500,
+			"hotel": 92600,
+			"allowance": 40000,
 			"other": 0
 		},
 		"status": "rejected",
 		"createdAt": "2026-03-05T13:36:00.000Z",
-		"updatedAt": "2026-03-06T21:36:00.000Z",
+		"updatedAt": "2026-03-07T07:36:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0022-audit-1",
-				"at": "2026-03-05T17:36:00.000Z",
+				"at": "2026-03-06T04:36:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -862,7 +905,7 @@
 			},
 			{
 				"id": "TR-0022-audit-2",
-				"at": "2026-03-06T21:36:00.000Z",
+				"at": "2026-03-07T07:36:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
@@ -871,38 +914,30 @@
 				"comment": "该时间段已有同事出差同一地点，建议合并行程"
 			}
 		],
-		"submittedAt": "2026-03-05T17:36:00.000Z"
+		"submittedAt": "2026-03-06T04:36:00.000Z"
 	},
 	{
 		"id": "TR-0021",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "配合审计部门完成现场资料核查",
-		"urgency": "urgent",
+		"reason": "现场排查生产环境性能问题",
+		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
-				"to": "武汉",
+				"from": "上海",
+				"to": "成都",
 				"departDate": "2026-03-05",
 				"returnDate": "2026-03-07",
-				"transport": "train"
-			},
-			{
-				"id": "leg-2",
-				"from": "武汉",
-				"to": "杭州",
-				"departDate": "2026-03-12",
-				"returnDate": "2026-03-16",
-				"transport": "train"
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 56600,
-			"hotel": 584800,
-			"allowance": 160000,
-			"other": 12000
+			"transport": 92100,
+			"hotel": 133200,
+			"allowance": 60000,
+			"other": 0
 		},
 		"status": "draft",
 		"createdAt": "2026-03-05T12:02:00.000Z",
@@ -914,39 +949,31 @@
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
+		"reason": "配合审计部门完成现场资料核查",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "杭州",
-				"to": "上海",
+				"from": "武汉",
+				"to": "深圳",
 				"departDate": "2026-02-07",
 				"returnDate": "2026-02-08",
-				"transport": "flight"
-			},
-			{
-				"id": "leg-2",
-				"from": "杭州",
-				"to": "北京",
-				"departDate": "2026-02-12",
-				"returnDate": "2026-02-13",
 				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 287100,
-			"hotel": 243600,
-			"allowance": 80000,
+			"transport": 44100,
+			"hotel": 144600,
+			"allowance": 40000,
 			"other": 0
 		},
 		"status": "approved",
 		"createdAt": "2026-02-07T14:00:00.000Z",
-		"updatedAt": "2026-02-09T03:00:00.000Z",
+		"updatedAt": "2026-02-11T22:00:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0020-audit-1",
-				"at": "2026-02-08T02:00:00.000Z",
+				"at": "2026-02-07T22:00:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
@@ -955,48 +982,50 @@
 			},
 			{
 				"id": "TR-0020-audit-2",
-				"at": "2026-02-09T03:00:00.000Z",
+				"at": "2026-02-09T11:00:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved"
+				"to": "pending_finance",
+				"comment": "同意，注意留存票据"
+			},
+			{
+				"id": "TR-0020-audit-3",
+				"at": "2026-02-11T22:00:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved",
+				"comment": "同意，注意留存票据"
 			}
 		],
-		"submittedAt": "2026-02-08T02:00:00.000Z"
+		"submittedAt": "2026-02-07T22:00:00.000Z"
 	},
 	{
 		"id": "TR-0019",
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "对接分公司完成需求调研",
-		"urgency": "normal",
+		"reason": "参与合作伙伴季度业务复盘会议",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "深圳",
-				"to": "成都",
+				"from": "杭州",
+				"to": "上海",
 				"departDate": "2026-02-07",
-				"returnDate": "2026-02-09",
-				"transport": "car"
-			},
-			{
-				"id": "leg-2",
-				"from": "北京",
-				"to": "广州",
-				"departDate": "2026-02-12",
-				"returnDate": "2026-02-14",
+				"returnDate": "2026-02-10",
 				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 79500,
-			"hotel": 934200,
-			"allowance": 120000,
+			"transport": 65800,
+			"hotel": 633200,
+			"allowance": 80000,
 			"other": 0
 		},
-		"budgetNote": "客户现场驻场周期较长，住宿与交通成本高于常规出差",
 		"status": "draft",
 		"createdAt": "2026-02-07T10:27:00.000Z",
 		"updatedAt": "2026-02-07T10:27:00.000Z",
@@ -1007,31 +1036,31 @@
 		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
-		"urgency": "normal",
+		"reason": "参与合作伙伴季度业务复盘会议",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "广州",
+				"from": "武汉",
+				"to": "深圳",
 				"departDate": "2026-02-03",
-				"returnDate": "2026-02-07",
+				"returnDate": "2026-02-05",
 				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 91200,
-			"hotel": 247000,
-			"allowance": 100000,
+			"transport": 79000,
+			"hotel": 114600,
+			"allowance": 60000,
 			"other": 0
 		},
 		"status": "pending_manager",
 		"createdAt": "2026-02-03T09:24:00.000Z",
-		"updatedAt": "2026-02-04T14:24:00.000Z",
+		"updatedAt": "2026-02-03T17:24:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0018-audit-1",
-				"at": "2026-02-04T14:24:00.000Z",
+				"at": "2026-02-03T17:24:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
@@ -1039,38 +1068,38 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2026-02-04T14:24:00.000Z"
+		"submittedAt": "2026-02-03T17:24:00.000Z"
 	},
 	{
 		"id": "TR-0017",
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "参加行业展会并考察竞品方案",
+		"reason": "对接分公司完成需求调研",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "杭州",
-				"to": "上海",
+				"from": "深圳",
+				"to": "武汉",
 				"departDate": "2026-02-01",
-				"returnDate": "2026-02-03",
+				"returnDate": "2026-02-02",
 				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 183200,
-			"hotel": 223500,
-			"allowance": 60000,
-			"other": 0
+			"transport": 210900,
+			"hotel": 124200,
+			"allowance": 40000,
+			"other": 24100
 		},
 		"status": "rejected",
 		"createdAt": "2026-02-01T16:46:00.000Z",
-		"updatedAt": "2026-02-02T20:46:00.000Z",
+		"updatedAt": "2026-02-03T03:46:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0017-audit-1",
-				"at": "2026-02-01T20:46:00.000Z",
+				"at": "2026-02-01T19:46:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
@@ -1079,107 +1108,58 @@
 			},
 			{
 				"id": "TR-0017-audit-2",
-				"at": "2026-02-02T20:46:00.000Z",
+				"at": "2026-02-03T03:46:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
 				"from": "pending_manager",
 				"to": "rejected",
-				"comment": "出差事由描述不够具体，请补充客户名称与交付目标"
+				"comment": "预算超出部门季度额度，请压缩住宿费用后重新提交"
 			}
 		],
-		"submittedAt": "2026-02-01T20:46:00.000Z"
+		"submittedAt": "2026-02-01T19:46:00.000Z"
 	},
 	{
 		"id": "TR-0016",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
+		"reason": "对接分公司完成需求调研",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
-				"to": "深圳",
+				"from": "北京",
+				"to": "武汉",
 				"departDate": "2026-01-18",
-				"returnDate": "2026-01-19",
-				"transport": "other"
-			}
-		],
-		"budget": {
-			"transport": 92300,
-			"hotel": 136200,
-			"allowance": 40000,
-			"other": 6200
-		},
-		"status": "pending_manager",
-		"createdAt": "2026-01-18T13:39:00.000Z",
-		"updatedAt": "2026-01-19T10:39:00.000Z",
-		"audit": [
-			{
-				"id": "TR-0016-audit-1",
-				"at": "2026-01-19T10:39:00.000Z",
-				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
-				"actorName": "刘洋",
-				"action": "submit",
-				"from": "draft",
-				"to": "pending_manager"
-			}
-		],
-		"submittedAt": "2026-01-19T10:39:00.000Z"
-	},
-	{
-		"id": "TR-0015",
-		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
-		"applicantName": "刘洋",
-		"department": "研发部",
-		"reason": "赴客户现场进行系统上线支持",
-		"urgency": "normal",
-		"legs": [
-			{
-				"id": "leg-1",
-				"from": "杭州",
-				"to": "成都",
-				"departDate": "2026-01-07",
-				"returnDate": "2026-01-09",
+				"returnDate": "2026-01-21",
 				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 291700,
-			"hotel": 158100,
-			"allowance": 60000,
-			"other": 0
+			"transport": 164000,
+			"hotel": 309200,
+			"allowance": 80000,
+			"other": 21500
 		},
-		"status": "approved",
-		"createdAt": "2026-01-07T14:34:00.000Z",
-		"updatedAt": "2026-01-10T00:34:00.000Z",
+		"status": "pending_manager",
+		"createdAt": "2026-01-18T13:39:00.000Z",
+		"updatedAt": "2026-01-19T13:39:00.000Z",
 		"audit": [
 			{
-				"id": "TR-0015-audit-1",
-				"at": "2026-01-08T04:34:00.000Z",
+				"id": "TR-0016-audit-1",
+				"at": "2026-01-19T13:39:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
 				"from": "draft",
 				"to": "pending_manager"
-			},
-			{
-				"id": "TR-0015-audit-2",
-				"at": "2026-01-10T00:34:00.000Z",
-				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
-				"actorName": "李经理",
-				"action": "approve",
-				"from": "pending_manager",
-				"to": "approved",
-				"comment": "同意，请按期提交出差总结"
 			}
 		],
-		"submittedAt": "2026-01-08T04:34:00.000Z"
+		"submittedAt": "2026-01-19T13:39:00.000Z"
 	},
 	{
-		"id": "TR-0014",
+		"id": "TR-0015",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
@@ -1189,33 +1169,90 @@
 			{
 				"id": "leg-1",
 				"from": "成都",
+				"to": "深圳",
+				"departDate": "2026-01-07",
+				"returnDate": "2026-01-08",
+				"transport": "car"
+			}
+		],
+		"budget": {
+			"transport": 77300,
+			"hotel": 131800,
+			"allowance": 40000,
+			"other": 17300
+		},
+		"status": "approved",
+		"createdAt": "2026-01-07T14:34:00.000Z",
+		"updatedAt": "2026-01-11T14:34:00.000Z",
+		"audit": [
+			{
+				"id": "TR-0015-audit-1",
+				"at": "2026-01-08T09:34:00.000Z",
+				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
+				"actorName": "刘洋",
+				"action": "submit",
+				"from": "draft",
+				"to": "pending_manager"
+			},
+			{
+				"id": "TR-0015-audit-2",
+				"at": "2026-01-09T13:34:00.000Z",
+				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
+				"actorName": "李经理",
+				"action": "approve",
+				"from": "pending_manager",
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0015-audit-3",
+				"at": "2026-01-11T14:34:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
+			}
+		],
+		"submittedAt": "2026-01-08T09:34:00.000Z"
+	},
+	{
+		"id": "TR-0014",
+		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
+		"applicantName": "刘洋",
+		"department": "研发部",
+		"reason": "新签客户的实施方案交付培训",
+		"urgency": "normal",
+		"legs": [
+			{
+				"id": "leg-1",
+				"from": "武汉",
 				"to": "南京",
 				"departDate": "2026-01-03",
-				"returnDate": "2026-01-07",
-				"transport": "train"
+				"returnDate": "2026-01-05",
+				"transport": "car"
 			},
 			{
 				"id": "leg-2",
 				"from": "深圳",
-				"to": "杭州",
-				"departDate": "2026-01-12",
-				"returnDate": "2026-01-15",
-				"transport": "other"
+				"to": "广州",
+				"departDate": "2026-01-08",
+				"returnDate": "2026-01-09",
+				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 117500,
-			"hotel": 529200,
-			"allowance": 180000,
-			"other": 39700
+			"transport": 217400,
+			"hotel": 178000,
+			"allowance": 100000,
+			"other": 7200
 		},
 		"status": "approved",
 		"createdAt": "2026-01-03T10:22:00.000Z",
-		"updatedAt": "2026-01-05T07:22:00.000Z",
+		"updatedAt": "2026-01-08T02:22:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0014-audit-1",
-				"at": "2026-01-03T19:22:00.000Z",
+				"at": "2026-01-04T09:22:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
@@ -1224,47 +1261,56 @@
 			},
 			{
 				"id": "TR-0014-audit-2",
-				"at": "2026-01-05T07:22:00.000Z",
+				"at": "2026-01-05T18:22:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0014-audit-3",
+				"at": "2026-01-08T02:22:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
 				"to": "approved",
-				"comment": "同意，注意留存票据"
+				"comment": "同意，请按期提交出差总结"
 			}
 		],
-		"submittedAt": "2026-01-03T19:22:00.000Z"
+		"submittedAt": "2026-01-04T09:22:00.000Z"
 	},
 	{
 		"id": "TR-0013",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
+		"reason": "现场排查生产环境性能问题",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "深圳",
-				"to": "南京",
+				"from": "南京",
+				"to": "上海",
 				"departDate": "2025-12-20",
-				"returnDate": "2025-12-21",
-				"transport": "car"
+				"returnDate": "2025-12-24",
+				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 41300,
-			"hotel": 76400,
-			"allowance": 40000,
-			"other": 6200
+			"transport": 178200,
+			"hotel": 380500,
+			"allowance": 100000,
+			"other": 0
 		},
 		"status": "approved",
 		"createdAt": "2025-12-20T17:45:00.000Z",
-		"updatedAt": "2025-12-23T09:45:00.000Z",
+		"updatedAt": "2025-12-23T15:45:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0013-audit-1",
-				"at": "2025-12-21T14:45:00.000Z",
+				"at": "2025-12-21T05:45:00.000Z",
 				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 				"actorName": "张三",
 				"action": "submit",
@@ -1273,66 +1319,28 @@
 			},
 			{
 				"id": "TR-0013-audit-2",
-				"at": "2025-12-23T09:45:00.000Z",
+				"at": "2025-12-22T08:45:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved"
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0013-audit-3",
+				"at": "2025-12-23T15:45:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved",
+				"comment": "同意，注意留存票据"
 			}
 		],
-		"submittedAt": "2025-12-21T14:45:00.000Z"
+		"submittedAt": "2025-12-21T05:45:00.000Z"
 	},
 	{
 		"id": "TR-0012",
-		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
-		"applicantName": "张三",
-		"department": "研发部",
-		"reason": "参加年度技术大会并做主题分享",
-		"urgency": "urgent",
-		"legs": [
-			{
-				"id": "leg-1",
-				"from": "深圳",
-				"to": "北京",
-				"departDate": "2025-12-10",
-				"returnDate": "2025-12-12",
-				"transport": "car"
-			}
-		],
-		"budget": {
-			"transport": 74600,
-			"hotel": 206700,
-			"allowance": 60000,
-			"other": 0
-		},
-		"status": "cancelled",
-		"createdAt": "2025-12-10T15:46:00.000Z",
-		"updatedAt": "2025-12-11T14:46:00.000Z",
-		"audit": [
-			{
-				"id": "TR-0012-audit-1",
-				"at": "2025-12-10T20:46:00.000Z",
-				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
-				"actorName": "张三",
-				"action": "submit",
-				"from": "draft",
-				"to": "pending_manager"
-			},
-			{
-				"id": "TR-0012-audit-2",
-				"at": "2025-12-11T14:46:00.000Z",
-				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
-				"actorName": "张三",
-				"action": "cancel",
-				"from": "pending_manager",
-				"to": "cancelled"
-			}
-		],
-		"submittedAt": "2025-12-10T20:46:00.000Z"
-	},
-	{
-		"id": "TR-0011",
 		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
 		"applicantName": "张三",
 		"department": "研发部",
@@ -1341,22 +1349,70 @@
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "南京",
-				"to": "成都",
-				"departDate": "2025-12-08",
-				"returnDate": "2025-12-09",
-				"transport": "train"
+				"from": "北京",
+				"to": "广州",
+				"departDate": "2025-12-10",
+				"returnDate": "2025-12-14",
+				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 101900,
-			"hotel": 83400,
-			"allowance": 40000,
+			"transport": 42700,
+			"hotel": 457500,
+			"allowance": 100000,
+			"other": 34700
+		},
+		"status": "cancelled",
+		"createdAt": "2025-12-10T15:46:00.000Z",
+		"updatedAt": "2025-12-12T18:46:00.000Z",
+		"audit": [
+			{
+				"id": "TR-0012-audit-1",
+				"at": "2025-12-11T13:46:00.000Z",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
+				"actorName": "张三",
+				"action": "submit",
+				"from": "draft",
+				"to": "pending_manager"
+			},
+			{
+				"id": "TR-0012-audit-2",
+				"at": "2025-12-12T18:46:00.000Z",
+				"actorId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
+				"actorName": "张三",
+				"action": "cancel",
+				"from": "pending_manager",
+				"to": "cancelled"
+			}
+		],
+		"submittedAt": "2025-12-11T13:46:00.000Z"
+	},
+	{
+		"id": "TR-0011",
+		"applicantId": "e61fe483-3b09-4e05-b4fe-dde3bc2a8694",
+		"applicantName": "张三",
+		"department": "研发部",
+		"reason": "新签客户的实施方案交付培训",
+		"urgency": "normal",
+		"legs": [
+			{
+				"id": "leg-1",
+				"from": "上海",
+				"to": "武汉",
+				"departDate": "2025-12-08",
+				"returnDate": "2025-12-10",
+				"transport": "flight"
+			}
+		],
+		"budget": {
+			"transport": 194300,
+			"hotel": 174600,
+			"allowance": 60000,
 			"other": 0
 		},
 		"status": "approved",
 		"createdAt": "2025-12-08T09:20:00.000Z",
-		"updatedAt": "2025-12-10T06:20:00.000Z",
+		"updatedAt": "2025-12-11T11:20:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0011-audit-1",
@@ -1369,13 +1425,23 @@
 			},
 			{
 				"id": "TR-0011-audit-2",
-				"at": "2025-12-10T06:20:00.000Z",
+				"at": "2025-12-10T02:20:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
+				"to": "pending_finance",
 				"comment": "同意，注意留存票据"
+			},
+			{
+				"id": "TR-0011-audit-3",
+				"at": "2025-12-11T11:20:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved",
+				"comment": "同意，请按期提交出差总结"
 			}
 		],
 		"submittedAt": "2025-12-09T03:20:00.000Z"
@@ -1385,31 +1451,39 @@
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "参加行业展会并考察竞品方案",
-		"urgency": "urgent",
+		"reason": "配合审计部门完成现场资料核查",
+		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "成都",
+				"from": "武汉",
+				"to": "深圳",
 				"departDate": "2025-11-22",
 				"returnDate": "2025-11-26",
-				"transport": "train"
+				"transport": "other"
+			},
+			{
+				"id": "leg-2",
+				"from": "成都",
+				"to": "北京",
+				"departDate": "2025-11-30",
+				"returnDate": "2025-12-03",
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 102900,
-			"hotel": 371500,
-			"allowance": 100000,
-			"other": 0
+			"transport": 94900,
+			"hotel": 663300,
+			"allowance": 180000,
+			"other": 12800
 		},
 		"status": "approved",
 		"createdAt": "2025-11-22T10:29:00.000Z",
-		"updatedAt": "2025-11-24T23:29:00.000Z",
+		"updatedAt": "2025-11-26T04:29:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0010-audit-1",
-				"at": "2025-11-23T08:29:00.000Z",
+				"at": "2025-11-22T17:29:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -1418,46 +1492,55 @@
 			},
 			{
 				"id": "TR-0010-audit-2",
-				"at": "2025-11-24T23:29:00.000Z",
+				"at": "2025-11-24T00:29:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
+				"to": "pending_finance"
+			},
+			{
+				"id": "TR-0010-audit-3",
+				"at": "2025-11-26T04:29:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
 				"to": "approved"
 			}
 		],
-		"submittedAt": "2025-11-23T08:29:00.000Z"
+		"submittedAt": "2025-11-22T17:29:00.000Z"
 	},
 	{
 		"id": "TR-0009",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "参与合作伙伴季度业务复盘会议",
-		"urgency": "normal",
+		"reason": "新签客户的实施方案交付培训",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "广州",
-				"to": "武汉",
+				"from": "武汉",
+				"to": "成都",
 				"departDate": "2025-11-16",
-				"returnDate": "2025-11-19",
-				"transport": "train"
+				"returnDate": "2025-11-17",
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 103300,
-			"hotel": 152000,
-			"allowance": 80000,
-			"other": 0
+			"transport": 77000,
+			"hotel": 290800,
+			"allowance": 40000,
+			"other": 15300
 		},
 		"status": "approved",
 		"createdAt": "2025-11-16T15:16:00.000Z",
-		"updatedAt": "2025-11-18T20:16:00.000Z",
+		"updatedAt": "2025-11-18T23:16:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0009-audit-1",
-				"at": "2025-11-17T16:16:00.000Z",
+				"at": "2025-11-16T23:16:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -1466,55 +1549,64 @@
 			},
 			{
 				"id": "TR-0009-audit-2",
-				"at": "2025-11-18T20:16:00.000Z",
+				"at": "2025-11-17T10:16:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
-				"comment": "同意，注意留存票据"
+				"to": "pending_finance",
+				"comment": "同意，请按期提交出差总结"
+			},
+			{
+				"id": "TR-0009-audit-3",
+				"at": "2025-11-18T23:16:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved"
 			}
 		],
-		"submittedAt": "2025-11-17T16:16:00.000Z"
+		"submittedAt": "2025-11-16T23:16:00.000Z"
 	},
 	{
 		"id": "TR-0008",
 		"applicantId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 		"applicantName": "王芳",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
+		"reason": "参加行业展会并考察竞品方案",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "南京",
-				"to": "北京",
+				"from": "深圳",
+				"to": "南京",
 				"departDate": "2025-11-13",
-				"returnDate": "2025-11-15",
-				"transport": "other"
+				"returnDate": "2025-11-17",
+				"transport": "car"
 			},
 			{
 				"id": "leg-2",
-				"from": "成都",
-				"to": "武汉",
-				"departDate": "2025-11-20",
-				"returnDate": "2025-11-24",
-				"transport": "flight"
+				"from": "武汉",
+				"to": "杭州",
+				"departDate": "2025-11-22",
+				"returnDate": "2025-11-25",
+				"transport": "car"
 			}
 		],
 		"budget": {
-			"transport": 294400,
-			"hotel": 320000,
-			"allowance": 160000,
-			"other": 6800
+			"transport": 44300,
+			"hotel": 471600,
+			"allowance": 180000,
+			"other": 0
 		},
-		"status": "approved",
+		"status": "pending_finance",
 		"createdAt": "2025-11-13T13:44:00.000Z",
-		"updatedAt": "2025-11-15T08:44:00.000Z",
+		"updatedAt": "2025-11-16T18:44:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0008-audit-1",
-				"at": "2025-11-14T01:44:00.000Z",
+				"at": "2025-11-14T13:44:00.000Z",
 				"actorId": "5170a4c5-20dc-4d18-91a9-95ba9786e3f0",
 				"actorName": "王芳",
 				"action": "submit",
@@ -1523,46 +1615,46 @@
 			},
 			{
 				"id": "TR-0008-audit-2",
-				"at": "2025-11-15T08:44:00.000Z",
+				"at": "2025-11-16T18:44:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved"
+				"to": "pending_finance"
 			}
 		],
-		"submittedAt": "2025-11-14T01:44:00.000Z"
+		"submittedAt": "2025-11-14T13:44:00.000Z"
 	},
 	{
 		"id": "TR-0007",
 		"applicantId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 		"applicantName": "李经理",
 		"department": "研发部",
-		"reason": "对接分公司完成需求调研",
-		"urgency": "normal",
+		"reason": "新签客户的实施方案交付培训",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
 				"from": "南京",
-				"to": "杭州",
+				"to": "成都",
 				"departDate": "2025-11-09",
-				"returnDate": "2025-11-13",
-				"transport": "car"
+				"returnDate": "2025-11-11",
+				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 51700,
-			"hotel": 337000,
-			"allowance": 100000,
-			"other": 20200
+			"transport": 218100,
+			"hotel": 339600,
+			"allowance": 60000,
+			"other": 37500
 		},
 		"status": "cancelled",
 		"createdAt": "2025-11-09T18:34:00.000Z",
-		"updatedAt": "2025-11-12T03:34:00.000Z",
+		"updatedAt": "2025-11-11T02:34:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0007-audit-1",
-				"at": "2025-11-10T19:34:00.000Z",
+				"at": "2025-11-09T22:34:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "submit",
@@ -1571,7 +1663,7 @@
 			},
 			{
 				"id": "TR-0007-audit-2",
-				"at": "2025-11-12T03:34:00.000Z",
+				"at": "2025-11-11T02:34:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "cancel",
@@ -1579,30 +1671,30 @@
 				"to": "cancelled"
 			}
 		],
-		"submittedAt": "2025-11-10T19:34:00.000Z"
+		"submittedAt": "2025-11-09T22:34:00.000Z"
 	},
 	{
 		"id": "TR-0006",
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "参加行业展会并考察竞品方案",
+		"reason": "现场排查生产环境性能问题",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
 				"from": "武汉",
-				"to": "北京",
+				"to": "深圳",
 				"departDate": "2025-10-23",
-				"returnDate": "2025-10-26",
+				"returnDate": "2025-10-27",
 				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 68100,
-			"hotel": 289200,
-			"allowance": 80000,
-			"other": 7300
+			"transport": 91900,
+			"hotel": 190000,
+			"allowance": 100000,
+			"other": 0
 		},
 		"status": "draft",
 		"createdAt": "2025-10-23T11:45:00.000Z",
@@ -1614,33 +1706,24 @@
 		"applicantId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 		"applicantName": "陈静",
 		"department": "研发部",
-		"reason": "赴客户现场进行系统上线支持",
-		"urgency": "normal",
+		"reason": "配合审计部门完成现场资料核查",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "成都",
-				"to": "深圳",
+				"from": "南京",
+				"to": "北京",
 				"departDate": "2025-10-10",
-				"returnDate": "2025-10-14",
-				"transport": "flight"
-			},
-			{
-				"id": "leg-2",
-				"from": "深圳",
-				"to": "南京",
-				"departDate": "2025-10-19",
-				"returnDate": "2025-10-23",
+				"returnDate": "2025-10-11",
 				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 161800,
-			"hotel": 1061000,
-			"allowance": 200000,
-			"other": 0
+			"transport": 40800,
+			"hotel": 236200,
+			"allowance": 40000,
+			"other": 37900
 		},
-		"budgetNote": "客户现场驻场周期较长，住宿与交通成本高于常规出差",
 		"status": "draft",
 		"createdAt": "2025-10-10T17:01:00.000Z",
 		"updatedAt": "2025-10-10T17:01:00.000Z",
@@ -1656,26 +1739,26 @@
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "深圳",
-				"to": "武汉",
+				"from": "上海",
+				"to": "北京",
 				"departDate": "2025-10-01",
-				"returnDate": "2025-10-04",
-				"transport": "train"
+				"returnDate": "2025-10-05",
+				"transport": "flight"
 			}
 		],
 		"budget": {
-			"transport": 45700,
-			"hotel": 183600,
-			"allowance": 80000,
-			"other": 0
+			"transport": 237400,
+			"hotel": 292500,
+			"allowance": 100000,
+			"other": 30600
 		},
-		"status": "approved",
+		"status": "pending_finance",
 		"createdAt": "2025-10-01T16:46:00.000Z",
-		"updatedAt": "2025-10-04T14:46:00.000Z",
+		"updatedAt": "2025-10-03T12:46:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0004-audit-1",
-				"at": "2025-10-02T18:46:00.000Z",
+				"at": "2025-10-02T08:46:00.000Z",
 				"actorId": "ba778d9f-8224-4de3-bbaa-05ca9cbcc679",
 				"actorName": "陈静",
 				"action": "submit",
@@ -1684,46 +1767,46 @@
 			},
 			{
 				"id": "TR-0004-audit-2",
-				"at": "2025-10-04T14:46:00.000Z",
+				"at": "2025-10-03T12:46:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved"
+				"to": "pending_finance"
 			}
 		],
-		"submittedAt": "2025-10-02T18:46:00.000Z"
+		"submittedAt": "2025-10-02T08:46:00.000Z"
 	},
 	{
 		"id": "TR-0003",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "配合审计部门完成现场资料核查",
+		"reason": "对接分公司完成需求调研",
 		"urgency": "normal",
 		"legs": [
 			{
 				"id": "leg-1",
-				"from": "北京",
-				"to": "深圳",
+				"from": "广州",
+				"to": "杭州",
 				"departDate": "2025-09-26",
-				"returnDate": "2025-09-27",
-				"transport": "flight"
+				"returnDate": "2025-09-29",
+				"transport": "other"
 			}
 		],
 		"budget": {
-			"transport": 261700,
-			"hotel": 113200,
-			"allowance": 40000,
-			"other": 0
+			"transport": 48700,
+			"hotel": 255600,
+			"allowance": 80000,
+			"other": 15900
 		},
 		"status": "rejected",
 		"createdAt": "2025-09-26T18:58:00.000Z",
-		"updatedAt": "2025-09-28T22:58:00.000Z",
+		"updatedAt": "2025-09-29T09:58:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0003-audit-1",
-				"at": "2025-09-27T14:58:00.000Z",
+				"at": "2025-09-27T17:58:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
@@ -1732,7 +1815,7 @@
 			},
 			{
 				"id": "TR-0003-audit-2",
-				"at": "2025-09-28T22:58:00.000Z",
+				"at": "2025-09-29T09:58:00.000Z",
 				"actorId": "0841d235-b926-4a41-aecd-3c5de814bd68",
 				"actorName": "李经理",
 				"action": "reject",
@@ -1741,38 +1824,38 @@
 				"comment": "预算超出部门季度额度，请压缩住宿费用后重新提交"
 			}
 		],
-		"submittedAt": "2025-09-27T14:58:00.000Z"
+		"submittedAt": "2025-09-27T17:58:00.000Z"
 	},
 	{
 		"id": "TR-0002",
 		"applicantId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 		"applicantName": "刘洋",
 		"department": "研发部",
-		"reason": "现场排查生产环境性能问题",
-		"urgency": "normal",
+		"reason": "对接分公司完成需求调研",
+		"urgency": "urgent",
 		"legs": [
 			{
 				"id": "leg-1",
 				"from": "武汉",
-				"to": "杭州",
+				"to": "深圳",
 				"departDate": "2025-09-19",
 				"returnDate": "2025-09-21",
-				"transport": "other"
+				"transport": "train"
 			}
 		],
 		"budget": {
-			"transport": 43500,
-			"hotel": 166500,
+			"transport": 86000,
+			"hotel": 207000,
 			"allowance": 60000,
-			"other": 0
+			"other": 8700
 		},
 		"status": "pending_manager",
 		"createdAt": "2025-09-19T10:14:00.000Z",
-		"updatedAt": "2025-09-20T05:14:00.000Z",
+		"updatedAt": "2025-09-20T01:14:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0002-audit-1",
-				"at": "2025-09-20T05:14:00.000Z",
+				"at": "2025-09-20T01:14:00.000Z",
 				"actorId": "0fc31634-c8ac-482a-8b95-4df36fdbf571",
 				"actorName": "刘洋",
 				"action": "submit",
@@ -1780,7 +1863,7 @@
 				"to": "pending_manager"
 			}
 		],
-		"submittedAt": "2025-09-20T05:14:00.000Z"
+		"submittedAt": "2025-09-20T01:14:00.000Z"
 	},
 	{
 		"id": "TR-0001",
@@ -1807,7 +1890,7 @@
 		},
 		"status": "approved",
 		"createdAt": "2025-09-01T11:06:00.000Z",
-		"updatedAt": "2025-09-02T16:06:00.000Z",
+		"updatedAt": "2025-09-04T10:06:00.000Z",
 		"audit": [
 			{
 				"id": "TR-0001-audit-1",
@@ -1825,8 +1908,18 @@
 				"actorName": "李经理",
 				"action": "approve",
 				"from": "pending_manager",
-				"to": "approved",
+				"to": "pending_finance",
 				"comment": "同意，注意留存票据"
+			},
+			{
+				"id": "TR-0001-audit-3",
+				"at": "2025-09-04T10:06:00.000Z",
+				"actorId": "f1a2c3e4-5b6d-4f8a-9c0b-1d2e3f4a5b6c",
+				"actorName": "王会计",
+				"action": "approve",
+				"from": "pending_finance",
+				"to": "approved",
+				"comment": "同意，请按期提交出差总结"
 			}
 		],
 		"submittedAt": "2025-09-01T14:06:00.000Z"

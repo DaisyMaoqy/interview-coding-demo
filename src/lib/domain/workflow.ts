@@ -71,7 +71,7 @@ type ActorRule =
 	| 'applicant'
 	/** 申请人的直属主管，且不能是本人 */
 	| 'manager'
-	/** 财务角色；本演示中暂省略两级审批，相关流转规则以注释保留在 TRANSITIONS，待接入独立 finance 角色时启用 */
+	/** 财务角色，审批「待财务审批」环节，且不能是申请人本人 */
 	| 'finance';
 
 interface TransitionRule {
@@ -86,36 +86,41 @@ interface TransitionRule {
  * 完整流转表。
  *
  * ```
- * draft ──submit──▶ pending_manager ──approve──▶ approved
- *                        │
- *                        ├──reject──▶ rejected
- *                        └──cancel──▶ cancelled
+ * draft ──submit──▶ pending_manager ──approve(主管)──▶ pending_finance ──approve(财务)──▶ approved
+ *                        │                                      │
+ *                        ├──reject(主管)──▶ rejected ◀──reject(财务)──┤
+ *                        └──cancel──────▶ cancelled ◀──cancel───────┘
  *
  * rejected ──reedit──▶ draft
+ *
+ * 草稿本身即可编辑，reedit 对草稿是「原地继续编辑」（状态不变、不追加审计），
+ * 只是把数据回填进向导；对驳回单才是 rejected → draft 的真实状态流转。
  * ```
  *
- * 注：财务审批（pending_finance）环节当前省略，相关流转规则在下方以注释保留，
- * 待接入独立 finance 角色时取消注释即可恢复两级审批。
+ * 两级审批：主管先审，通过后进入「待财务审批」，由独立财务角色二审。
  */
 const TRANSITIONS: Record<AuditAction, readonly TransitionRule[]> = {
 	submit: [{ from: 'draft', to: 'pending_manager', actor: 'applicant', commentRequired: false }],
 	approve: [
-		// 当前演示仅一级审批：主管通过即归档。
-		// 财务审批环节暂省略；下方规则保留以便日后接入独立 finance 角色时启用。
-		{ from: 'pending_manager', to: 'approved', actor: 'manager', commentRequired: false },
-		// { from: 'pending_finance', to: 'approved', actor: 'finance', commentRequired: false },
+		{ from: 'pending_manager', to: 'pending_finance', actor: 'manager', commentRequired: false },
+		{ from: 'pending_finance', to: 'approved', actor: 'finance', commentRequired: false }
 	],
 	// 驳回必须说明理由，否则申请人不知道该改什么
 	reject: [
 		{ from: 'pending_manager', to: 'rejected', actor: 'manager', commentRequired: true },
-		// { from: 'pending_finance', to: 'rejected', actor: 'finance', commentRequired: true }
+		{ from: 'pending_finance', to: 'rejected', actor: 'finance', commentRequired: true }
 	],
-	// 已通过的单不可撤销 —— 差旅已成行，撤销没有业务含义
+	// 申请人可在两级审批的任一待审阶段撤销；已通过的单不可撤销（差旅已成行）
 	cancel: [
 		{ from: 'pending_manager', to: 'cancelled', actor: 'applicant', commentRequired: false },
-		// { from: 'pending_finance', to: 'cancelled', actor: 'applicant', commentRequired: false }
+		{ from: 'pending_finance', to: 'cancelled', actor: 'applicant', commentRequired: false }
 	],
-	reedit: [{ from: 'rejected', to: 'draft', actor: 'applicant', commentRequired: false }]
+	// 被驳回：rejected → draft 才是真实状态流转（记一条审计）；
+	// 草稿：原地继续编辑，状态不变，不追加审计，仅把数据回填进向导
+	reedit: [
+		{ from: 'rejected', to: 'draft', actor: 'applicant', commentRequired: false },
+		{ from: 'draft', to: 'draft', actor: 'applicant', commentRequired: false }
+	]
 };
 
 export type TransitionFailureCode =
@@ -137,9 +142,11 @@ function canActAs(rule: ActorRule, actor: User, request: TravelRequest): boolean
 		case 'applicant':
 			return actor.id === request.applicantId;
 		case 'manager':
-		case 'finance':
-			// 审批人必须是管理角色，且不能审批自己提交的单
+			// 主管审批：必须是管理角色，且不能审批自己提交的单
 			return actor.role === 'manager' && actor.id !== request.applicantId;
+		case 'finance':
+			// 财务审批：必须是财务角色，且不能审批自己提交的单
+			return actor.role === 'finance' && actor.id !== request.applicantId;
 	}
 }
 
@@ -159,6 +166,7 @@ export function availableActions(request: TravelRequest, actor: User): AuditActi
  * - 自己的单（任意状态）一定可看；
  * - 经理可查看**员工**的**非草稿**单（草稿仅申请人自己可见），便于主管掌握
  *   团队差旅进展，员工的已审批 / 已驳回等也对他可见；
+ * - 财务只查看流转到「待财务审批」的单，避免越权看到他人草稿或主管环节；
  * - 其余（员工看他人或领导的单、经理看员工的草稿、经理看其他经理的单）一律不可看。
  *
  * 注意查看权限与操作权限（availableActions）是两回事：能看不代表能审批，
@@ -167,7 +175,13 @@ export function availableActions(request: TravelRequest, actor: User): AuditActi
 export function canViewRequest(request: TravelRequest, viewer: User): boolean {
 	if (request.applicantId === viewer.id) return true;
 	const applicant = findUser(request.applicantId);
-	return viewer.role === 'manager' && applicant?.role === 'employee' && request.status !== 'draft';
+	if (viewer.role === 'manager') {
+		return applicant?.role === 'employee' && request.status !== 'draft';
+	}
+	if (viewer.role === 'finance') {
+		return request.status === 'pending_finance';
+	}
+	return false;
 }
 
 /** 是否可编辑内容：只有草稿可改 */

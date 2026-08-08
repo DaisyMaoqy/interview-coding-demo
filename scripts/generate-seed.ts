@@ -12,14 +12,18 @@
  * 2. **走真实状态机**：每张单的状态都由 `transition()` 一步步流转出来，
  *    而不是直接写死 `status: 'approved'`。这样审批时间线必然自洽，
  *    也顺带反向验证了状态机本身。
- * 3. **李经理的单全部预置为终态**：他既是审批人又是员工，
+ * 3. **李经理的单全部预置为终态**：他既是主管又是员工，
  *    而「不能自审」是硬规则，所以他的单不能停在待审批状态，否则永远无人处理。
+ *
+ * 审批为两级：主管先审（pending_manager → pending_finance），财务二审
+ * （pending_finance → approved）。申请人池仅限 role==='employee'，财务角色
+ * 只作为二审审批人出现，避免「自己审自己」的死锁。
  */
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { EMPLOYEE_ID, MANAGER_ID, USERS, requireUser } from '../src/lib/domain/org';
+import { EMPLOYEE_ID, FINANCE_ID, MANAGER_ID, USERS, requireUser } from '../src/lib/domain/org';
 import { budgetTotal } from '../src/lib/domain/money';
 import { BUDGET_NOTE_THRESHOLD_CENTS } from '../src/lib/domain/schema';
 import { transition } from '../src/lib/domain/workflow';
@@ -169,6 +173,8 @@ interface Plan {
 function driveToTarget(draft: TravelRequest, target: RequestStatus, approver: User): TravelRequest {
 	let current = draft;
 	let clock = 0;
+	// 财务二审审批人：与主管分离的独立角色，确保两级审批由不同人完成
+	const financeApprover = requireUser(FINANCE_ID);
 
 	const step = (
 		action: Parameters<typeof transition>[0]['action'],
@@ -202,19 +208,23 @@ function driveToTarget(draft: TravelRequest, target: RequestStatus, approver: Us
 		case 'pending_manager':
 			break;
 
-		// 财务审批环节当前省略（见 workflow.ts 的 TRANSITIONS 注释），pending_finance 不再是目标状态。
-		// 保留此分支，待接入独立 finance 角色、取消 workflow.ts 中对应注释后即可恢复两级审批。
-		// case 'pending_finance':
-		// 	step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
-		// 	break;
-
-		case 'approved':
-			// 一级审批：主管通过即归档
+		case 'pending_finance':
+			// 只走主管一审：主管通过即停在「待财务审批」，留待财务二审
 			step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
 			break;
 
+		case 'approved':
+			// 两级审批：主管通过后再由财务通过才归档
+			step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
+			step(
+				'approve',
+				financeApprover,
+				random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined
+			);
+			break;
+
 		case 'rejected':
-			// 当前仅主管一级审批，驳回统一发生在主管环节
+			// 驳回统一发生在主管环节（主管驳回即终止，不进财务）
 			step('reject', approver, random.pick(REJECT_COMMENTS));
 			break;
 
@@ -264,7 +274,8 @@ function makeDraft(plan: Plan, sequence: number): TravelRequest {
 const EMPLOYEE_QUOTA: ReadonlyArray<readonly [RequestStatus, number]> = [
 	['draft', 4],
 	['pending_manager', 6],
-	['approved', 16],
+	['pending_finance', 4],
+	['approved', 12],
 	['rejected', 4],
 	['cancelled', 3]
 ];
@@ -303,7 +314,9 @@ function shuffle<T>(items: T[]): T[] {
 function buildPlans(): Plan[] {
 	const approver = requireUser(MANAGER_ID);
 	const zhangsan = requireUser(EMPLOYEE_ID);
-	const employees = USERS.filter((u) => u.id !== MANAGER_ID);
+	// 申请人池只取普通员工：财务角色仅作为二审审批人出现，
+	// 否则财务自己提交的单会卡在「待财务审批」且无人可二审（自审被禁止）。
+	const employees = USERS.filter((u) => u.role === 'employee');
 
 	// 覆盖最近 12 个自然月，锚定在固定日期以保证输出稳定
 	const anchor = new Date(Date.UTC(2026, 7, 1));

@@ -43,8 +43,8 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 				label: '待我审批',
 				description: '等待我处理的申请',
 				icon: 'check',
-				// 员工没有审批职责，菜单里不该出现这一项
-				visibleTo: ['manager']
+				// 员工没有审批职责，菜单里不该出现这一项；主管审一级、财务审二级
+				visibleTo: ['manager', 'finance']
 			},
 			{
 				href: resolve('/travel/apply'),
