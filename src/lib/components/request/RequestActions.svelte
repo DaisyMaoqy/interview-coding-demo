@@ -86,16 +86,20 @@
 
 <!-- 驳回弹窗：意见必填，否则申请人不知道该改什么 -->
 <Modal open={showReject} title="驳回申请" onclose={() => (showReject = false)}>
-	{#snippet children()}
-		<p class="modal__hint">请填写驳回理由（不超过 {REJECT_COMMENT_MAX_LENGTH} 字），申请人会看到这条意见。</p>
+	{#snippet body()}
+		<p class="modal__hint">
+			请填写驳回理由（不超过 {REJECT_COMMENT_MAX_LENGTH} 字），申请人会看到这条意见。
+		</p>
 		<textarea
 			class="modal__input"
 			rows="3"
 			maxlength={REJECT_COMMENT_MAX_LENGTH}
 			placeholder="驳回理由（必填）"
-			bind:value={comment}
-		></textarea>
-		<p class="modal__counter" class:modal__counter--max={comment.length >= REJECT_COMMENT_MAX_LENGTH}>
+			bind:value={comment}></textarea>
+		<p
+			class="modal__counter"
+			class:modal__counter--max={comment.length >= REJECT_COMMENT_MAX_LENGTH}
+		>
 			{comment.length}/{REJECT_COMMENT_MAX_LENGTH}
 		</p>
 		{#if feedback}

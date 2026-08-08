@@ -7,12 +7,12 @@
 		title: string;
 		onclose?: () => void;
 		/** 弹窗主体内容，例如说明文案与输入控件 */
-		children: Snippet;
+		body: Snippet;
 		/** 底部操作区，例如取消 / 确认按钮 */
 		actions?: Snippet;
 	}
 
-	let { open, title, onclose, children, actions }: Props = $props();
+	let { open, title, onclose, body, actions }: Props = $props();
 </script>
 
 <!-- Esc 关闭：窗口级监听，无论焦点在弹窗内还是外都能生效 -->
@@ -37,7 +37,7 @@
 		<div class="modal" role="dialog" aria-modal="true" aria-label={title} tabindex="-1">
 			<h3 class="modal__title">{title}</h3>
 			<div class="modal__body">
-				{@render children()}
+				{@render body()}
 			</div>
 			{#if actions}
 				<div class="modal__actions">
