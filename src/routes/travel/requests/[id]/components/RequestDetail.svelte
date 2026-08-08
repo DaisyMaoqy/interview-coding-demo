@@ -13,11 +13,15 @@
 	import type { TravelRequest, User } from '$lib/domain/types';
 
 	let { request, actor }: { request: TravelRequest; actor: User } = $props();
+
+	// 返回去向随身份：经理从「待我审批」进详情，返回待我审批；员工返回我的申请
+	const backHref = $derived(actor.role === 'manager' ? '/travel/approvals' : '/travel/requests');
+	const backLabel = $derived(actor.role === 'manager' ? '待我审批' : '我的申请');
 </script>
 
 <!-- 头部内容 -->
-<a href={resolve('/travel/requests')} class="back-link">
-	<span aria-hidden="true">←</span> 返回我的申请
+<a href={resolve(backHref)} class="back-link">
+	<span aria-hidden="true">←</span> 返回{backLabel}
 </a>
 <PageHeader title="申请详情" description="单号 {request.id}">
 	{#snippet actions()}

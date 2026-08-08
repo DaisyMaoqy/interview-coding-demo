@@ -11,18 +11,17 @@
 
 	const identity = useIdentity();
 
-	// 待我审批 = 非本人提交、可查看、且处于两个审批中的状态之一。
-	// 自审规则由 workflow 在 transition 时再兜底拦截，这里先收窄列表。
+	// 经理的「待我审批」只收一级审批：待主管审批。财务审批由独立角色处理，
+	// 不在本视图出现（既不能看，也不会从这里流转过去）。自审规则由 workflow 在
+	// transition 时再兜底拦截，这里先按状态收窄列表。
 	const todo = $derived(
 		$requestsStore.filter(
 			(r) =>
 				r.applicantId !== identity.user.id &&
 				canViewRequest(r, identity.user) &&
-				(r.status === 'pending_manager' || r.status === 'pending_finance')
+				r.status === 'pending_manager'
 		)
 	);
-	const pendingManager = $derived(todo.filter((r) => r.status === 'pending_manager'));
-	const pendingFinance = $derived(todo.filter((r) => r.status === 'pending_finance'));
 	const allIds = $derived(todo.map((r) => r.id));
 
 	// 批量选择：以 id 数组为唯一真相，卡片只回传切换事件，由这里维护集合
@@ -112,43 +111,21 @@
 			</button>
 		</div>
 
-		<div class="approval-groups">
-			{#if pendingManager.length > 0}
-				<Panel title="待主管审批 ({pendingManager.length})">
-					<ul class="approval-list">
-						{#each pendingManager as request (request.id)}
-							<li>
-								<ApprovalCard
-									{request}
-									selected={isSelected(request.id)}
-									ontoggle={toggle}
-									onapprove={approve}
-									onreject={openReject}
-								/>
-							</li>
-						{/each}
-					</ul>
-				</Panel>
-			{/if}
-
-			{#if pendingFinance.length > 0}
-				<Panel title="待财务审批 ({pendingFinance.length})">
-					<ul class="approval-list">
-						{#each pendingFinance as request (request.id)}
-							<li>
-								<ApprovalCard
-									{request}
-									selected={isSelected(request.id)}
-									ontoggle={toggle}
-									onapprove={approve}
-									onreject={openReject}
-								/>
-							</li>
-						{/each}
-					</ul>
-				</Panel>
-			{/if}
-		</div>
+		<Panel title="待主管审批 ({todo.length})">
+			<ul class="approval-list">
+				{#each todo as request (request.id)}
+					<li>
+						<ApprovalCard
+							{request}
+							selected={isSelected(request.id)}
+							ontoggle={toggle}
+							onapprove={approve}
+							onreject={openReject}
+						/>
+					</li>
+				{/each}
+			</ul>
+		</Panel>
 	{/if}
 
 	<Modal open={rejectTarget !== null} title="驳回申请" onclose={closeReject}>
@@ -232,11 +209,6 @@
 	}
 	.toolbar__spacer {
 		flex: 1;
-	}
-	.approval-groups {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 	}
 	.approval-list {
 		display: flex;
