@@ -3,6 +3,8 @@
 	import type { Role } from '$lib/domain/types';
 	import { useIdentity } from '$lib/state/identity.svelte';
 
+	let { showSwitch = true }: { showSwitch?: boolean } = $props();
+
 	const identity = useIdentity();
 
 	const OPTIONS: ReadonlyArray<{ role: Role; hint: string }> = [
@@ -22,20 +24,22 @@
 			工号 {identity.user.employeeId} · {identity.user.department} · {identity.user.title}
 		</div>
 	</div>
-	<!-- 方便演示切换申请人和审批人 -->
-	<div class="identity-switcher__switch" role="group" aria-label="切换演示身份">
-		{#each OPTIONS as option (option.role)}
-			{@const user = requireUser(IDENTITY_BY_ROLE[option.role])}
-			{@const selected = identity.role === option.role}
-			<button
-				type="button"
-				aria-pressed={selected}
-				title="以 {user.name}（{user.title}）的身份{option.hint}"
-				onclick={() => identity.switchTo(option.role)}
-				class="identity-switcher__option {selected ? 'identity-switcher__option--active' : ''}"
-			>
-				{user.name}
-			</button>
-		{/each}
-	</div>
+	{#if showSwitch}
+		<!-- 方便演示切换申请人和审批人 -->
+		<div class="identity-switcher__switch" role="group" aria-label="切换演示身份">
+			{#each OPTIONS as option (option.role)}
+				{@const user = requireUser(IDENTITY_BY_ROLE[option.role])}
+				{@const selected = identity.role === option.role}
+				<button
+					type="button"
+					aria-pressed={selected}
+					title="以 {user.name}（{user.title}）的身份{option.hint}"
+					onclick={() => identity.switchTo(option.role)}
+					class="identity-switcher__option {selected ? 'identity-switcher__option--active' : ''}"
+				>
+					{user.name}
+				</button>
+			{/each}
+		</div>
+	{/if}
 </div>

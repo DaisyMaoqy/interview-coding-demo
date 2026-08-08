@@ -130,11 +130,7 @@
 		onconfirm={confirmReject}
 	/>
 {:else}
-	<!--
-		员工的侧栏本就没有这一项，能走到这里只有直接输入 URL 一种情况。
-		不做 403 拦截而是给出解释与出口 —— 演示中身份可自由切换，
-		把话说清楚比把人挡在门外更有用。
-	-->
+	<!-- 员工没有审批权限 -->
 	<div class="notice-card">
 		<p class="notice-card__text">
 			当前身份是 <span class="font-medium text-slate-900">{identity.user.name}</span
