@@ -2,31 +2,35 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props {
-		title: string;
+		title?: string;
 		/** 标题下方的补充说明，例如数据口径 */
 		subtitle?: string;
 		/** 标题右侧的操作区，例如「展开 / 新增」按钮 */
 		actions?: Snippet;
+		/** 隐藏整块 header，仅保留卡片容器（如外层已有同级标题时避免重复） */
+		hideHeader?: boolean;
 		children: Snippet;
 	}
 
-	let { title, subtitle, actions, children }: Props = $props();
+	let { title, subtitle, actions, hideHeader = false, children }: Props = $props();
 </script>
 
 <section class="panel">
-	<header class="panel__header">
-		<div class="panel__heading">
-			<h2 class="panel__title">{title}</h2>
-			{#if subtitle}
-				<p class="panel__subtitle">{subtitle}</p>
-			{/if}
-		</div>
-		{#if actions}
-			<div class="panel__actions">
-				{@render actions()}
+	{#if !hideHeader}
+		<header class="panel__header">
+			<div class="panel__heading">
+				<h2 class="panel__title">{title}</h2>
+				{#if subtitle}
+					<p class="panel__subtitle">{subtitle}</p>
+				{/if}
 			</div>
-		{/if}
-	</header>
+			{#if actions}
+				<div class="panel__actions">
+					{@render actions()}
+				</div>
+			{/if}
+		</header>
+	{/if}
 	<div class="panel__body">
 		{@render children()}
 	</div>
