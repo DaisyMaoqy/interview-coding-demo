@@ -8,11 +8,9 @@
  */
 
 /**
- * 用户主键，UUID。
- *
- * 用 UUID 而非自增数字：主键不该携带业务含义，
- * ID 不能动，一旦被引用（申请单、审批留痕）就改不动了。
- * 对外展示工号 `employeeId`。
+ * 用户主键ID用UUID而非自增数字
+ * 主键不该携带业务含义，不能动
+ * 对外展示工号 `employeeId`
  */
 export type UserId = string;
 
