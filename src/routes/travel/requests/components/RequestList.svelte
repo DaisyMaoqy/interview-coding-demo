@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
+	import Pagination from '$lib/components/common/Pagination.svelte';
 	import RequestCard from './RequestCard.svelte';
 	import type { TravelRequest } from '$lib/domain/types';
 
 	interface Props {
-		/** 已筛选过的待渲染列表 */
+		/** 已筛选过的待渲染列表（完整集合，分页切片在此处理） */
 		requests: readonly TravelRequest[];
 		/** 搜索词，透传给卡片做命中高亮 */
 		keyword?: string;
@@ -13,10 +14,13 @@
 		hasNoRequests: boolean;
 		/** 当前存在可清除的年/月/关键字条件 */
 		hasClearableFilter: boolean;
+		/** 筛选条件变化时回到首页（传入如「状态|关键词|年|月」拼接串） */
+		resetKey?: unknown;
 		onclear?: () => void;
 	}
 
-	let { requests, keyword = '', hasNoRequests, hasClearableFilter, onclear }: Props = $props();
+	let { requests, keyword = '', hasNoRequests, hasClearableFilter, resetKey, onclear }: Props =
+		$props();
 
 	// 空状态文案：区分「真的没申请单」与「被筛选/搜索过滤没了」，
 	const emptyTitle = $derived(
@@ -40,11 +44,19 @@
 		{/snippet}
 	</EmptyState>
 {:else}
-	<ul class="request-list">
-		{#each requests as request (request.id)}
-			<li><RequestCard {request} {keyword} /></li>
-		{/each}
-	</ul>
+	<Pagination
+		items={requests}
+		pageSizeOptions={[5, 10, 20]}
+		{resetKey}
+		children={requestListSnippet}
+	/>
+	{#snippet requestListSnippet({ pageItems }: { pageItems: TravelRequest[] })}
+		<ul class="request-list">
+			{#each pageItems as request (request.id)}
+				<li><RequestCard {request} {keyword} /></li>
+			{/each}
+		</ul>
+	{/snippet}
 {/if}
 
 <style>

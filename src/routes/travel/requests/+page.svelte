@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { get } from 'svelte/store';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import RequestFilterBar from './components/RequestFilterBar.svelte';
 	import RequestList from './components/RequestList.svelte';
 	import { resolve } from '$app/paths';
 	import { useIdentity } from '$lib/state/identity.svelte';
+	import { requestListFilters } from '$lib/state/requestListFilters';
 	import {
 		distinctYears,
 		filterByDate,
@@ -11,6 +13,7 @@
 		getRequestsByApplicant,
 		requestsStore,
 		searchRequests,
+		sortBySubmittedAtDesc,
 		type StatusFilter
 	} from '$lib/data/requests';
 
@@ -28,14 +31,23 @@
 
 	const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
-	let activeFilter = $state<StatusFilter>('all');
-	let keyword = $state('');
-	let year = $state<number | 'all'>('all');
-	let month = $state<number | 'all'>('all');
+	// 以共享 store 的当前值初始化，离开本页（去重新编辑申请）后再回来可恢复上次筛选
+	const savedFilters = get(requestListFilters);
+	let activeFilter = $state<StatusFilter>(savedFilters.status);
+	let keyword = $state(savedFilters.keyword);
+	let year = $state<number | 'all'>(savedFilters.year);
+	let month = $state<number | 'all'>(savedFilters.month);
+
+	// 任一筛选维度变化都同步回 store，供「返回我的申请」等跨页导航恢复
+	$effect(() => {
+		requestListFilters.set({ status: activeFilter, keyword, year, month });
+	});
 
 	// 切角色即切登录人，依赖 identity.user（读取响应式的 role）会自动重算；
 	// 传入 $requestsStore（响应式）让列表随远端加载 / 缓存回退自动刷新
-	const mine = $derived(getRequestsByApplicant(identity.user.id, $requestsStore));
+	const mine = $derived(
+		sortBySubmittedAtDesc(getRequestsByApplicant(identity.user.id, $requestsStore))
+	);
 	const years = $derived(distinctYears(mine));
 	// 三个维度正交：状态 → 年/月 → 关键字，叠加生效
 	const visible = $derived(
@@ -64,6 +76,9 @@
 		year = 'all';
 		month = 'all';
 	}
+
+	// 筛选条件拼接串：任一维度变化都令分页回到首页
+	const filterKey = $derived(`${activeFilter}|${keyword}|${year}|${month}`);
 </script>
 
 <PageHeader title="我的申请" description="{identity.user.name} 发起的全部差旅申请">
@@ -89,5 +104,6 @@
 	{keyword}
 	hasNoRequests={mine.length === 0}
 	{hasClearableFilter}
+	resetKey={filterKey}
 	onclear={resetFilters}
 />

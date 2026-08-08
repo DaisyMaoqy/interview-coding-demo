@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { summarizeLegs, requestTotal } from '$lib/data/requests';
 	import { formatYuan } from '$lib/domain/money';
-	import { formatDate } from '$lib/format';
+	import { formatDate, formatDateTime } from '$lib/format';
 	import type { TravelRequest } from '$lib/domain/types';
 
 	interface Props {
@@ -30,7 +30,12 @@
 				{formatDate(request.createdAt)}
 			</p>
 		</div>
-		<StatusBadge status={request.status} />
+		<div class="request-card__status">
+			<StatusBadge status={request.status} />
+			<p class="request-card__submitted">
+				{request.submittedAt ? `提交于 ${formatDateTime(request.submittedAt)}` : '尚未提交'}
+			</p>
+		</div>
 	</div>
 
 	<div class="request-card__footer">
@@ -59,6 +64,19 @@
 	}
 	.request-card__main {
 		min-width: 0;
+	}
+	.request-card__status {
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.375rem;
+		text-align: right;
+	}
+	.request-card__submitted {
+		font-size: 0.75rem;
+		color: var(--color-slate-400);
+		white-space: nowrap;
 	}
 	.request-card__reason {
 		overflow: hidden;

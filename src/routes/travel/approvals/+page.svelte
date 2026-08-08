@@ -1,26 +1,38 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
+	import Pagination from '$lib/components/common/Pagination.svelte';
 	import ApprovalCard from './components/ApprovalCard.svelte';
 	import RejectDialog from '../components/RejectDialog.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { requestsStore, updateRequest } from '$lib/data/requests';
+	import { requestsStore, updateRequest, sortBySubmittedAtDesc } from '$lib/data/requests';
 	import { canViewRequest, transition } from '$lib/domain/workflow';
-	import type { TravelRequest } from '$lib/domain/types';
+	import type { RequestStatus, TravelRequest } from '$lib/domain/types';
 
 	const identity = useIdentity();
 
-	// 经理的「待我审批」只收一级审批：待主管审批。财务审批由独立角色处理，
-	// 不在本视图出现（既不能看，也不会从这里流转过去）。自审规则由 workflow 在
-	// transition 时再兜底拦截，这里先按状态收窄列表。
+	// 两级审批：主管看「待主管审批」，财务看「待财务审批」。
+	// 各自的待办状态由身份决定；自审规则由 workflow 在 transition 时再兜底拦截，
+	// 这里先按身份收窄到对应状态。
+	const myPendingStatus: RequestStatus | null = identity.isManager
+		? 'pending_manager'
+		: identity.isFinance
+			? 'pending_finance'
+			: null;
+
 	const todo = $derived(
-		$requestsStore.filter(
-			(r) =>
-				r.applicantId !== identity.user.id &&
-				canViewRequest(r, identity.user) &&
-				r.status === 'pending_manager'
+		sortBySubmittedAtDesc(
+			$requestsStore.filter(
+				(r) =>
+					myPendingStatus !== null &&
+					r.applicantId !== identity.user.id &&
+					canViewRequest(r, identity.user) &&
+					r.status === myPendingStatus
+			)
 		)
 	);
+	// 切换审批身份时回到首页，避免停留在另一角色的无数据页码
+	const approvalResetKey = $derived(identity.role);
 	const allIds = $derived(todo.map((r) => r.id));
 
 	// 批量选择：以 id 数组为唯一真相，卡片只回传切换事件，由这里维护集合
@@ -38,8 +50,8 @@
 		selected = allSelected ? [] : [...allIds];
 	}
 
-	// 通过/驳回只描述意图，具体落到 approved 还是 rejected 由状态机决定。
-	// 当前为一级审批（pending_manager → approved），见 workflow.ts 的 TRANSITIONS 注释。
+	// 通过/驳回只描述意图，具体落到 pending_finance 还是 approved 由状态机决定。
+	// 主管通过停在待财务审批，财务通过才归档，见 workflow.ts 的 TRANSITIONS。
 	function approve(request: TravelRequest): void {
 		const res = transition({ request, action: 'approve', actor: identity.user });
 		if (res.ok) {
@@ -85,7 +97,7 @@
 	}
 </script>
 
-{#if identity.isManager}
+{#if identity.isManager || identity.isFinance}
 	<PageHeader title="待我审批" />
 
 	{#if todo.length === 0}
@@ -108,19 +120,27 @@
 			</button>
 		</div>
 
-		<ul class="approval-list">
-			{#each todo as request (request.id)}
-				<li>
-					<ApprovalCard
-						{request}
-						selected={isSelected(request.id)}
-						ontoggle={toggle}
-						onapprove={approve}
-						onreject={openReject}
-					/>
-				</li>
-			{/each}
-		</ul>
+		<Pagination
+			items={todo}
+			pageSizeOptions={[5, 10, 20]}
+			resetKey={approvalResetKey}
+			children={approvalListSnippet}
+		/>
+		{#snippet approvalListSnippet({ pageItems }: { pageItems: TravelRequest[] })}
+			<ul class="approval-list">
+				{#each pageItems as request (request.id)}
+					<li>
+						<ApprovalCard
+							{request}
+							selected={isSelected(request.id)}
+							ontoggle={toggle}
+							onapprove={approve}
+							onreject={openReject}
+						/>
+					</li>
+				{/each}
+			</ul>
+		{/snippet}
 	{/if}
 
 	<RejectDialog
@@ -134,15 +154,24 @@
 	<div class="notice-card">
 		<p class="notice-card__text">
 			当前身份是 <span class="font-medium text-slate-900">{identity.user.name}</span
-			>，没有审批职责。
+			>，没有审批职责。可切换到审批身份查看待办。
 		</p>
-		<button
-			type="button"
-			onclick={() => identity.switchTo('manager')}
-			class="notice-card__action btn btn--primary"
-		>
-			切换到主管身份
-		</button>
+		<div class="notice-card__actions">
+			<button
+				type="button"
+				onclick={() => identity.switchTo('manager')}
+				class="notice-card__action btn btn--primary"
+			>
+				切换到主管身份
+			</button>
+			<button
+				type="button"
+				onclick={() => identity.switchTo('finance')}
+				class="notice-card__action btn btn--primary"
+			>
+				切换到财务身份
+			</button>
+		</div>
 	</div>
 {/if}
 
@@ -177,6 +206,11 @@
 	.approval-list {
 		display: flex;
 		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.notice-card__actions {
+		display: flex;
+		flex-wrap: wrap;
 		gap: 0.75rem;
 	}
 </style>

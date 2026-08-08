@@ -57,6 +57,16 @@ function byUpdatedDesc(a: TravelRequest, b: TravelRequest): number {
 	return b.updatedAt.localeCompare(a.updatedAt);
 }
 
+/**
+ * 按「首次提交时间」倒序（最新提交在前）。
+ *
+ * 草稿没有 `submittedAt`，用空串兜底沉到末尾，保证有实际提交记录的单据始终排在前面。
+ * 列表（我的申请 / 待我审批）统一走此排序，让卡片以提交时间先后呈现。
+ */
+export function sortBySubmittedAtDesc(requests: readonly TravelRequest[]): TravelRequest[] {
+	return [...requests].sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''));
+}
+
 /** 启动加载：Apifox Mock → localStorage 缓存 → seed.json 兜底 */
 export async function loadRequests(): Promise<void> {
 	const base = PUBLIC_MOCK_BASE_URL;
