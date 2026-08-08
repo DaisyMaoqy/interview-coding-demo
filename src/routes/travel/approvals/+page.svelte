@@ -1,12 +1,11 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
-	import Panel from '$lib/components/common/Panel.svelte';
-	import Modal from '$lib/components/common/Modal.svelte';
 	import ApprovalCard from './components/ApprovalCard.svelte';
+	import RejectDialog from '../components/RejectDialog.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestsStore, updateRequest } from '$lib/data/requests';
-	import { canViewRequest, transition, REJECT_COMMENT_MAX_LENGTH } from '$lib/domain/workflow';
+	import { canViewRequest, transition } from '$lib/domain/workflow';
 	import type { TravelRequest } from '$lib/domain/types';
 
 	const identity = useIdentity();
@@ -57,28 +56,25 @@
 		selected = [];
 	}
 
-	// 驳回需填意见：弹窗里取 comment，由 transition 校验必填与长度上限
+	// 驳回需填意见：意见与校验由 RejectDialog，这里只拿到最终 comment 去流转
 	let rejectTarget = $state<TravelRequest | null>(null);
-	let rejectComment = $state('');
 	let rejectError = $state<string | null>(null);
 
 	function openReject(request: TravelRequest): void {
 		rejectTarget = request;
-		rejectComment = '';
 		rejectError = null;
 	}
 	function closeReject(): void {
 		rejectTarget = null;
-		rejectComment = '';
 		rejectError = null;
 	}
-	function confirmReject(): void {
+	function confirmReject(comment: string): void {
 		if (!rejectTarget) return;
 		const res = transition({
 			request: rejectTarget,
 			action: 'reject',
 			actor: identity.user,
-			comment: rejectComment
+			comment
 		});
 		if (res.ok) {
 			updateRequest(res.request);
@@ -100,7 +96,7 @@
 				<input type="checkbox" checked={allSelected} aria-label="全选" onchange={toggleAll} />
 				全选
 			</label>
-			<span class="toolbar__count">已选 {selectedCount} 项</span>
+			<span class="toolbar__count">已选 {selectedCount} 项 · 共 {todo.length} 条</span>
 			<span class="toolbar__spacer"></span>
 			<button
 				type="button"
@@ -112,56 +108,27 @@
 			</button>
 		</div>
 
-		<Panel title="待主管审批 ({todo.length})">
-			<ul class="approval-list">
-				{#each todo as request (request.id)}
-					<li>
-						<ApprovalCard
-							{request}
-							selected={isSelected(request.id)}
-							ontoggle={toggle}
-							onapprove={approve}
-							onreject={openReject}
-						/>
-					</li>
-				{/each}
-			</ul>
-		</Panel>
+		<ul class="approval-list">
+			{#each todo as request (request.id)}
+				<li>
+					<ApprovalCard
+						{request}
+						selected={isSelected(request.id)}
+						ontoggle={toggle}
+						onapprove={approve}
+						onreject={openReject}
+					/>
+				</li>
+			{/each}
+		</ul>
 	{/if}
 
-	<Modal open={rejectTarget !== null} title="驳回申请" onclose={closeReject}>
-		{#snippet body()}
-			<p class="modal__hint">
-				请填写驳回理由（不超过 {REJECT_COMMENT_MAX_LENGTH} 字），申请人会看到这条意见。
-			</p>
-			<textarea
-				class="modal__input"
-				rows="3"
-				maxlength={REJECT_COMMENT_MAX_LENGTH}
-				placeholder="驳回理由（必填）"
-				bind:value={rejectComment}></textarea>
-			<p
-				class="modal__counter"
-				class:modal__counter--max={rejectComment.length >= REJECT_COMMENT_MAX_LENGTH}
-			>
-				{rejectComment.length}/{REJECT_COMMENT_MAX_LENGTH}
-			</p>
-			{#if rejectError}
-				<p class="modal__error" role="alert">{rejectError}</p>
-			{/if}
-		{/snippet}
-		{#snippet actions()}
-			<button type="button" class="btn btn--ghost" onclick={closeReject}>取消</button>
-			<button
-				type="button"
-				class="btn btn--danger"
-				disabled={rejectComment.trim() === ''}
-				onclick={confirmReject}
-			>
-				确认驳回
-			</button>
-		{/snippet}
-	</Modal>
+	<RejectDialog
+		open={rejectTarget !== null}
+		error={rejectError}
+		onclose={closeReject}
+		onconfirm={confirmReject}
+	/>
 {:else}
 	<!--
 		员工的侧栏本就没有这一项，能走到这里只有直接输入 URL 一种情况。

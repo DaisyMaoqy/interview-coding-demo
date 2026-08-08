@@ -45,7 +45,10 @@
 	</div>
 
 	<div class="approval-card__body">
-		<a class="approval-card__reason" href={resolve('/travel/requests/[id]', { id: request.id })}>
+		<a
+			class="approval-card__reason"
+			href={resolve(`/travel/requests/${request.id}?from=approvals`)}
+		>
 			{request.reason}
 		</a>
 		<p class="approval-card__meta">
