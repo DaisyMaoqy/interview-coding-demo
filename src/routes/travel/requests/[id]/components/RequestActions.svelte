@@ -1,10 +1,9 @@
 <script lang="ts">
-	import Modal from '$lib/components/common/Modal.svelte';
+	import RejectDialog from '../../../components/RejectDialog.svelte';
 	import {
 		ACTION_LABELS,
 		actionRequiresComment,
 		availableActions,
-		REJECT_COMMENT_MAX_LENGTH,
 		transition
 	} from '$lib/domain/workflow';
 	import { updateRequest } from '$lib/data/requests';
@@ -28,10 +27,9 @@
 
 	let feedback = $state<string | null>(null);
 	let showReject = $state(false);
-	let comment = $state('');
 
-	/** 执行一次流转并落库；需要意见的动作（驳回）从弹窗里的 comment 取值 */
-	function runAction(action: AuditAction): void {
+	/** 执行一次流转并落库；需要意见的动作（驳回）由调用方传入 comment */
+	function runAction(action: AuditAction, comment?: string): void {
 		feedback = null;
 		const result = transition({
 			request,
@@ -47,11 +45,9 @@
 
 		updateRequest(result.request);
 		showReject = false;
-		comment = '';
 	}
 
 	function openReject(): void {
-		comment = '';
 		feedback = null;
 		showReject = true;
 	}
@@ -84,40 +80,12 @@
 	<p class="action-empty">{emptyHint}</p>
 {/if}
 
-<!-- 驳回弹窗：意见必填，否则申请人不知道该改什么 -->
-<Modal open={showReject} title="驳回申请" onclose={() => (showReject = false)}>
-	{#snippet body()}
-		<p class="modal__hint">
-			请填写驳回理由（不超过 {REJECT_COMMENT_MAX_LENGTH} 字），申请人会看到这条意见。
-		</p>
-		<textarea
-			class="modal__input"
-			rows="3"
-			maxlength={REJECT_COMMENT_MAX_LENGTH}
-			placeholder="驳回理由（必填）"
-			bind:value={comment}></textarea>
-		<p
-			class="modal__counter"
-			class:modal__counter--max={comment.length >= REJECT_COMMENT_MAX_LENGTH}
-		>
-			{comment.length}/{REJECT_COMMENT_MAX_LENGTH}
-		</p>
-		{#if feedback}
-			<p class="modal__error" role="alert">{feedback}</p>
-		{/if}
-	{/snippet}
-	{#snippet actions()}
-		<button type="button" class="btn btn--ghost" onclick={() => (showReject = false)}>取消</button>
-		<button
-			type="button"
-			class="btn btn--danger"
-			disabled={comment.trim() === ''}
-			onclick={() => runAction('reject')}
-		>
-			确认驳回
-		</button>
-	{/snippet}
-</Modal>
+<RejectDialog
+	open={showReject}
+	error={feedback}
+	onclose={() => (showReject = false)}
+	onconfirm={(c) => runAction('reject', c)}
+/>
 
 <style>
 	.action-bar {
