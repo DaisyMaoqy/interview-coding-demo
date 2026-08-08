@@ -56,5 +56,11 @@ describe('isActive', () => {
 			expect(isActive(approvals, detail, '?from=approvals')).toBe(true);
 			expect(isActive(requests, detail, '?from=approvals')).toBe(false);
 		});
+
+		it('带 ?from=requests 时详情点亮「我的申请」而非「待我审批」', () => {
+			// 提交后由向导跳回详情即带此参数，应归属「我的申请」
+			expect(isActive(requests, detail, '?from=requests')).toBe(true);
+			expect(isActive(approvals, detail, '?from=requests')).toBe(false);
+		});
 	});
 });
