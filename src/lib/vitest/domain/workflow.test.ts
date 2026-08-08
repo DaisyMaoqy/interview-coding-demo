@@ -374,18 +374,18 @@ describe('canViewRequest', () => {
 	});
 
 	it('经理可查看员工的非草稿单（含已审 / 已驳回）', () => {
-		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' }), lijingli)).toBe(
-			true
-		);
-		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'rejected' }), lijingli)).toBe(
-			true
-		);
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' }), lijingli)
+		).toBe(true);
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'rejected' }), lijingli)
+		).toBe(true);
 	});
 
 	it('经理不能查看员工的草稿单', () => {
-		expect(canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'draft' }), lijingli)).toBe(
-			false
-		);
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'draft' }), lijingli)
+		).toBe(false);
 	});
 });
 
