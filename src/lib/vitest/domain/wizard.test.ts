@@ -65,6 +65,10 @@ describe('prevStep / nextStep', () => {
 	it('末步没有下一步', () => {
 		expect(nextStep('preview')).toBeNull();
 	});
+
+	it('预算步的前后分别是行程与预览（WizardFooter 实际使用的导航路径）', () => {
+		expect([prevStep('budget'), nextStep('budget')]).toEqual(['trips', 'preview']);
+	});
 });
 
 describe('stepIndex', () => {
@@ -131,5 +135,16 @@ describe('evaluateSteps', () => {
 		const steps = evaluateSteps({ ...validBasic, ...validTrips, ...validBudget });
 
 		expect(steps.at(-1)?.completed).toBe(false);
+	});
+
+	it('草稿回退时后续步骤立即关闭：删掉行程后即便预算已填也不可达', () => {
+		// 模拟用户填到预览步后又把第一段行程删掉。
+		// 预算步自身的 schema 仍然通过（completed=true），但前沿回退到行程步，
+		// 因此预算与预览立刻不可达——避免在没有行程的前提下误展示预算页。
+		const regressed = { ...validBasic, ...validBudget };
+		const steps = evaluateSteps(regressed);
+
+		expect(steps.map((s) => s.completed)).toEqual([true, false, true, false]);
+		expect(steps.map((s) => s.reachable)).toEqual([true, true, false, false]);
 	});
 });
