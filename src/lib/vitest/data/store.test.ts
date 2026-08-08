@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { get } from 'svelte/store';
-import { getAllRequests, getRequestById, requestsStore, updateRequest } from '$lib/data/requests';
-import type { TravelRequest } from '$lib/domain/types';
+import {
+	getAllRequests,
+	getRequestById,
+	requestsStore,
+	updateRequest,
+	createRequest,
+	addRequest
+} from '$lib/data/requests';
+import type { TravelRequest, User } from '$lib/domain/types';
+import type { TravelFormInput } from '$lib/domain/schema';
 
 describe('getRequestById', () => {
 	it('按单号返回匹配的申请', () => {
@@ -34,5 +42,46 @@ describe('updateRequest', () => {
 		// 还原，避免影响其它用例 / 演示数据
 		updateRequest(original);
 		expect(getRequestById('TR-0040')?.status).toBe(original.status);
+	});
+});
+
+describe('createRequest', () => {
+	it('生成待主管审批的单据并写入首条 submit 审计', () => {
+		const applicant: User = {
+			id: 'u-test',
+			employeeId: 'EMP99999',
+			name: '测试员',
+			title: '工程师',
+			department: '测试部',
+			role: 'employee',
+			managerId: null
+		};
+		const input: TravelFormInput = {
+			reason: '去北京参加技术大会并拜访重点客户',
+			urgency: 'normal',
+			legs: [
+				{
+					id: 'leg-1',
+					from: '上海',
+					to: '北京',
+					departDate: '2026-09-01',
+					returnDate: '2026-09-05',
+					transport: 'flight'
+				}
+			],
+			budget: { transport: 200000, hotel: 150000, allowance: 50000, other: 0 },
+			budgetNote: ''
+		};
+
+		const created = createRequest(input, applicant);
+
+		expect(created.status).toBe('pending_manager');
+		expect(created.applicantId).toBe('u-test');
+		expect(created.audit).toHaveLength(1);
+		expect(created.audit[0].action).toBe('submit');
+
+		// 进入工作数据集后，我的申请里能查到这张新单
+		addRequest(created);
+		expect(getRequestById(created.id)?.id).toBe(created.id);
 	});
 });

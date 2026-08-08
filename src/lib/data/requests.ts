@@ -1,6 +1,8 @@
 import seed from './seed.json' with { type: 'json' };
-import type { RequestStatus, TravelRequest, UserId } from '$lib/domain/types';
+import type { RequestStatus, TravelRequest, User, UserId } from '$lib/domain/types';
 import { budgetTotal } from '$lib/domain/money';
+import { transition } from '$lib/domain/workflow';
+import type { TravelFormInput } from '$lib/domain/schema';
 import { writable, get } from 'svelte/store';
 import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
 
@@ -188,4 +190,52 @@ export function summarizeLegs(request: TravelRequest): string {
 /** 预算合计（分） */
 export function requestTotal(request: TravelRequest): number {
 	return budgetTotal(request.budget);
+}
+
+/** 由现有单号（TR-####）推算下一个，保证新单号唯一且连续 */
+export function nextRequestId(requests: readonly TravelRequest[] = get(requestsStore)): string {
+	let max = 0;
+	for (const r of requests) {
+		const n = Number(r.id.replace(/^TR-/, ''));
+		if (Number.isFinite(n) && n > max) max = n;
+	}
+	return `TR-${String(max + 1).padStart(4, '0')}`;
+}
+
+/**
+ * 由向导的整单表单数据新建一张申请并直接提交（draft → pending_manager）。
+ *
+ * 内部走 workflow 的 submit 流转，自动追加首条 audit（记录提交人与提交时间），
+ * 与「草稿再提交」共用同一套状态机，避免规则漂移。
+ */
+export function createRequest(input: TravelFormInput, applicant: User): TravelRequest {
+	const now = new Date().toISOString();
+	const base: TravelRequest = {
+		id: nextRequestId(),
+		applicantId: applicant.id,
+		applicantName: applicant.name,
+		department: applicant.department,
+		reason: input.reason,
+		urgency: input.urgency,
+		legs: input.legs,
+		budget: input.budget,
+		budgetNote: input.budgetNote,
+		status: 'draft',
+		createdAt: now,
+		updatedAt: now,
+		audit: []
+	};
+
+	const result = transition({ request: base, action: 'submit', actor: applicant });
+	if (!result.ok) throw new Error(result.message);
+	return result.request;
+}
+
+/** 把新单插入工作数据集（置顶）并同步 localStorage 缓存 */
+export function addRequest(request: TravelRequest): void {
+	requestsStore.update((list) => {
+		const next = [request, ...list];
+		writeStorage(next);
+		return next;
+	});
 }
