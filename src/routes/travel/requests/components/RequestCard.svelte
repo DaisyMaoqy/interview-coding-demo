@@ -1,5 +1,5 @@
 <script lang="ts">
-	import StatusBadge from './StatusBadge.svelte';
+	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
 	import HighlightText from '$lib/components/common/HighlightText.svelte';
 	import { resolve } from '$app/paths';
 	import { summarizeLegs, requestTotal } from '$lib/data/requests';

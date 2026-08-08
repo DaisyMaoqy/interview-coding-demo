@@ -4,7 +4,7 @@
 	import SearchInput from '$lib/components/common/SearchInput.svelte';
 	import UnitSelect from '$lib/components/common/UnitSelect.svelte';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
-	import RequestCard from '$lib/components/request/RequestCard.svelte';
+	import RequestCard from './components/RequestCard.svelte';
 	import { resolve } from '$app/paths';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import {

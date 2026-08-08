@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import RequestDetail from '$lib/components/request/RequestDetail.svelte';
+	import RequestDetail from './components/RequestDetail.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestsStore } from '$lib/data/requests';
 	import { canViewRequest } from '$lib/domain/workflow';
