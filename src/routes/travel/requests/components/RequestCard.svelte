@@ -16,7 +16,10 @@
 	let { request, keyword = '' }: Props = $props();
 </script>
 
-<a class="request-card" href={resolve('/travel/requests/[id]', { id: request.id })}>
+<a 
+	class="request-card" 
+	href={resolve(`/travel/requests/${request.id}?from=requests`)}
+>
 	<div class="request-card__top">
 		<div class="request-card__main">
 			<p class="request-card__reason">

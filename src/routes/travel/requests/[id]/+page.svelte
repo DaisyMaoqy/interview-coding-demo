@@ -8,6 +8,8 @@
 
 	const identity = useIdentity();
 	const id = $derived(page.params.id);
+	// 入口来源：?from=approvals 表示由「待我审批」点进来，详情页据此隐藏底部操作
+	const from = $derived(page.url.searchParams.get('from'));
 
 	// 从响应式 store 派生，流转后仍会自动刷新（RequestActions 改的是同一 store）
 	const request = $derived($requestsStore.find((r) => r.id === id));
@@ -31,5 +33,5 @@
 		</a>
 	</div>
 {:else}
-	<RequestDetail {request} actor={identity.user} />
+	<RequestDetail {request} actor={identity.user} {from} />
 {/if}

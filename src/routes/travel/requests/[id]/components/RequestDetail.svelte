@@ -12,11 +12,35 @@
 	import { requestTotal } from '$lib/data/requests';
 	import type { TravelRequest, User } from '$lib/domain/types';
 
-	let { request, actor }: { request: TravelRequest; actor: User } = $props();
+	let {
+		request,
+		actor,
+		/** 入口来源；?from=approvals 表示由「待我审批」点入，此时只读、不展示底部操作 */
+		from = null
+	}: { request: TravelRequest; actor: User; from?: string | null } = $props();
 
-	// 返回去向随身份：经理从「待我审批」进详情，返回待我审批；员工返回我的申请
-	const backHref = $derived(actor.role === 'manager' ? '/travel/approvals' : '/travel/requests');
-	const backLabel = $derived(actor.role === 'manager' ? '待我审批' : '我的申请');
+	// 返回去向随入口：?from=approvals 回待我审批，?from=requests 回我的申请；
+	// 直接输入 URL（无 from）时按身份兜底：经理回待我审批，员工回我的申请
+	const backHref = $derived(
+		from === 'approvals'
+			? '/travel/approvals'
+			: from === 'requests'
+				? '/travel/requests'
+				: actor.role === 'manager'
+					? '/travel/approvals'
+					: '/travel/requests'
+	);
+	const backLabel = $derived(
+		from === 'approvals'
+			? '待我审批'
+			: from === 'requests'
+				? '我的申请'
+				: actor.role === 'manager'
+					? '待我审批'
+					: '我的申请'
+	);
+	// 从「待我审批」进来的详情是只读视角，底部通过/驳回等操作不展示
+	const showActions = $derived(from !== 'approvals');
 </script>
 
 <!-- 头部内容 -->
@@ -56,8 +80,10 @@
 		<AuditTimeline audit={request.audit} />
 	</Panel>
 
-	<!-- 操作区 -->
-	<RequestActions {request} {actor} />
+	<!-- 操作区：从「待我审批」进入时为只读，不展示底部操作 -->
+	{#if showActions}
+		<RequestActions {request} {actor} />
+	{/if}
 </div>
 
 <!--
