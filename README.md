@@ -140,7 +140,9 @@ src/
 │   ├── state/          客户端状态：当前身份、草稿
 │   ├── components/
 │   │   ├── layout/     全局壳：侧栏导航、身份切换、页头
-│   │   └── ui/ form/ request/ wizard/ chart/
+│   │   ├── common/     通用件：面板、弹窗、筛选、图标等，与业务无关
+│   │   └── request/    跨页复用的领域展示件：状态徽标、行程表、预算、时间线
+│   ├── styles/         设计令牌、全局基础样式、跨页复用的 BEM 类
 │   ├── vitest/         单元测试，目录结构镜像被测源码
 │   └── routes.ts       落地页常量
 └── routes/
@@ -150,6 +152,15 @@ src/
     │   └── apply/      新建向导
     └── reports/        统计看板
 ```
+
+只服务于单个页面的组件，就近放在该路由的 `components/` 下
+（如详情页的 `routes/travel/requests/[id]/components/`），
+只有确实跨页复用的才提到 `$lib`。读某个页面时不必在 `$lib` 与路由之间来回跳，
+组件被谁使用也一目了然。
+
+样式同理分层：单处使用的样式就近留在组件的 scoped `<style>` 里并语义化命名，
+出现第二个使用方时才收口到 `src/lib/styles/components.css`。
+图标统一走 `$lib/components/common/Icon.svelte`，path 数据集中一处，不引图标库。
 
 ## 测试
 
