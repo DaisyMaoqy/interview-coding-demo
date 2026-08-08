@@ -167,11 +167,6 @@
 		@apply mt-3;
 	}
 
-	/* ===== HighlightText（src/lib/components/common/HighlightText.svelte） ===== */
-	.highlight-text__mark {
-		@apply rounded bg-brand-100 px-0.5 font-medium text-brand-700;
-	}
-
 	/* ===== Button（全局按钮工具类） =====
 	   不用 Button 组件，改用工具类，避免为叶子节点引入额外组件。
 	   颜色走 Tailwind 暴露的 --color-* 设计令牌。 */

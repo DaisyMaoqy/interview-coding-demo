@@ -47,3 +47,17 @@
 		{part.text}
 	{/if}
 {/each}
+
+<!--
+	highlight-text__mark 只服务于本组件，按「单处使用留在组件」的约定收口到这里，
+	不进全局 components.css（全局只保留复用 ≥2 处或跨页共享的原语，如 .btn / section-title）。
+-->
+<style>
+	.highlight-text__mark {
+		border-radius: 0.25rem;
+		background-color: var(--color-brand-100);
+		padding-inline: 0.125rem;
+		font-weight: 500;
+		color: var(--color-brand-700);
+	}
+</style>
