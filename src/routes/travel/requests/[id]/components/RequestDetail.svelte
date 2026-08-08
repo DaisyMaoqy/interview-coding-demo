@@ -3,7 +3,7 @@
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Panel from '$lib/components/common/Panel.svelte';
 	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
-	import RequestBasicInfo from './RequestBasicInfo.svelte';
+	import RequestBasicInfo from '$lib/components/request/RequestBasicInfo.svelte';
 	import LegsTable from '$lib/components/request/LegsTable.svelte';
 	import BudgetBreakdown from '$lib/components/request/BudgetBreakdown.svelte';
 	import AuditTimeline from '$lib/components/request/AuditTimeline.svelte';

@@ -4,7 +4,11 @@
 	import { formatDate } from '$lib/format';
 	import type { TravelRequest } from '$lib/domain/types';
 
-	let { request }: { request: TravelRequest } = $props();
+	let {
+		request,
+		/** 是否渲染「基本信息」标题；预览步骤已在外部带「修改」链接的区块头里给出标题，故此处隐藏 */
+		showTitle = true
+	}: { request: TravelRequest; showTitle?: boolean } = $props();
 </script>
 
 <section>
@@ -32,7 +36,7 @@
 		{formatDate(request.createdAt)}
 	{/snippet}
 
-	<h3 class="section-title">基本信息</h3>
+	{#if showTitle}<h3 class="section-title">基本信息</h3>{/if}
 	<InfoGrid
 		items={[
 			{ label: '出差事由', full: true, value: reasonValue },
