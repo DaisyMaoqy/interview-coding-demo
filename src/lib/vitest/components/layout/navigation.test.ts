@@ -42,4 +42,19 @@ describe('isActive', () => {
 	it('不同入口互不选中', () => {
 		expect(isActive(requests, resolve('/reports'))).toBe(false);
 	});
+
+	describe('申请详情的入口归属', () => {
+		const detail = resolve('/travel/requests/[id]', { id: 'TR-0001' });
+		const approvals = resolve('/travel/approvals');
+
+		it('不带 from 时详情归属「我的申请」', () => {
+			expect(isActive(requests, detail)).toBe(true);
+			expect(isActive(approvals, detail)).toBe(false);
+		});
+
+		it('带 ?from=approvals 时详情点亮「待我审批」而非「我的申请」', () => {
+			expect(isActive(approvals, detail, '?from=approvals')).toBe(true);
+			expect(isActive(requests, detail, '?from=approvals')).toBe(false);
+		});
+	});
 });
