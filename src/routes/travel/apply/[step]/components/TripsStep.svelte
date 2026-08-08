@@ -50,6 +50,7 @@
 		}
 		errors = {};
 		const next = nextStep('trips');
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		if (next) goto(stepHref(next));
 	}
 </script>
@@ -110,7 +111,7 @@
 							value={leg.transport}
 							onchange={(e) => updateLeg(i, { transport: e.currentTarget.value as Transport })}
 						>
-							{#each TRANSPORTS as t}
+							{#each TRANSPORTS as t (t.value)}
 								<option value={t.value}>{t.label}</option>
 							{/each}
 						</select>

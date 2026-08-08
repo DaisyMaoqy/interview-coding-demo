@@ -15,6 +15,7 @@
 
 <div class="wizard-footer">
 	{#if prevHref}
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={prevHref} class="btn btn--ghost">上一步</a>
 	{:else}
 		<span></span>

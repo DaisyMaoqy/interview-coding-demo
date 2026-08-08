@@ -22,6 +22,7 @@
 		}
 		errors = {};
 		const next = nextStep('basic');
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		if (next) goto(stepHref(next));
 	}
 </script>

@@ -67,6 +67,7 @@
 		}
 		errors = {};
 		const n = nextStep('budget');
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		if (n) goto(stepHref(n));
 	}
 </script>
