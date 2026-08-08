@@ -14,10 +14,11 @@ import type { RequestStatus, TravelRequest } from '../../domain/types';
 
 const requests = seed as TravelRequest[];
 
-const ALL_STATUSES: RequestStatus[] = [
+// 当前流程实际会产生的状态（财务审批 pending_finance 已省略，仅保留在
+// workflow.ts 的 TRANSITIONS 注释与 types 的联合类型中，待日后接入 finance 角色）。
+const ACTIVE_STATUSES: RequestStatus[] = [
 	'draft',
 	'pending_manager',
-	'pending_finance',
 	'approved',
 	'rejected',
 	'cancelled'
@@ -62,17 +63,15 @@ describe('seed 数据结构', () => {
 });
 
 describe('seed 场景覆盖', () => {
-	it('六种状态全部有数据，保证每个筛选 tab 都非空', () => {
+	it('当前流程涉及的五种状态全部有数据，保证每个筛选 tab 都非空', () => {
 		const present = new Set(requests.map((r) => r.status));
 
-		expect(ALL_STATUSES.filter((s) => !present.has(s))).toEqual([]);
+		expect(ACTIVE_STATUSES.filter((s) => !present.has(s))).toEqual([]);
 	});
 
 	it('审批人有待处理的他人单据，审批视图不会是空列表', () => {
 		const todo = requests.filter(
-			(r) =>
-				r.applicantId !== MANAGER_ID &&
-				(r.status === 'pending_manager' || r.status === 'pending_finance')
+			(r) => r.applicantId !== MANAGER_ID && r.status === 'pending_manager'
 		);
 
 		expect(todo.length).toBeGreaterThan(0);

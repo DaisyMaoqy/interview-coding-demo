@@ -39,7 +39,8 @@
 		selected = allSelected ? [] : [...allIds];
 	}
 
-	// 通过/驳回都只描述意图，具体落到 pending_finance 还是 approved 由状态机决定
+	// 通过/驳回只描述意图，具体落到 approved 还是 rejected 由状态机决定。
+	// 当前为一级审批（pending_manager → approved），见 workflow.ts 的 TRANSITIONS 注释。
 	function approve(request: TravelRequest): void {
 		const res = transition({ request, action: 'approve', actor: identity.user });
 		if (res.ok) {

@@ -202,23 +202,20 @@ function driveToTarget(draft: TravelRequest, target: RequestStatus, approver: Us
 		case 'pending_manager':
 			break;
 
-		case 'pending_finance':
-			step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
-			break;
+		// 财务审批环节当前省略（见 workflow.ts 的 TRANSITIONS 注释），pending_finance 不再是目标状态。
+		// 保留此分支，待接入独立 finance 角色、取消 workflow.ts 中对应注释后即可恢复两级审批。
+		// case 'pending_finance':
+		// 	step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
+		// 	break;
 
 		case 'approved':
+			// 一级审批：主管通过即归档
 			step('approve', approver, random.chance(0.5) ? random.pick(APPROVE_COMMENTS) : undefined);
-			step('approve', approver);
 			break;
 
 		case 'rejected':
-			// 一半在主管环节被驳回，一半过了主管在财务环节被驳回
-			if (random.chance(0.5)) {
-				step('reject', approver, random.pick(REJECT_COMMENTS));
-			} else {
-				step('approve', approver);
-				step('reject', approver, random.pick(REJECT_COMMENTS));
-			}
+			// 当前仅主管一级审批，驳回统一发生在主管环节
+			step('reject', approver, random.pick(REJECT_COMMENTS));
 			break;
 
 		case 'cancelled':
@@ -267,8 +264,7 @@ function makeDraft(plan: Plan, sequence: number): TravelRequest {
 const EMPLOYEE_QUOTA: ReadonlyArray<readonly [RequestStatus, number]> = [
 	['draft', 4],
 	['pending_manager', 6],
-	['pending_finance', 4],
-	['approved', 12],
+	['approved', 16],
 	['rejected', 4],
 	['cancelled', 3]
 ];

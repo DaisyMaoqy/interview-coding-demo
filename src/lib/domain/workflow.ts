@@ -71,7 +71,7 @@ type ActorRule =
 	| 'applicant'
 	/** 申请人的直属主管，且不能是本人 */
 	| 'manager'
-	/** 财务角色；本演示中同样由主管身份承担 */
+	/** 财务角色；本演示中暂省略两级审批，相关流转规则以注释保留在 TRANSITIONS，待接入独立 finance 角色时启用 */
 	| 'finance';
 
 interface TransitionRule {
@@ -86,29 +86,34 @@ interface TransitionRule {
  * 完整流转表。
  *
  * ```
- * draft ──submit──▶ pending_manager ──approve──▶ pending_finance ──approve──▶ approved
- *                        │                                │
- *                        ├──reject──▶ rejected ◀──reject──┤
- *                        └──cancel──▶ cancelled ◀──cancel─┘
+ * draft ──submit──▶ pending_manager ──approve──▶ approved
+ *                        │
+ *                        ├──reject──▶ rejected
+ *                        └──cancel──▶ cancelled
  *
  * rejected ──reedit──▶ draft
  * ```
+ *
+ * 注：财务审批（pending_finance）环节当前省略，相关流转规则在下方以注释保留，
+ * 待接入独立 finance 角色时取消注释即可恢复两级审批。
  */
 const TRANSITIONS: Record<AuditAction, readonly TransitionRule[]> = {
 	submit: [{ from: 'draft', to: 'pending_manager', actor: 'applicant', commentRequired: false }],
 	approve: [
-		{ from: 'pending_manager', to: 'pending_finance', actor: 'manager', commentRequired: false },
-		{ from: 'pending_finance', to: 'approved', actor: 'finance', commentRequired: false }
+		// 当前演示仅一级审批：主管通过即归档。
+		// 财务审批环节暂省略；下方规则保留以便日后接入独立 finance 角色时启用。
+		{ from: 'pending_manager', to: 'approved', actor: 'manager', commentRequired: false },
+		// { from: 'pending_finance', to: 'approved', actor: 'finance', commentRequired: false },
 	],
 	// 驳回必须说明理由，否则申请人不知道该改什么
 	reject: [
 		{ from: 'pending_manager', to: 'rejected', actor: 'manager', commentRequired: true },
-		{ from: 'pending_finance', to: 'rejected', actor: 'finance', commentRequired: true }
+		// { from: 'pending_finance', to: 'rejected', actor: 'finance', commentRequired: true }
 	],
 	// 已通过的单不可撤销 —— 差旅已成行，撤销没有业务含义
 	cancel: [
 		{ from: 'pending_manager', to: 'cancelled', actor: 'applicant', commentRequired: false },
-		{ from: 'pending_finance', to: 'cancelled', actor: 'applicant', commentRequired: false }
+		// { from: 'pending_finance', to: 'cancelled', actor: 'applicant', commentRequired: false }
 	],
 	reedit: [{ from: 'rejected', to: 'draft', actor: 'applicant', commentRequired: false }]
 };

@@ -55,7 +55,10 @@ describe('transition — 正常流转链路', () => {
 		expect(result).toMatchObject({ ok: true, request: { status: 'pending_manager' } });
 	});
 
-	it('主管通过后流转到待财务审批', () => {
+	// 当前演示为一级审批：主管通过即归档。
+	// 财务审批（pending_finance）环节已省略，对应流转规则在 workflow.ts 的
+	// TRANSITIONS 中以注释保留，待接入独立 finance 角色时取消注释即可恢复两级审批。
+	it('主管通过后直接成为已通过（一级审批）', () => {
 		const result = transition({
 			request: makeRequest({ status: 'pending_manager' }),
 			action: 'approve',
@@ -63,10 +66,13 @@ describe('transition — 正常流转链路', () => {
 			now: NOW
 		});
 
-		expect(result).toMatchObject({ ok: true, request: { status: 'pending_finance' } });
+		expect(result).toMatchObject({ ok: true, request: { status: 'approved' } });
 	});
 
-	it('财务通过后成为已通过', () => {
+	// 反向守住「财务环节已关闭」：处于 pending_finance 的单在当前流程里无法被审批。
+	// 这既是现状的文档，也能在将来有人误删 workflow.ts 注释、把 finance 规则重新
+	// 接回流转表时及时报警（pending_finance 此时应能流转，测试应随之改写）。
+	it('财务审批环节暂未启用：pending_finance 的单无法通过 approve 流转', () => {
 		const result = transition({
 			request: makeRequest({ status: 'pending_finance' }),
 			action: 'approve',
@@ -74,7 +80,7 @@ describe('transition — 正常流转链路', () => {
 			now: NOW
 		});
 
-		expect(result).toMatchObject({ ok: true, request: { status: 'approved' } });
+		expect(result).toMatchObject({ ok: false, code: 'invalid_status' });
 	});
 
 	it('驳回后申请人可重新编辑回到草稿', () => {
