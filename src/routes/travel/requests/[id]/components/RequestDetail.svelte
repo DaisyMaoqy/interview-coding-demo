@@ -16,10 +16,7 @@
 </script>
 
 <!-- 头部内容 -->
-<a
-	href={resolve('/travel/requests')}
-	class="mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
->
+<a href={resolve('/travel/requests')} class="back-link">
 	<span aria-hidden="true">←</span> 返回我的申请
 </a>
 <PageHeader title="申请详情" description="单号 {request.id}">
@@ -35,19 +32,15 @@
 			<RequestBasicInfo {request} />
 
 			<section>
-				<h3 class="mb-3 text-sm font-semibold text-slate-900">
-					行程明细<span class="ml-2 text-xs font-normal text-slate-500"
-						>共 {request.legs.length} 段</span
-					>
+				<h3 class="section-title">
+					行程明细<span class="section-title__sub">共 {request.legs.length} 段</span>
 				</h3>
 				<LegsTable legs={request.legs} />
 			</section>
 
 			<section>
-				<h3 class="mb-3 text-sm font-semibold text-slate-900">
-					费用预算<span class="ml-2 text-xs font-normal text-slate-500"
-						>合计 ¥{formatYuan(requestTotal(request))}</span
-					>
+				<h3 class="section-title">
+					费用预算<span class="section-title__sub">合计 ¥{formatYuan(requestTotal(request))}</span>
 				</h3>
 				<BudgetBreakdown budget={request.budget} budgetNote={request.budgetNote} />
 			</section>

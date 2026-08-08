@@ -17,19 +17,16 @@
 
 {#if !request}
 	<!-- 数据里没有这张单：可能 id 拼错，或流转后本地缓存与远端不一致 -->
-	<div class="rounded-card border border-slate-200 bg-white p-8 text-center">
-		<p class="text-sm text-slate-600">没有找到单号为 {id} 的申请</p>
+	<div class="notice-card">
+		<p class="notice-card__text">没有找到单号为 {id} 的申请</p>
 	</div>
 {:else if !canView}
 	<!-- 单存在但当前身份无权查看（如员工访问领导的单）；切到有权身份会自动恢复 -->
-	<div class="rounded-card border border-slate-200 bg-white p-8 text-center">
-		<p class="text-sm text-slate-600">
+	<div class="notice-card">
+		<p class="notice-card__text">
 			当前身份（{identity.user.name}）没有权限查看这张申请
 		</p>
-		<a
-			href={resolve('/travel/requests')}
-			class="mt-4 inline-block rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-brand-700"
-		>
+		<a href={resolve('/travel/requests')} class="notice-card__action btn btn--primary">
 			返回我的申请
 		</a>
 	</div>

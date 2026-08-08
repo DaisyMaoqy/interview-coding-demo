@@ -32,7 +32,7 @@
 		{formatDate(request.createdAt)}
 	{/snippet}
 
-	<h3 class="mb-3 text-sm font-semibold text-slate-900">基本信息</h3>
+	<h3 class="section-title">基本信息</h3>
 	<InfoGrid
 		items={[
 			{ label: '出差事由', full: true, value: reasonValue },

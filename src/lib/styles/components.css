@@ -4,8 +4,9 @@
  * 约定：block 用中划线（page-header），元素用双下划线（page-header__title），
  * 修饰态用双连字符（filter-tabs__tab--active）。标记只保留 BEM 类名。
  *
- * 范围：布局组件 + 通用（复用）组件。业务组件（request/）的样式放在组件内部
- * 的 scoped <style>，不在此处定义。
+ * 范围：布局组件 + 通用（复用）组件，以及跨页面重复出现的展示样式。
+ * 只在单处出现的样式先在页面/组件内做语义化（scoped <style> 或语义类名），
+ * 等第二处复用出现时再收口到这里。
  *
  * 每个 block 上方标注它对应的组件文件，便于定位。
  */
@@ -180,7 +181,7 @@
 	   不用 Button 组件，改用工具类，避免为叶子节点引入额外组件。
 	   颜色走 Tailwind 暴露的 --color-* 设计令牌。 */
 	.btn {
-		@apply cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors;
+		@apply inline-block cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors;
 	}
 	.btn:disabled {
 		@apply cursor-not-allowed opacity-50;
@@ -193,5 +194,29 @@
 	}
 	.btn--ghost {
 		@apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+	}
+
+	/* ===== 区块小标题 / 返回链接（跨页面复用的展示样式，集中此处） =====
+	   来源：详情页 RequestDetail / RequestBasicInfo 中重复的 h3 标题与返回链接。
+	   页面级样式语义化约定：重复的展示样式统一收口到 components.css。 */
+	.section-title {
+		@apply mb-3 text-sm font-semibold text-slate-900;
+	}
+	.section-title__sub {
+		@apply ml-2 text-xs font-normal text-slate-500;
+	}
+	.back-link {
+		@apply mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800;
+	}
+
+	/* ===== NoticeCard（无数据 / 无权限 / 无职责等提示卡，跨页面复用） ===== */
+	.notice-card {
+		@apply rounded-card border border-slate-200 bg-white p-8 text-center;
+	}
+	.notice-card__text {
+		@apply text-sm text-slate-600;
+	}
+	.notice-card__action {
+		@apply mt-4;
 	}
 }

@@ -23,16 +23,15 @@
 		不做 403 拦截而是给出解释与出口 —— 演示中身份可自由切换，
 		把话说清楚比把人挡在门外更有用。
 	-->
-	<div class="rounded-card border border-slate-200 bg-white p-8 text-center">
-		<p class="text-sm text-slate-600">
+	<div class="notice-card">
+		<p class="notice-card__text">
 			当前身份是 <span class="font-medium text-slate-900">{identity.user.name}</span
 			>，没有审批职责。
 		</p>
 		<button
 			type="button"
 			onclick={() => identity.switchTo('manager')}
-			class="mt-4 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white
-			       transition-colors hover:bg-brand-700"
+			class="notice-card__action btn btn--primary"
 		>
 			切换到主管身份
 		</button>

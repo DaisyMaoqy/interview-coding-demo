@@ -19,12 +19,6 @@
 			<p class="mt-1.5 text-sm text-slate-500">{page.error.message}</p>
 		{/if}
 
-		<a
-			href={HOME}
-			class="mt-6 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium
-			       text-white transition-colors hover:bg-brand-700"
-		>
-			返回我的申请
-		</a>
+		<a href={HOME} class="btn btn--primary mt-6"> 返回我的申请 </a>
 	</div>
 </div>

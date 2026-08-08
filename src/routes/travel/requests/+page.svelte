@@ -63,6 +63,15 @@
 	// 清除筛选按钮显隐：只关心年/月/搜索框，不含状态栏
 	const hasClearableFilter = $derived(keyword.trim() !== '' || year !== 'all' || month !== 'all');
 
+	// 空状态文案
+	const emptyTitle = $derived(
+		mine.length === 0
+			? '你还没有发起任何差旅申请'
+			: hasClearableFilter
+				? '没有符合当前筛选或搜索条件的申请'
+				: '没有符合当前状态的申请'
+	);
+
 	// 清除筛选只重置年/月/搜索框，保留当前状态栏筛选
 	function resetFilters(): void {
 		keyword = '';
@@ -134,32 +143,13 @@
 
 {#if visible.length === 0}
 	<!-- 空状态：区分「真的没申请单」与「被筛选/搜索过滤没了」 -->
-	<EmptyState
-		title={
-			mine.length === 0
-				? '你还没有发起任何差旅申请'
-				: hasClearableFilter
-					? '没有符合当前筛选或搜索条件的申请'
-					: '没有符合当前状态的申请'
-		}
-	>
+	<EmptyState title={emptyTitle}>
 		{#snippet action()}
 			{#if mine.length === 0}
-				<a
-					href={resolve('/travel/apply')}
-					class="inline-block rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-brand-700"
-				>
-					发起第一张申请
-				</a>
+				<a href={resolve('/travel/apply')} class="btn btn--primary"> 发起第一张申请 </a>
 			{:else if hasClearableFilter}
 				<!-- 仅状态栏导致为空时不显示「清除筛选」：该按钮只清搜索条件，对状态栏无效 -->
-				<button
-					type="button"
-					onclick={resetFilters}
-					class="inline-block rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-				>
-					清除筛选
-				</button>
+				<button type="button" onclick={resetFilters} class="btn btn--ghost"> 清除筛选 </button>
 			{/if}
 		{/snippet}
 	</EmptyState>
