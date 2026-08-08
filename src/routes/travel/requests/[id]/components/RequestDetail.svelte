@@ -55,3 +55,21 @@
 	<!-- 操作区 -->
 	<RequestActions {request} {actor} />
 </div>
+
+<!--
+	back-link 只服务详情页这一视图，按「组件专属样式就近收口」的约定放在本文件，
+	不放进全局 components.css（section-title 因看板/向导页也会复用，仍保留为共享原语）。
+-->
+<style>
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin-bottom: 0.75rem;
+		font-size: 0.875rem;
+		color: var(--color-slate-500);
+	}
+	.back-link:hover {
+		color: var(--color-slate-800);
+	}
+</style>

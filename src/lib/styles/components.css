@@ -94,11 +94,6 @@
 		@apply bg-brand-50 font-medium text-brand-700;
 	}
 
-	/* ===== 导航图标尺寸（SideNav 中 Icon 的 class） ===== */
-	.nav-icon {
-		@apply size-5 shrink-0;
-	}
-
 	/* ===== AppLayout（src/routes/+layout.svelte） ===== */
 	.app-layout {
 		@apply flex min-h-screen;
@@ -204,9 +199,6 @@
 	}
 	.section-title__sub {
 		@apply ml-2 text-xs font-normal text-slate-500;
-	}
-	.back-link {
-		@apply mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800;
 	}
 
 	/* ===== NoticeCard（无数据 / 无权限 / 无职责等提示卡，跨页面复用） ===== */

@@ -41,3 +41,16 @@
 		</div>
 	{/each}
 </nav>
+
+<!--
+	nav-icon 只服务 SideNav，且作用在子组件 <Icon> 上 —— 用 :global 让 SideNav 的
+	局部样式能命中子组件 DOM（scoped 默认够不到），同时把这条「组件专属」样式收回到本文件，
+	不污染全局 components.css。
+-->
+<style>
+	:global(.nav-icon) {
+		width: 1.25rem;
+		height: 1.25rem;
+		flex-shrink: 0;
+	}
+</style>
