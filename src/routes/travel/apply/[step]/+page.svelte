@@ -37,41 +37,32 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 <PageHeader title="发起申请" description={current.description} />
 
-<ol class="mb-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
+<ol class="step-nav">
 	{#each steps as item, i (item.step.slug)}
 		{@const active = item.step.slug === current.slug}
-		<li class="flex items-center gap-2">
+		<li class="step-nav__item">
 			{#if item.reachable}
 				<a
+					class="step-nav__link"
+					class:step-nav__link--active={active}
 					href={stepHref(item.step.slug)}
 					aria-current={active ? 'step' : undefined}
-					class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-colors
-					       {active
-						? 'bg-brand-50 font-medium text-brand-700'
-						: 'text-slate-500 hover:bg-slate-100'}"
 				>
 					<span
-						class="grid size-5 place-items-center rounded-full text-xs
-						       {active
-							? 'bg-brand-600 text-white'
-							: item.completed
-								? 'bg-emerald-100 text-emerald-700'
-								: 'bg-slate-200 text-slate-600'}"
-					>
-						{i + 1}
-					</span>
+						class="step-nav__badge"
+						class:step-nav__badge--active={active}
+						class:step-nav__badge--done={!active && item.completed}
+					>{i + 1}</span>
 					{item.step.title}
 				</a>
 			{:else}
-				<span class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-slate-300" aria-disabled="true">
-					<span class="grid size-5 place-items-center rounded-full bg-slate-100 text-xs text-slate-400">
-						{i + 1}
-					</span>
+				<span class="step-nav__link step-nav__link--disabled" aria-disabled="true">
+					<span class="step-nav__badge step-nav__badge--disabled">{i + 1}</span>
 					{item.step.title}
 				</span>
 			{/if}
 			{#if i < steps.length - 1}
-				<span class="text-slate-300" aria-hidden="true">→</span>
+				<span class="step-nav__sep" aria-hidden="true">→</span>
 			{/if}
 		</li>
 	{/each}
@@ -86,3 +77,72 @@
 {:else if current.slug === 'preview'}
 	<PreviewStep />
 {/if}
+
+<style>
+	/* 向导步骤栏（仅本页使用，按「页面级样式语义化」就近放在 scoped 样式里） */
+	.step-nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+		font-size: 0.875rem;
+	}
+	.step-nav__item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.step-nav__link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.375rem 0.625rem;
+		border-radius: var(--radius-lg);
+		color: var(--color-slate-500);
+		transition: background-color 0.15s ease, color 0.15s ease;
+	}
+	.step-nav__link:hover {
+		background-color: var(--color-slate-100);
+	}
+	.step-nav__link--active {
+		background-color: var(--color-brand-50);
+		font-weight: 500;
+		color: var(--color-brand-700);
+	}
+	.step-nav__link--active:hover {
+		background-color: var(--color-brand-50);
+	}
+	.step-nav__link--disabled {
+		color: var(--color-slate-300);
+		cursor: default;
+	}
+	.step-nav__link--disabled:hover {
+		background-color: transparent;
+	}
+	.step-nav__badge {
+		display: grid;
+		place-items: center;
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		background-color: var(--color-slate-200);
+		color: var(--color-slate-600);
+	}
+	.step-nav__badge--active {
+		background-color: var(--color-brand-600);
+		color: var(--color-white);
+	}
+	.step-nav__badge--done {
+		background-color: var(--color-emerald-100);
+		color: var(--color-emerald-700);
+	}
+	.step-nav__badge--disabled {
+		background-color: var(--color-slate-100);
+		color: var(--color-slate-400);
+	}
+	.step-nav__sep {
+		color: var(--color-slate-300);
+	}
+</style>
