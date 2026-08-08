@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import seed from '../../data/seed.json' with { type: 'json' };
-import { MANAGER_ID, findUser } from '../../domain/org';
+import { FINANCE_ID, MANAGER_ID, findUser } from '../../domain/org';
 import { travelFormSchema } from '../../domain/schema';
 import type { RequestStatus, TravelRequest } from '../../domain/types';
 
@@ -14,11 +14,11 @@ import type { RequestStatus, TravelRequest } from '../../domain/types';
 
 const requests = seed as TravelRequest[];
 
-// 当前流程实际会产生的状态（财务审批 pending_finance 已省略，仅保留在
-// workflow.ts 的 TRANSITIONS 注释与 types 的联合类型中，待日后接入 finance 角色）。
+// 两级审批实际会产生的全部状态。
 const ACTIVE_STATUSES: RequestStatus[] = [
 	'draft',
 	'pending_manager',
+	'pending_finance',
 	'approved',
 	'rejected',
 	'cancelled'
@@ -70,11 +70,15 @@ describe('seed 场景覆盖', () => {
 	});
 
 	it('审批人有待处理的他人单据，审批视图不会是空列表', () => {
-		const todo = requests.filter(
+		const managerTodo = requests.filter(
 			(r) => r.applicantId !== MANAGER_ID && r.status === 'pending_manager'
 		);
+		const financeTodo = requests.filter(
+			(r) => r.applicantId !== FINANCE_ID && r.status === 'pending_finance'
+		);
 
-		expect(todo.length).toBeGreaterThan(0);
+		expect(managerTodo.length).toBeGreaterThan(0);
+		expect(financeTodo.length).toBeGreaterThan(0);
 	});
 
 	it('存在超过 1 万元的单，覆盖预算超限场景', () => {

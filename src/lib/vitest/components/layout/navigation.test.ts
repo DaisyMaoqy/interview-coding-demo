@@ -63,4 +63,19 @@ describe('isActive', () => {
 			expect(isActive(approvals, detail, '?from=requests')).toBe(false);
 		});
 	});
+
+	describe('编辑态的入口归属', () => {
+		const apply = resolve('/travel/apply');
+
+		it('?edit=ID 时点亮「我的申请」并熄掉「发起申请」', () => {
+			const search = '?edit=TR-0034';
+			expect(isActive(requests, `${apply}/basic`, search)).toBe(true);
+			expect(isActive(apply, `${apply}/basic`, search)).toBe(false);
+		});
+
+		it('普通发起申请不带 edit 时正常点亮「发起申请」', () => {
+			expect(isActive(apply, `${apply}/basic`)).toBe(true);
+			expect(isActive(requests, `${apply}/basic`)).toBe(false);
+		});
+	});
 });

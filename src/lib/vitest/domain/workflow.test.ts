@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EMPLOYEE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
+import { EMPLOYEE_ID, FINANCE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
 import type { AuditAction, RequestStatus, TravelRequest } from '../../domain/types';
 import {
 	availableActions,
@@ -12,6 +12,7 @@ import {
 
 const zhangsan = requireUser(EMPLOYEE_ID);
 const lijingli = requireUser(MANAGER_ID);
+const wangcaiwu = requireUser(FINANCE_ID);
 const wangfang = USERS.find((u) => u.name === '王芳')!;
 
 const NOW = new Date('2026-03-10T02:00:00.000Z');
@@ -55,10 +56,8 @@ describe('transition — 正常流转链路', () => {
 		expect(result).toMatchObject({ ok: true, request: { status: 'pending_manager' } });
 	});
 
-	// 当前演示为一级审批：主管通过即归档。
-	// 财务审批（pending_finance）环节已省略，对应流转规则在 workflow.ts 的
-	// TRANSITIONS 中以注释保留，待接入独立 finance 角色时取消注释即可恢复两级审批。
-	it('主管通过后直接成为已通过（一级审批）', () => {
+	// 两级审批：主管通过只走到「待财务审批」，需财务二审才归档。
+	it('主管审批通过将流转到待财务审批', () => {
 		const result = transition({
 			request: makeRequest({ status: 'pending_manager' }),
 			action: 'approve',
@@ -66,13 +65,11 @@ describe('transition — 正常流转链路', () => {
 			now: NOW
 		});
 
-		expect(result).toMatchObject({ ok: true, request: { status: 'approved' } });
+		expect(result).toMatchObject({ ok: true, request: { status: 'pending_finance' } });
 	});
 
-	// 反向守住「财务环节已关闭」：处于 pending_finance 的单在当前流程里无法被审批。
-	// 这既是现状的文档，也能在将来有人误删 workflow.ts 注释、把 finance 规则重新
-	// 接回流转表时及时报警（pending_finance 此时应能流转，测试应随之改写）。
-	it('财务审批环节暂未启用：pending_finance 的单无法通过 approve 流转', () => {
+	// 主管无权处理「待财务审批」环节：那是财务二审的职责。
+	it('主管不能审批待财务审批的单（越权）', () => {
 		const result = transition({
 			request: makeRequest({ status: 'pending_finance' }),
 			action: 'approve',
@@ -80,7 +77,54 @@ describe('transition — 正常流转链路', () => {
 			now: NOW
 		});
 
-		expect(result).toMatchObject({ ok: false, code: 'invalid_status' });
+		expect(result).toMatchObject({ ok: false, code: 'forbidden' });
+	});
+
+	// 财务二审通过才真正归档；财务驳回同理需填意见。
+	it('财务审批通过待财务审批的单后成为已通过', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_finance' }),
+			action: 'approve',
+			actor: wangcaiwu,
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: true, request: { status: 'approved' } });
+	});
+
+	it('财务可驳回待财务审批的单（需填意见）', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_finance' }),
+			action: 'reject',
+			actor: wangcaiwu,
+			comment: '票据不合规，请补充增值税专用发票',
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: true, request: { status: 'rejected' } });
+	});
+
+	it('财务驳回待财务审批的单也必须填写意见', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_finance' }),
+			action: 'reject',
+			actor: wangcaiwu,
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: false, code: 'comment_required' });
+	});
+
+	// 申请人可在两级审批的任一待审阶段撤销。
+	it('申请人可在待财务审批阶段撤销', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_finance' }),
+			action: 'cancel',
+			actor: zhangsan,
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: true, request: { status: 'cancelled' } });
 	});
 
 	it('驳回后申请人可重新编辑回到草稿', () => {
@@ -92,6 +136,15 @@ describe('transition — 正常流转链路', () => {
 		});
 
 		expect(result).toMatchObject({ ok: true, request: { status: 'draft' } });
+	});
+
+	it('对草稿重新编辑是原地继续编辑，状态不变', () => {
+		const draft = makeRequest({ status: 'draft' });
+		const result = transition({ request: draft, action: 'reedit', actor: zhangsan, now: NOW });
+
+		expect(result).toMatchObject({ ok: true, request: { status: 'draft' } });
+		// 不产出新的提交时间（草稿本就没有 submittedAt，重新编辑也不应写入）
+		expect(result.ok && result.request.submittedAt).toBeUndefined();
 	});
 
 	it('申请人可撤销审批中的单', () => {
@@ -337,8 +390,8 @@ describe('transition — 留痕与不可变性', () => {
 });
 
 describe('availableActions', () => {
-	it('草稿状态下申请人可提交', () => {
-		expect(availableActions(makeRequest(), zhangsan)).toEqual(['submit']);
+	it('草稿状态下申请人可提交，且可重新编辑（继续编辑草稿）', () => {
+		expect(availableActions(makeRequest(), zhangsan)).toEqual(['submit', 'reedit']);
 	});
 
 	it('待主管审批时申请人只能撤销', () => {
@@ -352,6 +405,17 @@ describe('availableActions', () => {
 			'approve',
 			'reject'
 		]);
+	});
+
+	it('待财务审批时财务可通过或驳回', () => {
+		expect(availableActions(makeRequest({ status: 'pending_finance' }), wangcaiwu)).toEqual([
+			'approve',
+			'reject'
+		]);
+	});
+
+	it('待财务审批时主管无可执行动作（二审归财务）', () => {
+		expect(availableActions(makeRequest({ status: 'pending_finance' }), lijingli)).toEqual([]);
 	});
 
 	it('终态下无任何可用动作', () => {
@@ -391,6 +455,21 @@ describe('canViewRequest', () => {
 	it('经理不能查看员工的草稿单', () => {
 		expect(
 			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'draft' }), lijingli)
+		).toBe(false);
+	});
+
+	it('财务可查看待财务审批的单（自己的二审队列）', () => {
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_finance' }), wangcaiwu)
+		).toBe(true);
+	});
+
+	it('财务不能查看待主管审批或终态的单', () => {
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_manager' }), wangcaiwu)
+		).toBe(false);
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' }), wangcaiwu)
 		).toBe(false);
 	});
 });
