@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { budgetTotal } from './money';
+import { TRANSPORT_VALUES, URGENCY_VALUES } from './types';
 
 /**
  * 表单校验规则的唯一真相。
@@ -53,7 +54,7 @@ export const basicSchema = z.object({
 		.trim()
 		.min(REASON_MIN_LENGTH, `出差事由请不少于 ${REASON_MIN_LENGTH} 个字`)
 		.max(200, '出差事由请控制在 200 字以内'),
-	urgency: z.enum(['normal', 'urgent'], { error: '请选择紧急程度' })
+	urgency: z.enum(URGENCY_VALUES, { error: '请选择紧急程度' })
 });
 
 // ── 第二步：行程明细 ─────────────────────────────────────────────
@@ -65,7 +66,7 @@ export const legSchema = z
 		to: z.string().trim().min(1, '请填写目的地').max(30, '地点名称过长'),
 		departDate: dateString,
 		returnDate: dateString,
-		transport: z.enum(['train', 'flight', 'car', 'other'], { error: '请选择交通方式' })
+		transport: z.enum(TRANSPORT_VALUES, { error: '请选择交通方式' })
 	})
 	.refine((leg) => leg.returnDate >= leg.departDate, {
 		// ISO 日期字符串可直接字典序比较

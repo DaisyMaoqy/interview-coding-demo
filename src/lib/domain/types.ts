@@ -5,7 +5,14 @@
  * 1. 金额一律用「分」为单位的整数存储，只在 UI 边界转成「元」，见 money.ts。
  * 2. 日期用 `YYYY-MM-DD` 字符串，可直接字典序比较，避免时区问题；
  *    时间戳则用完整 ISO 字符串。
+ * 
+ * 行程单段与分项预算的形状由 schema.ts 的 zod 推导类型统一定义
+ * z.infer 才保证类型与校验规则不漂移
+ * 用 `import type` 别名引用，编译期擦除、不产生运行时依赖
+ * 用 as const 定义的数组（运行时存在）
  */
+
+import type { BudgetInput, LegInput } from './schema';
 
 /**
  * 用户主键ID用UUID而非自增数字
@@ -45,40 +52,22 @@ export interface User {
 export type RequestStatus =
 	'draft' | 'pending_manager' | 'pending_finance' | 'approved' | 'rejected' | 'cancelled';
 
-/** 终态：不可再流转 */
-export const TERMINAL_STATUSES = ['approved', 'rejected', 'cancelled'] as const;
-
 /** 审批中：申请人可撤销 */
 export const PENDING_STATUSES = ['pending_manager', 'pending_finance'] as const;
 
-export type Urgency = 'normal' | 'urgent';
+/** 紧急程度；字面量元组是唯一真相，类型由它推导，表单 z.enum 也引用同一份 */
+export const URGENCY_VALUES = ['normal', 'urgent'] as const;
+export type Urgency = (typeof URGENCY_VALUES)[number];
 
-export type Transport = 'train' | 'flight' | 'car' | 'other';
+/** 交通方式；同上，避免 domain 类型与 schema 的 z.enum 字面量各写一份 */
+export const TRANSPORT_VALUES = ['train', 'flight', 'car', 'other'] as const;
+export type Transport = (typeof TRANSPORT_VALUES)[number];
 
-export interface TripLeg {
-	id: string;
-	/** 出发地 */
-	from: string;
-	/** 目的地 */
-	to: string;
-	/** YYYY-MM-DD */
-	departDate: string;
-	/** YYYY-MM-DD，不早于 departDate */
-	returnDate: string;
-	transport: Transport;
-}
+/** 行程单段；形状与 schema.ts 的 `LegInput` 一致（见文件头 import） */
+export type TripLeg = LegInput;
 
-/** 分项预算，单位「分」 */
-export interface Budget {
-	/** 交通费 */
-	transport: number;
-	/** 住宿费 */
-	hotel: number;
-	/** 出差补贴 */
-	allowance: number;
-	/** 其他费用 */
-	other: number;
-}
+/** 分项预算，单位「分」；形状与 schema.ts 的 `BudgetInput['budget']` 一致 */
+export type Budget = BudgetInput['budget'];
 
 export type AuditAction = 'submit' | 'approve' | 'reject' | 'cancel' | 'reedit';
 
