@@ -59,9 +59,11 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 		items: [
 			{
 				href: resolve('/reports'),
-				label: '数据看板',
-				description: '申请与费用的统计分析',
-				icon: 'chart'
+				label: '统计报表',
+				description: '团队差旅成本与审批效率',
+				icon: 'chart',
+				// 统计报表是面向领导（主管）的管理视图，员工与财务无需也无法查看
+				visibleTo: ['manager']
 			}
 		]
 	}

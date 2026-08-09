@@ -3,10 +3,10 @@ import { PENDING_STATUSES } from './types';
 import { STATUS_LABELS } from './workflow';
 
 /**
- * 数据看板聚合层（纯函数，与 UI 解耦，便于将来补单测）。
+ * 统计报表聚合层（纯函数，与 UI 解耦，便于将来补单测）。
  *
- * 本看板以「申请情况」为核心：状态分布、申请量趋势、通过率、按部门分布，
- * 而非费用分析。金额仅在概览卡中作为辅助指标出现。
+ * 仅面向领导（主管）角色，以「团队申请情况」为核心：状态分布、申请量趋势、
+ * 通过率、按部门分布，而非个人费用分析。金额仅在概览卡中作为辅助指标出现。
  */
 
 /** echarts 调色板，与设计令牌（brand/emerald/amber/rose…）观感对齐 */
@@ -95,18 +95,3 @@ export function managerOverview(requests: readonly TravelRequest[]): ManagerOver
 	return { total, pending, passRate: decided ? approved / decided : 0 };
 }
 
-export interface EmployeeOverview {
-	/** 我的申请总数 */
-	total: number;
-	/** 审批中数量 */
-	pending: number;
-	/** 已通过数量 */
-	approved: number;
-}
-
-export function employeeOverview(requests: readonly TravelRequest[]): EmployeeOverview {
-	const total = requests.length;
-	const pending = requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s)).length;
-	const approved = requests.filter((r) => r.status === 'approved').length;
-	return { total, pending, approved };
-}

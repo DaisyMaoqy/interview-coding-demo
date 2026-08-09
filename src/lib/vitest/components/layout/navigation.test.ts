@@ -16,10 +16,20 @@ describe('visibleSections', () => {
 		expect(managerCount).toBeGreaterThan(employeeCount);
 	});
 
-	it('两种角色都保留「差旅申请」与「统计」两个入口', () => {
-		for (const role of ['employee', 'manager'] as const) {
-			expect(visibleSections(role).map((s) => s.title)).toEqual(['差旅申请', '统计']);
+	it('主管能看到「差旅申请」与「统计」两个入口', () => {
+		expect(visibleSections('manager').map((s) => s.title)).toEqual(['差旅申请', '统计']);
+	});
+
+	it('统计报表仅对领导（主管）角色可见', () => {
+		for (const role of ['employee', 'finance'] as const) {
+			const labels = visibleSections(role).flatMap((s) => s.items.map((i) => i.label));
+			expect(labels).not.toContain('统计报表');
 		}
+		expect(
+			visibleSections('manager')
+				.flatMap((s) => s.items.map((i) => i.label))
+				.includes('统计报表')
+		).toBe(true);
 	});
 });
 
