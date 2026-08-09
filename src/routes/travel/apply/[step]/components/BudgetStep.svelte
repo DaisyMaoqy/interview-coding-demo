@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import { budgetSchema, validate, type FieldErrors } from '$lib/domain/schema';
+	import { budgetSchema, validate, type BudgetInput, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { centsToYuan, parseYuanInput, budgetTotal, formatYuan } from '$lib/domain/money';
 	import type { Budget } from '$lib/domain/types';
@@ -64,7 +64,8 @@
 		}
 		patchDraft({ budget: next });
 
-		const result = validate(budgetSchema, { ...$draft, budget: next });
+		const payload: BudgetInput = { budget: next, budgetNote: $draft.budgetNote };
+		const result = validate<BudgetInput>(budgetSchema, payload);
 		if (!result.ok) {
 			errors = result.errors;
 			return;

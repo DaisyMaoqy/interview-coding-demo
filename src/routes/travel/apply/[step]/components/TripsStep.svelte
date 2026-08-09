@@ -2,23 +2,24 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import { tripsSchema, validate, type FieldErrors } from '$lib/domain/schema';
+	import { tripsSchema, validate, type LegInput, type TripsInput, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { TRANSPORT_LABELS } from '$lib/domain/workflow';
-	import type { TripLeg, Transport } from '$lib/domain/types';
+	import type { Transport } from '$lib/domain/types';
 	import WizardFooter from './WizardFooter.svelte';
 
 	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
 	const editId = $derived(page.url.searchParams.get('edit'));
 
-	// 交通方式中文名统一取自 workflow 的 TRANSPORT_LABELS（行程表/详情页共用），避免各处的叫法漂移
+	// 交通方式中文名统一取自 workflow 的 TRANSPORT_LABELS（行程表/详情页共用）
 	const TRANSPORTS: ReadonlyArray<{ value: Transport; label: string }> = (
 		Object.keys(TRANSPORT_LABELS) as Transport[]
 	).map((value) => ({ value, label: TRANSPORT_LABELS[value] }));
 
 	let errors = $state<FieldErrors>({});
 
-	function newLeg(): TripLeg {
+	// 创建新的行程段，LegInput - 行程的数据结构
+	function newLeg(): LegInput {
 		return {
 			id: `leg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
 			from: '',
@@ -30,7 +31,7 @@
 	}
 
 	// 每次改动都生成新数组并写回草稿，保证响应式与 localStorage 持久化都生效
-	function updateLeg(index: number, patch: Partial<TripLeg>): void {
+	function updateLeg(index: number, patch: Partial<LegInput>): void {
 		patchDraft({ legs: $draft.legs.map((leg, i) => (i === index ? { ...leg, ...patch } : leg)) });
 	}
 
@@ -47,7 +48,7 @@
 	}
 
 	function onNext(): void {
-		const result = validate(tripsSchema, $draft);
+		const result = validate<TripsInput>(tripsSchema, $draft);
 		if (!result.ok) {
 			errors = result.errors;
 			return;

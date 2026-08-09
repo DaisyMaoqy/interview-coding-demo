@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import { basicSchema, validate, REASON_MIN_LENGTH, type FieldErrors } from '$lib/domain/schema';
+	import { basicSchema, validate, REASON_MIN_LENGTH, type BasicInput, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { URGENCY_LABELS } from '$lib/domain/workflow';
 	import type { Urgency } from '$lib/domain/types';
@@ -19,7 +19,7 @@
 	let errors = $state<FieldErrors>({});
 
 	function onNext(): void {
-		const result = validate(basicSchema, $draft);
+		const result = validate<BasicInput>(basicSchema, $draft);
 		if (!result.ok) {
 			errors = result.errors;
 			return;
@@ -69,4 +69,5 @@
 	</fieldset>
 </section>
 
-<WizardFooter prevHref={prevStep('basic') ? stepHref(prevStep('basic')!, editId) : null} primaryLabel="下一步" onPrimary={onNext} />
+<!-- 第一步基本信息只有下一步按钮 -->
+<WizardFooter prevHref={null} primaryLabel="下一步" onPrimary={onNext} />
