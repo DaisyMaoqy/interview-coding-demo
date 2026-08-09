@@ -4,10 +4,12 @@
 	import { page } from '$app/state';
 	import { draft, resetDraft } from '$lib/state/wizardDraft';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { addRequest, createRequest, updateRequestFromDraft } from '$lib/data/requests';
+	import { addRequest, createDraft, createRequest, updateRequestFromDraft } from '$lib/data/requests';
 	import { travelFormSchema, validate } from '$lib/domain/schema';
 	import { stepHref, stepHrefWithFocus, setActiveEditId } from '$lib/domain/wizard';
 	import { formatYuan, budgetTotal } from '$lib/domain/money';
+	import { toLocalISO } from '$lib/format/date';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import type { TravelRequest } from '$lib/domain/types';
 	import RequestBasicInfo from '$lib/components/request/RequestBasicInfo.svelte';
 	import LegsTable from '$lib/components/request/LegsTable.svelte';
@@ -32,13 +34,30 @@
 		budget: $draft.budget,
 		budgetNote: $draft.budgetNote,
 		status: 'draft',
-		createdAt: new Date().toISOString(),
-		updatedAt: new Date().toISOString(),
+		createdAt: toLocalISO(),
+		updatedAt: toLocalISO(),
 		audit: []
 	});
 
 	let submitting = $state(false);
 	let submitError = $state('');
+	let savingDraft = $state(false);
+
+	// 存为草稿：不校验整单是否填全，直接落当前填写内容，状态停 draft；
+	// 仅「发起申请」流程有此入口（编辑态已有单据，走「重新提交」）。
+	async function onSaveDraft(): Promise<void> {
+		savingDraft = true;
+		try {
+			addRequest(createDraft($draft, identity.user));
+			setActiveEditId(null);
+			resetDraft();
+			// 存草稿后回到「我的申请」并直接停在「草稿」状态，便于看到刚存的那条
+			resetRequestListFilters('draft');
+			await goto(resolve('/travel/requests'));
+		} catch {
+			savingDraft = false;
+		}
+	}
 
 	async function onSubmit(): Promise<void> {
 		// 提交前再跑一遍整单 schema，兜底各步可能因 localStorage 脏数据/手写产生的偏差
@@ -50,19 +69,18 @@
 		submitError = '';
 		submitting = true;
 		try {
-			let targetId: string;
 			if (editId) {
 				// 编辑态：在原单上套用新数据并重新提交，沿用原单号与审计轨迹
-				const updated = updateRequestFromDraft(editId, $draft, identity.user);
-				targetId = updated.id;
+				updateRequestFromDraft(editId, $draft, identity.user);
 			} else {
-				const created = createRequest($draft, identity.user);
-				addRequest(created);
-				targetId = created.id;
+				addRequest(createRequest($draft, identity.user));
 			}
 			setActiveEditId(null);
 			resetDraft();
-			await goto(resolve(`/travel/requests/${targetId}?from=requests`));
+			// 提交会改变单据状态（草稿/驳回 → pending_manager），重置列表筛选为全部，
+			// 直接回到「我的申请」即可看到全部数据，无需再经详情页中转
+			resetRequestListFilters();
+			await goto(resolve('/travel/requests'));
 		} catch {
 			submitting = false;
 		}
@@ -101,6 +119,9 @@
 	primaryLabel={editId ? '重新提交' : '提交申请'}
 	loading={submitting}
 	onPrimary={onSubmit}
+	secondaryLabel={editId ? undefined : '存为草稿'}
+	secondaryLoading={savingDraft}
+	onSecondary={onSaveDraft}
 />
 
 <style>

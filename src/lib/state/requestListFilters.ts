@@ -24,3 +24,11 @@ const DEFAULT_FILTERS: RequestListFilterState = {
 };
 
 export const requestListFilters = writable<RequestListFilterState>({ ...DEFAULT_FILTERS });
+
+/**
+ * 重置筛选，默认回到「全部」。
+ * 传 status 可直接落到指定状态 tab（如存草稿后回到「草稿」），其余维度仍清空。
+ */
+export function resetRequestListFilters(status: StatusFilter = 'all'): void {
+	requestListFilters.set({ ...DEFAULT_FILTERS, status });
+}

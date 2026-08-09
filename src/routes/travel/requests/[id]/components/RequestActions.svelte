@@ -11,6 +11,7 @@
 	import { deleteRequest, updateRequest } from '$lib/data/requests';
 	import { setActiveEditId, stepHref } from '$lib/domain/wizard';
 	import { loadDraftForEdit } from '$lib/state/wizardDraft';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import type { AuditAction, TravelRequest, User } from '$lib/domain/types';
 
@@ -22,9 +23,17 @@
 		emptyHint?: string;
 		/** 删除成功后回调（一般用于跳回列表），可选 */
 		ondeleted?: () => void;
+		/** 提交成功后回调（草稿详情页提交后直接回「我的申请」），可选 */
+		onsubmitted?: () => void;
 	}
 
-	let { request, actor, emptyHint = '当前状态下你没有可执行的操作', ondeleted }: Props = $props();
+	let {
+		request,
+		actor,
+		emptyHint = '当前状态下你没有可执行的操作',
+		ondeleted,
+		onsubmitted
+	}: Props = $props();
 
 	// 能做什么完全由状态机决定，详情页与审批页共用同一套按钮逻辑
 	const actions = $derived(availableActions(request, actor));
@@ -58,6 +67,8 @@
 
 		updateRequest(result.request);
 		showReject = false;
+		// 草稿详情页「提交申请」提交后直接回到「我的申请」，由页面层决定去向
+		if (action === 'submit') onsubmitted?.();
 	}
 
 	function openReject(): void {

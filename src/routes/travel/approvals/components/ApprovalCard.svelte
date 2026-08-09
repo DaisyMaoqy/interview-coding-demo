@@ -3,7 +3,7 @@
 	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
 	import { summarizeLegs, requestTotal } from '$lib/data/requests';
 	import { formatYuan } from '$lib/domain/money';
-	import { formatDate } from '$lib/format';
+	import { formatDate, formatDateTime } from '$lib/format';
 	import { availableActions } from '$lib/domain/workflow';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import type { TravelRequest } from '$lib/domain/types';
@@ -41,7 +41,12 @@
 			<span class="approval-card__name">{request.applicantName}</span>
 			<span class="approval-card__dept">{request.department}</span>
 		</div>
-		<StatusBadge status={request.status} />
+		<div class="approval-card__status">
+			<StatusBadge status={request.status} />
+			<p class="approval-card__submitted">
+				{request.submittedAt ? `提交于 ${formatDateTime(request.submittedAt)}` : '尚未提交'}
+			</p>
+		</div>
 	</div>
 
 	<div class="approval-card__body">
@@ -116,6 +121,19 @@
 	.approval-card__dept {
 		font-size: 0.75rem;
 		color: var(--color-slate-500);
+	}
+	.approval-card__status {
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.375rem;
+		text-align: right;
+	}
+	.approval-card__submitted {
+		font-size: 0.75rem;
+		color: var(--color-slate-400);
+		white-space: nowrap;
 	}
 	.approval-card__body {
 		margin-top: 0.75rem;

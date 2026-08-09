@@ -11,6 +11,7 @@
 	import RequestActions from './RequestActions.svelte';
 	import { formatYuan } from '$lib/domain/money';
 	import { requestTotal } from '$lib/data/requests';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import type { TravelRequest, User } from '$lib/domain/types';
 
 	let {
@@ -88,7 +89,15 @@
 
 	<!-- 操作区：从「待我审批」进入时为只读，不展示底部操作 -->
 	{#if showActions}
-		<RequestActions {request} {actor} ondeleted={() => goto(resolve(backHref))} />
+		<RequestActions
+			{request}
+			{actor}
+			ondeleted={() => goto(resolve(backHref))}
+			onsubmitted={() => {
+				resetRequestListFilters();
+				goto(resolve('/travel/requests'));
+			}}
+		/>
 	{/if}
 </div>
 

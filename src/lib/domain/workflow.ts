@@ -8,6 +8,7 @@ import type {
 	User
 } from './types';
 import { findUser } from './org';
+import { toLocalISO } from '$lib/format/date';
 
 /**
  * 审批状态机。
@@ -257,7 +258,8 @@ export function transition({
 		};
 	}
 
-	const at = now.toISOString();
+	// 用户动作产生的时间戳按本地墙钟存储（toLocalISO），保证「提交时间」等展示与用户所在时区一致。
+	const at = toLocalISO(now);
 	const entry: AuditEntry = {
 		id: auditId ?? `audit-${request.audit.length + 1}-${at}`,
 		at,
@@ -275,8 +277,8 @@ export function transition({
 			...request,
 			status: rule.to,
 			updatedAt: at,
-			// 首次提交才记录提交时间；驳回后重新提交不覆盖，保证「平均审批时长」以初次提交为基准
-			submittedAt: action === 'submit' ? (request.submittedAt ?? at) : request.submittedAt,
+			// 每次提交都刷新提交时间；驳回后「重新编辑 → 再提交」应以最新的提交时间为准
+			submittedAt: action === 'submit' ? at : request.submittedAt,
 			audit: [...request.audit, entry]
 		}
 	};

@@ -8,9 +8,23 @@
 		onPrimary: () => void;
 		/** 提交/下一步进行中时禁用按钮并切换文案 */
 		loading?: boolean;
+		/** 次按钮文案，如「存为草稿」；不传则不渲染 */
+		secondaryLabel?: string;
+		/** 次按钮点击：各步注入自己的逻辑（如存草稿） */
+		onSecondary?: () => void;
+		/** 次按钮进行中时禁用并切换文案 */
+		secondaryLoading?: boolean;
 	}
 
-	let { prevHref, primaryLabel, onPrimary, loading = false }: Props = $props();
+	let {
+		prevHref,
+		primaryLabel,
+		onPrimary,
+		loading = false,
+		secondaryLabel,
+		onSecondary,
+		secondaryLoading = false
+	}: Props = $props();
 </script>
 
 <div class="wizard-footer">
@@ -20,9 +34,26 @@
 	{:else}
 		<span></span>
 	{/if}
-	<button type="button" class="btn btn--primary" onclick={onPrimary} disabled={loading}>
-		{loading ? `${primaryLabel}中...` : primaryLabel}
-	</button>
+	<div class="wizard-footer__right">
+		{#if secondaryLabel}
+			<button
+				type="button"
+				class="btn btn--ghost"
+				onclick={onSecondary}
+				disabled={loading || secondaryLoading}
+			>
+				{secondaryLoading ? `${secondaryLabel}中...` : secondaryLabel}
+			</button>
+		{/if}
+		<button
+			type="button"
+			class="btn btn--primary"
+			onclick={onPrimary}
+			disabled={loading || secondaryLoading}
+		>
+			{loading ? `${primaryLabel}中...` : primaryLabel}
+		</button>
+	</div>
 </div>
 
 <style>
@@ -31,5 +62,9 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-top: 1.5rem;
+	}
+	.wizard-footer__right {
+		display: flex;
+		gap: 0.75rem;
 	}
 </style>

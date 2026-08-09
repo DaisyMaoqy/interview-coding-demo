@@ -10,6 +10,7 @@ import {
 	REJECT_COMMENT_MAX_LENGTH,
 	transition
 } from '../../domain/workflow';
+import { toLocalISO } from '../../format/date';
 
 const zhangsan = requireUser(EMPLOYEE_ID);
 const lijingli = requireUser(MANAGER_ID);
@@ -347,7 +348,7 @@ describe('transition — 留痕与不可变性', () => {
 		expect(result.ok && result.request.audit).toEqual([
 			{
 				id: 'audit-fixed',
-				at: NOW.toISOString(),
+				at: toLocalISO(NOW),
 				actorId: zhangsan.id,
 				actorName: zhangsan.name,
 				action: 'submit',
@@ -373,11 +374,10 @@ describe('transition — 留痕与不可变性', () => {
 			now: NOW
 		});
 
-		expect(result.ok && result.request.submittedAt).toBe(NOW.toISOString());
+		expect(result.ok && result.request.submittedAt).toBe(toLocalISO(NOW));
 	});
 
-	it('驳回后重新提交不覆盖首次提交时间', () => {
-		// 平均审批时长以初次提交为基准，否则反复驳回会把时长算短
+	it('驳回后重新提交以最新提交时间为准', () => {
 		const firstSubmit = '2026-03-01T02:00:00.000Z';
 		const result = transition({
 			request: makeRequest({ status: 'draft', submittedAt: firstSubmit }),
@@ -386,7 +386,7 @@ describe('transition — 留痕与不可变性', () => {
 			now: NOW
 		});
 
-		expect(result.ok && result.request.submittedAt).toBe(firstSubmit);
+		expect(result.ok && result.request.submittedAt).toBe(toLocalISO(NOW));
 	});
 });
 
