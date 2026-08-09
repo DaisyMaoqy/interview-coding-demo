@@ -114,8 +114,8 @@
 
 	// ---- 图表点击交互 ----
 	function onPieReady(chart: echarts.ECharts): void {
-		chart.on('click', (params: any) => {
-			const key: RequestStatus | undefined = LABEL_TO_STATUS[params.name as string];
+		chart.on('click', (params: { name?: string }) => {
+			const key: RequestStatus | undefined = LABEL_TO_STATUS[params.name ?? ''];
 			if (!key) return;
 			selectedStatus = selectedStatus === key ? null : key;
 			selectedMonth = null;
@@ -124,7 +124,7 @@
 	}
 
 	function onLineReady(chart: echarts.ECharts): void {
-		chart.on('click', (params: any) => {
+		chart.on('click', (params: { name?: string }) => {
 			const month = params.name as string;
 			if (!month) return;
 			selectedMonth = selectedMonth === month ? null : month;

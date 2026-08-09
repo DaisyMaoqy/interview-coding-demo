@@ -19,7 +19,6 @@ const VALID_ROLES: Set<string> = new Set(['employee', 'manager', 'finance']);
 
 function loadRole(): Role {
 	if (typeof localStorage === 'undefined') return 'employee';
-	// console.log('loadRole', localStorage.getItem(STORAGE_KEY))
 	const saved = localStorage.getItem(STORAGE_KEY);
 	return saved && VALID_ROLES.has(saved) ? (saved as Role) : 'employee';
 }

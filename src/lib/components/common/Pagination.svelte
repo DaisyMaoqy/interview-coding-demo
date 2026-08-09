@@ -29,7 +29,8 @@
 
 	// 筛选条件 / 身份切换后回到首页，避免停留在已无数据的页码
 	$effect(() => {
-		resetKey;
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		void resetKey;
 		page = 1;
 	});
 	// 数据变少（通过/筛选收紧）致当前页越界时收拢到最后有效页

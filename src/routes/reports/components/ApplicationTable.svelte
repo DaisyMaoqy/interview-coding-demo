@@ -8,11 +8,10 @@
 
 	interface Props {
 		requests: readonly TravelRequest[];
-		pageSizeOptions?: ReadonlyArray<number>;
 		resetKey?: unknown;
 	}
 
-	let { requests, pageSizeOptions = [5], resetKey = undefined }: Props = $props();
+	let { requests, resetKey = undefined }: Props = $props();
 
 	function tripChain(req: TravelRequest): string {
 		if (req.legs.length === 0) return '—';
