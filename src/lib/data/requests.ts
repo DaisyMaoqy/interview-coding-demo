@@ -120,6 +120,21 @@ export function updateRequest(updated: TravelRequest): void {
 	});
 }
 
+/**
+ * 删除一张申请单。
+ *
+ * 仅草稿允许删除，调用方需先经 {@link isDeletable} 校验；与 updateRequest 一样只落本地
+ * localStorage 缓存（云端 Mock 只读，删除不会回写远端）。删除后该 id 从工作数据集消失，
+ * 列表/详情订阅会自动刷新。
+ */
+export function deleteRequest(id: string): void {
+	requestsStore.update((list) => {
+		const next = list.filter((r) => r.id !== id);
+		writeStorage(next);
+		return next;
+	});
+}
+
 /** 某用户发起的全部申请（我的申请 / 待我审批都从这里再按角色筛） */
 export function getRequestsByApplicant(
 	applicantId: UserId,
