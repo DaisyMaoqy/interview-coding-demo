@@ -1,4 +1,5 @@
 import type { RequestStatus, TravelRequest } from './types';
+import { PENDING_STATUSES } from './types';
 import { STATUS_LABELS } from './workflow';
 
 /**
@@ -87,9 +88,7 @@ export interface ManagerOverview {
 
 export function managerOverview(requests: readonly TravelRequest[]): ManagerOverview {
 	const total = requests.length;
-	const pending = requests.filter(
-		(r) => r.status === 'pending_manager' || r.status === 'pending_finance'
-	).length;
+	const pending = requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s)).length;
 	const approved = requests.filter((r) => r.status === 'approved').length;
 	const rejected = requests.filter((r) => r.status === 'rejected').length;
 	const decided = approved + rejected;
@@ -107,9 +106,7 @@ export interface EmployeeOverview {
 
 export function employeeOverview(requests: readonly TravelRequest[]): EmployeeOverview {
 	const total = requests.length;
-	const pending = requests.filter(
-		(r) => r.status === 'pending_manager' || r.status === 'pending_finance'
-	).length;
+	const pending = requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s)).length;
 	const approved = requests.filter((r) => r.status === 'approved').length;
 	return { total, pending, approved };
 }
