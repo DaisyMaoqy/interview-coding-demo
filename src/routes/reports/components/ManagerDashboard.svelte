@@ -1,23 +1,82 @@
 <script lang="ts">
 	import type { EChartsOption } from 'echarts';
-	import type { TravelRequest } from '$lib/domain/types';
+	import type * as echarts from 'echarts';
+	import type { RequestStatus, TravelRequest } from '$lib/domain/types';
 	import {
 		statusDistribution,
 		monthlyApplicationTrend,
 		managerOverview,
 		STATUS_COLORS,
 		STATUS_ORDER,
-		CHART_COLORS
+		CHART_COLORS,
+		computeDateRange,
+		filterByDateRange,
+		type DatePreset
 	} from '$lib/domain/dashboard';
 	import Panel from '$lib/components/common/Panel.svelte';
 	import Chart from '$lib/components/common/Chart.svelte';
 	import StatCard from '$lib/components/common/StatCard.svelte';
+	import DateFilter from './DateFilter.svelte';
+	import ApplicationTable from './ApplicationTable.svelte';
 
 	let { requests }: { requests: readonly TravelRequest[] } = $props();
 
-	const overview = $derived(managerOverview(requests));
-	const status = $derived(statusDistribution(requests));
-	const trend = $derived(monthlyApplicationTrend(requests));
+	// ---- 筛选状态 ----
+	let preset = $state<DatePreset>('all');
+	let customStart = $state('');
+	let customEnd = $state('');
+	let selectedStatus = $state<RequestStatus | null>(null);
+	let selectedMonth = $state<string | null>(null);
+	let showDateFilter = $state(false);
+
+	function resetDateFilter(): void {
+		preset = 'all';
+		customStart = '';
+		customEnd = '';
+		showDateFilter = false;
+	}
+
+	function resetAllFilters(): void {
+		resetDateFilter();
+		selectedStatus = null;
+		selectedMonth = null;
+	}
+
+	// ---- 日期范围 ----
+	const dateRange = $derived.by(() => {
+		const start = customStart ? new Date(customStart) : undefined;
+		const end = customEnd ? new Date(customEnd) : undefined;
+		return computeDateRange(preset, start, end);
+	});
+
+	// ---- 筛选 & 排序 ----
+	const dateFiltered = $derived(filterByDateRange(requests, dateRange));
+	const finalFiltered = $derived.by(() => {
+		let result = dateFiltered;
+		if (selectedStatus) {
+			result = result.filter((r) => r.status === selectedStatus);
+		}
+		if (selectedMonth) {
+			result = result.filter((r) => r.createdAt.slice(0, 7) === selectedMonth);
+		}
+		return result;
+	});
+	const sortedRequests = $derived([...finalFiltered].sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	));
+
+	// 筛选条件改变 → 分页回到首页
+	const filterKey = $derived(`${preset}:${selectedStatus ?? ''}:${selectedMonth ?? ''}:${customStart}:${customEnd}`);
+
+	// ---- 图表聚合（仅对日期筛选后的数据做聚合） ----
+	const overview = $derived(managerOverview(dateFiltered));
+	const status = $derived(statusDistribution(dateFiltered));
+	const trend = $derived(monthlyApplicationTrend(dateFiltered));
+
+	// 状态标签名 → 状态 key 的反向映射
+	const LABEL_TO_STATUS: Record<string, RequestStatus> = $derived(
+		Object.fromEntries(status.map((s) => [s.name, s.status]))
+	);
 
 	const statusOption = $derived<EChartsOption>({
 		color: STATUS_ORDER.filter((s) => status.some((d) => d.status === s)).map((s) => STATUS_COLORS[s]),
@@ -52,6 +111,27 @@
 		},
 		series: [{ name: '申请量', type: 'line', smooth: true, showSymbol: false, areaStyle: { opacity: 0.12 }, data: trend.map((p) => p.amount) }]
 	});
+
+	// ---- 图表点击交互 ----
+	function onPieReady(chart: echarts.ECharts): void {
+		chart.on('click', (params: any) => {
+			const key: RequestStatus | undefined = LABEL_TO_STATUS[params.name as string];
+			if (!key) return;
+			selectedStatus = selectedStatus === key ? null : key;
+			selectedMonth = null;
+			resetDateFilter();
+		});
+	}
+
+	function onLineReady(chart: echarts.ECharts): void {
+		chart.on('click', (params: any) => {
+			const month = params.name as string;
+			if (!month) return;
+			selectedMonth = selectedMonth === month ? null : month;
+			selectedStatus = null;
+			resetDateFilter();
+		});
+	}
 </script>
 
 <div class="cards">
@@ -62,12 +142,20 @@
 
 <div class="grid">
 	<Panel title="申请状态分布">
-		<Chart option={statusOption} />
+		<Chart option={statusOption} onReady={onPieReady} />
 	</Panel>
 	<Panel title="近 12 个月申请量趋势">
-		<Chart option={trendOption} />
+		<Chart option={trendOption} onReady={onLineReady} />
 	</Panel>
 </div>
+
+<Panel title="申请记录" actions={header}>
+	<ApplicationTable requests={sortedRequests} resetKey={filterKey} />
+</Panel>
+
+{#snippet header()}
+	<DateFilter bind:preset bind:customStart bind:customEnd bind:visible={showDateFilter} onreset={resetAllFilters} />
+{/snippet}
 
 <style>
 	.cards {
@@ -80,5 +168,6 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 		gap: 1.25rem;
+		margin-bottom: 1.25rem;
 	}
 </style>

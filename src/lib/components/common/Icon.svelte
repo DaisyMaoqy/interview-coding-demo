@@ -6,7 +6,7 @@
 	 * 统一 24×24 视窗 + `stroke="currentColor"` 描边，图标颜色随文字走，
 	 * 视觉重量也就天然一致；调用方只需给 class 控制尺寸。
 	 */
-	export type IconName = 'inbox' | 'check' | 'plus' | 'chart' | 'filter' | 'search';
+	export type IconName = 'inbox' | 'check' | 'plus' | 'chart' | 'filter' | 'search' | 'x';
 
 	/** 图标名 → path 数据。新增图标只改这里一处 */
 	const PATHS: Record<IconName, string> = {
@@ -16,7 +16,8 @@
 		plus: 'M12 5v14M5 12h14',
 		chart: 'M4 20h16M7 16V9m5 7V5m5 11v-4',
 		filter: 'M3 4h18l-7 8v6l-4 2v-8z',
-		search: 'm20 20-4.2-4.2M18 11a7 7 0 1 1-14 0 7 7 0 0 1 14 0z'
+		search: 'm20 20-4.2-4.2M18 11a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
+		x: 'M18 6 6 18M6 6l12 12'
 	};
 </script>
 

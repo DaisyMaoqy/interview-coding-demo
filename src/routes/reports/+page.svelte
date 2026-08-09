@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestsStore } from '$lib/data/requests';
@@ -7,12 +8,26 @@
 	const identity = useIdentity();
 	// 报表数据随请求数据集变化（含启动时的 Mock 加载）自动刷新
 	const all = $derived($requestsStore);
+	// 主管只查看本部门员工（不含自己、排除草稿）的申请数据
+	const deptRequests = $derived.by(() =>
+		all.filter(
+			(r) =>
+				r.department === identity.user.department &&
+				r.applicantId !== identity.user.id &&
+				r.status !== 'draft'
+		)
+	);
+
+	// URL 直达时自动纠正非主管身份，无需手动点切换按钮
+	onMount(() => {
+		if (!identity.isManager) identity.switchTo('manager');
+	});
 </script>
 
 {#if identity.isManager}
 	<PageHeader title="统计报表" description="团队差旅成本与审批效率" />
 
-	<ManagerDashboard requests={all} />
+	<ManagerDashboard requests={deptRequests} />
 {:else}
 	<!-- 统计报表是领导（主管）专属视图，其余身份无权查看 -->
 	<div class="notice-card">
@@ -36,6 +51,7 @@
 	.notice-card__actions {
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: center;
 		gap: 0.75rem;
 	}
 </style>

@@ -9,9 +9,11 @@
 		option: EChartsOption;
 		/** 容器高度，默认 320px */
 		height?: string;
+		/** 初始化完成后回调，传递 ECharts 实例供父组件注册事件 */
+		onReady?: (chart: echarts.ECharts) => void;
 	}
 
-	let { option, height = '320px' }: Props = $props();
+	let { option, height = '320px', onReady }: Props = $props();
 
 	let container = $state<HTMLDivElement>();
 	let chart: echarts.ECharts | null = null;
@@ -28,6 +30,7 @@
 		chart.setOption(option, true);
 		observer = new ResizeObserver(() => chart?.resize());
 		observer.observe(container!);
+		onReady?.(chart);
 	});
 
 	onDestroy(() => {

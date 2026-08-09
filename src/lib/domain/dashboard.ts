@@ -95,3 +95,53 @@ export function managerOverview(requests: readonly TravelRequest[]): ManagerOver
 	return { total, pending, passRate: decided ? approved / decided : 0 };
 }
 
+export type DatePreset = 'all' | 'thisMonth' | 'thisQuarter' | 'thisYear' | 'custom';
+
+export interface DateRange {
+	start: Date;
+	end: Date;
+}
+
+/** 根据预设类型计算日期范围（end 含当天 23:59:59.999） */
+export function computeDateRange(preset: DatePreset, customStart?: Date, customEnd?: Date): DateRange {
+	const now = new Date();
+	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+	switch (preset) {
+		case 'all': {
+			// 返回足够宽广的范围以包含全部历史数据
+			const start = new Date(2000, 0, 1);
+			return { start, end };
+		}
+		case 'thisMonth': {
+			const start = new Date(now.getFullYear(), now.getMonth(), 1);
+			return { start, end };
+		}
+		case 'thisQuarter': {
+			const q = Math.floor(now.getMonth() / 3) * 3;
+			const start = new Date(now.getFullYear(), q, 1);
+			return { start, end };
+		}
+		case 'thisYear': {
+			const start = new Date(now.getFullYear(), 0, 1);
+			return { start, end };
+		}
+		case 'custom':
+			if (customStart && customEnd) {
+				return { start: customStart, end: new Date(customEnd.getFullYear(), customEnd.getMonth(), customEnd.getDate(), 23, 59, 59, 999) };
+			}
+			// 未选择起止日期时展示全部数据
+			return computeDateRange('all');
+	}
+}
+
+/** 按日期范围筛选申请（createdAt 落在 [start, end] 内） */
+export function filterByDateRange(requests: readonly TravelRequest[], range: DateRange): TravelRequest[] {
+	const startTime = range.start.getTime();
+	const endTime = range.end.getTime();
+	return requests.filter((r) => {
+		const t = new Date(r.createdAt).getTime();
+		return t >= startTime && t <= endTime;
+	});
+}
+
