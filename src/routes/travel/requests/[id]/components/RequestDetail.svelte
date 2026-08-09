@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Panel from '$lib/components/common/Panel.svelte';
@@ -83,7 +84,7 @@
 
 	<!-- 操作区：从「待我审批」进入时为只读，不展示底部操作 -->
 	{#if showActions}
-		<RequestActions {request} {actor} />
+		<RequestActions {request} {actor} ondeleted={() => goto(resolve(backHref))} />
 	{/if}
 </div>
 
