@@ -28,23 +28,6 @@
 		@apply flex shrink-0 items-center gap-2;
 	}
 
-	/* ===== PagePlaceholder（src/lib/components/layout/PagePlaceholder.svelte） ===== */
-	.page-placeholder {
-		@apply rounded-card border border-dashed border-slate-300 bg-white p-8;
-	}
-	.page-placeholder__title {
-		@apply text-sm font-medium text-slate-500;
-	}
-	.page-placeholder__list {
-		@apply mt-3 space-y-1.5;
-	}
-	.page-placeholder__item {
-		@apply flex gap-2 text-sm text-slate-600;
-	}
-	.page-placeholder__bullet {
-		@apply text-slate-300;
-	}
-
 	/* ===== IdentitySwitcher（src/lib/components/layout/IdentitySwitcher.svelte） ===== */
 	.identity-switcher {
 		@apply flex items-center gap-3;

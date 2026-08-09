@@ -1,4 +1,5 @@
 import seed from './seed.json' with { type: 'json' };
+import { PENDING_STATUSES } from '$lib/domain/types';
 import type { RequestStatus, TravelRequest, User, UserId } from '$lib/domain/types';
 import { budgetTotal } from '$lib/domain/money';
 import { transition } from '$lib/domain/workflow';
@@ -140,7 +141,7 @@ export function filterByStatus(
 ): TravelRequest[] {
 	if (!filter || filter === 'all') return [...requests];
 	if (filter === 'pending')
-		return requests.filter((r) => r.status === 'pending_manager' || r.status === 'pending_finance');
+		return requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s));
 	return requests.filter((r) => r.status === filter);
 }
 
