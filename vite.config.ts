@@ -1,22 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import tailwindcss from '@tailwindcss/vite';
-import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
-	plugins: [
-		tailwindcss(),
-		sveltekit({
-			compilerOptions: {
-				// 判断是否启用runes模式
-				runes: ({ filename }) =>
-					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
-			},
-
-			// 适配器
-			adapter: adapter()
-		})
-	],
+	plugins: [tailwindcss(), sveltekit()],
 	test: {
 		expect: { requireAssertions: true }, // 要求每条测试都有except断言，expect.assertions(0); // 明确表示不要断言
 		//  用projects包一层，是为了把那句resolve.conditions配置在测试范围内，不污染dev，build的模块解析
