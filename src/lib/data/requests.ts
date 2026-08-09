@@ -6,6 +6,7 @@ import { transition } from '$lib/domain/workflow';
 import type { TravelFormInput } from '$lib/domain/schema';
 import { writable, get } from 'svelte/store';
 import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
+import { toLocalISO } from '$lib/format/date';
 
 /**
  * 列表筛选维度。
@@ -120,6 +121,21 @@ export function updateRequest(updated: TravelRequest): void {
 	});
 }
 
+/**
+ * 删除一张申请单。
+ *
+ * 仅草稿允许删除，调用方需先经 {@link isDeletable} 校验；与 updateRequest 一样只落本地
+ * localStorage 缓存（云端 Mock 只读，删除不会回写远端）。删除后该 id 从工作数据集消失，
+ * 列表/详情订阅会自动刷新。
+ */
+export function deleteRequest(id: string): void {
+	requestsStore.update((list) => {
+		const next = list.filter((r) => r.id !== id);
+		writeStorage(next);
+		return next;
+	});
+}
+
 /** 某用户发起的全部申请（我的申请 / 待我审批都从这里再按角色筛） */
 export function getRequestsByApplicant(
 	applicantId: UserId,
@@ -220,7 +236,7 @@ export function nextRequestId(requests: readonly TravelRequest[] = get(requestsS
  * 与「草稿再提交」共用同一套状态机，避免规则漂移。
  */
 export function createRequest(input: TravelFormInput, applicant: User): TravelRequest {
-	const now = new Date().toISOString();
+	const now = toLocalISO();
 	const base: TravelRequest = {
 		id: nextRequestId(),
 		applicantId: applicant.id,
@@ -240,6 +256,31 @@ export function createRequest(input: TravelFormInput, applicant: User): TravelRe
 	const result = transition({ request: base, action: 'submit', actor: applicant });
 	if (!result.ok) throw new Error(result.message);
 	return result.request;
+}
+
+/**
+ * 由向导整单表单数据新建一条「草稿」申请，不提交（不走 submit 流转）。
+ *
+ * 草稿不要求字段齐全，直接落当前填写内容；无审计、无提交时间，状态停 `draft`。
+ * 用户可从「我的申请」的草稿卡片继续编辑。
+ */
+export function createDraft(input: TravelFormInput, applicant: User): TravelRequest {
+	const now = toLocalISO();
+	return {
+		id: nextRequestId(),
+		applicantId: applicant.id,
+		applicantName: applicant.name,
+		department: applicant.department,
+		reason: input.reason,
+		urgency: input.urgency,
+		legs: input.legs,
+		budget: input.budget,
+		budgetNote: input.budgetNote,
+		status: 'draft',
+		createdAt: now,
+		updatedAt: now,
+		audit: []
+	};
 }
 
 /** 把新单插入工作数据集（置顶）并同步 localStorage 缓存 */

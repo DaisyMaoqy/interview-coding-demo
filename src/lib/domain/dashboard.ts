@@ -3,10 +3,10 @@ import { PENDING_STATUSES } from './types';
 import { STATUS_LABELS } from './workflow';
 
 /**
- * 数据看板聚合层（纯函数，与 UI 解耦，便于将来补单测）。
+ * 统计报表聚合层（纯函数，与 UI 解耦，便于将来补单测）。
  *
- * 本看板以「申请情况」为核心：状态分布、申请量趋势、通过率、按部门分布，
- * 而非费用分析。金额仅在概览卡中作为辅助指标出现。
+ * 仅面向领导（主管）角色，以「团队申请情况」为核心：状态分布、申请量趋势、
+ * 通过率、按部门分布，而非个人费用分析。金额仅在概览卡中作为辅助指标出现。
  */
 
 /** echarts 调色板，与设计令牌（brand/emerald/amber/rose…）观感对齐 */
@@ -95,18 +95,53 @@ export function managerOverview(requests: readonly TravelRequest[]): ManagerOver
 	return { total, pending, passRate: decided ? approved / decided : 0 };
 }
 
-export interface EmployeeOverview {
-	/** 我的申请总数 */
-	total: number;
-	/** 审批中数量 */
-	pending: number;
-	/** 已通过数量 */
-	approved: number;
+export type DatePreset = 'all' | 'thisMonth' | 'thisQuarter' | 'thisYear' | 'custom';
+
+export interface DateRange {
+	start: Date;
+	end: Date;
 }
 
-export function employeeOverview(requests: readonly TravelRequest[]): EmployeeOverview {
-	const total = requests.length;
-	const pending = requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s)).length;
-	const approved = requests.filter((r) => r.status === 'approved').length;
-	return { total, pending, approved };
+/** 根据预设类型计算日期范围（end 含当天 23:59:59.999） */
+export function computeDateRange(preset: DatePreset, customStart?: Date, customEnd?: Date): DateRange {
+	const now = new Date();
+	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+	switch (preset) {
+		case 'all': {
+			// 返回足够宽广的范围以包含全部历史数据
+			const start = new Date(2000, 0, 1);
+			return { start, end };
+		}
+		case 'thisMonth': {
+			const start = new Date(now.getFullYear(), now.getMonth(), 1);
+			return { start, end };
+		}
+		case 'thisQuarter': {
+			const q = Math.floor(now.getMonth() / 3) * 3;
+			const start = new Date(now.getFullYear(), q, 1);
+			return { start, end };
+		}
+		case 'thisYear': {
+			const start = new Date(now.getFullYear(), 0, 1);
+			return { start, end };
+		}
+		case 'custom':
+			if (customStart && customEnd) {
+				return { start: customStart, end: new Date(customEnd.getFullYear(), customEnd.getMonth(), customEnd.getDate(), 23, 59, 59, 999) };
+			}
+			// 未选择起止日期时展示全部数据
+			return computeDateRange('all');
+	}
 }
+
+/** 按日期范围筛选申请（createdAt 落在 [start, end] 内） */
+export function filterByDateRange(requests: readonly TravelRequest[], range: DateRange): TravelRequest[] {
+	const startTime = range.start.getTime();
+	const endTime = range.end.getTime();
+	return requests.filter((r) => {
+		const t = new Date(r.createdAt).getTime();
+		return t >= startTime && t <= endTime;
+	});
+}
+

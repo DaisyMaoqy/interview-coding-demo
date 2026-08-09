@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Panel from '$lib/components/common/Panel.svelte';
@@ -10,6 +11,7 @@
 	import RequestActions from './RequestActions.svelte';
 	import { formatYuan } from '$lib/domain/money';
 	import { requestTotal } from '$lib/data/requests';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import type { TravelRequest, User } from '$lib/domain/types';
 
 	let {
@@ -27,18 +29,22 @@
 			? '/travel/approvals'
 			: from === 'requests'
 				? '/travel/requests'
-				: isApprover
-					? '/travel/approvals'
-					: '/travel/requests'
+				: from === 'reports'
+					? '/reports'
+					: isApprover
+						? '/travel/approvals'
+						: '/travel/requests'
 	);
 	const backLabel = $derived(
 		from === 'approvals'
 			? '待我审批'
 			: from === 'requests'
 				? '我的申请'
-				: isApprover
-					? '待我审批'
-					: '我的申请'
+				: from === 'reports'
+					? '统计报表'
+					: isApprover
+						? '待我审批'
+						: '我的申请'
 	);
 	// 从「待我审批」进来的详情是只读视角，底部通过/驳回等操作不展示
 	const showActions = $derived(from !== 'approvals');
@@ -83,7 +89,15 @@
 
 	<!-- 操作区：从「待我审批」进入时为只读，不展示底部操作 -->
 	{#if showActions}
-		<RequestActions {request} {actor} />
+		<RequestActions
+			{request}
+			{actor}
+			ondeleted={() => goto(resolve(backHref))}
+			onsubmitted={() => {
+				resetRequestListFilters();
+				goto(resolve('/travel/requests'));
+			}}
+		/>
 	{/if}
 </div>
 

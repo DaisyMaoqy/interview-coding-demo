@@ -6,6 +6,7 @@
 	import { draft, loadDraftForEdit } from '$lib/state/wizardDraft';
 	import { evaluateSteps, stepHref, getActiveEditId, setActiveEditId } from '$lib/domain/wizard';
 	import { getRequestById } from '$lib/data/requests';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import type { PageData } from './$types';
 	import BasicStep from './components/BasicStep.svelte';
 	import TripsStep from './components/TripsStep.svelte';
@@ -27,8 +28,12 @@
 	// 这样直接打开编辑链接或刷新也能恢复。普通新建不带该参数，则清掉编辑态。
 	const isEditing = $derived(page.url.searchParams.has('edit'));
 
-	// 从编辑页返回「我的申请」：年月 / 关键词 / 状态等筛选都已在共享 store 中（由列表页
-	// $effect 实时回写），直接跳回列表页即可原样恢复，无需任何额外处理。
+	// 从编辑页返回「我的申请」：重新编辑会改变单据状态（rejected → draft，再提交 →
+	// pending_manager），若仍沿用进入编辑前的筛选 tab，刚编辑的单子会从列表里"消失"。
+	// 因此返回即重置筛选为全部，保证看得到这张单子。
+	function backToRequests(): void {
+		resetRequestListFilters();
+	}
 	$effect(() => {
 		const id = page.url.searchParams.get('edit');
 		if (id) {
@@ -59,7 +64,7 @@
 -->
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 {#if isEditing}
-	<a class="edit-back" href={resolve('/travel/requests')}>← 返回我的申请</a>
+	<a class="edit-back" href={resolve('/travel/requests')} onclick={backToRequests}>← 返回我的申请</a>
 {/if}
 
 <PageHeader title={isEditing ? '编辑申请' : '发起申请'} description={current.description} />

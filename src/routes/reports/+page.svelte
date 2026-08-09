@@ -1,23 +1,57 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { requestsStore, getRequestsByApplicant } from '$lib/data/requests';
+	import { requestsStore } from '$lib/data/requests';
 	import ManagerDashboard from './components/ManagerDashboard.svelte';
-	import EmployeeDashboard from './components/EmployeeDashboard.svelte';
 
 	const identity = useIdentity();
-	// 看板数据随请求数据集变化（含启动时的 Mock 加载）自动刷新
+	// 报表数据随请求数据集变化（含启动时的 Mock 加载）自动刷新
 	const all = $derived($requestsStore);
-	const mine = $derived(getRequestsByApplicant(identity.user.id, all));
+	// 主管只查看本部门员工（不含自己、排除草稿）的申请数据
+	const deptRequests = $derived.by(() =>
+		all.filter(
+			(r) =>
+				r.department === identity.user.department &&
+				r.applicantId !== identity.user.id &&
+				r.status !== 'draft'
+		)
+	);
+
+	// URL 直达时自动纠正非主管身份，无需手动点切换按钮
+	onMount(() => {
+		if (!identity.isManager) identity.switchTo('manager');
+	});
 </script>
 
-<PageHeader
-	title="数据看板"
-	description={identity.isManager || identity.isFinance ? '团队差旅成本与审批效率' : '我的申请进度与花费'}
-/>
+{#if identity.isManager}
+	<PageHeader title="统计报表" description="团队差旅成本与审批效率" />
 
-{#if identity.isManager || identity.isFinance}
-	<ManagerDashboard requests={all} />
+	<ManagerDashboard requests={deptRequests} />
 {:else}
-	<EmployeeDashboard requests={mine} />
+	<!-- 统计报表是领导（主管）专属视图，其余身份无权查看 -->
+	<div class="notice-card">
+		<p class="notice-card__text">
+			当前身份是 <span class="font-medium text-slate-900">{identity.user.name}</span
+			>，统计报表仅对领导（主管）开放。可切换到主管身份查看团队数据。
+		</p>
+		<div class="notice-card__actions">
+			<button
+				type="button"
+				onclick={() => identity.switchTo('manager')}
+				class="notice-card__action btn btn--primary"
+			>
+				切换到主管身份
+			</button>
+		</div>
+	</div>
 {/if}
+
+<style>
+	.notice-card__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+	}
+</style>

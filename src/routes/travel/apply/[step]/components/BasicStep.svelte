@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
 	import { basicSchema, validate, REASON_MIN_LENGTH, type BasicInput, type FieldErrors } from '$lib/domain/schema';
-	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
+	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { URGENCY_LABELS } from '$lib/domain/workflow';
 	import type { Urgency } from '$lib/domain/types';
 	import WizardFooter from './WizardFooter.svelte';

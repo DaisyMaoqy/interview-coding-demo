@@ -155,7 +155,7 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 | 驳回必须填写意见                                     | 否则申请人不知道该改什么                |
 | 驳回意见不超过 200 字（`REJECT_COMMENT_MAX_LENGTH`） | 避免意见无限拉长，`transition` 直接拒绝 |
 | 只有本人的草稿可编辑、可删除                         | `isEditable` / `isDeletable`            |
-| 首次提交才写 `submittedAt`，重新提交不覆盖           | 保证「平均审批时长」以初次提交为基准    |
+| 每次提交都刷新 `submittedAt`                         | 重新编辑后再提交应以最新提交时间为准；时间按本地时区存储 |
 
 **查看权限（`canViewRequest`）**
 
@@ -224,13 +224,21 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 
 ## 六、校验规则的测试覆盖
 
-| 测试文件                                 | 用例数 | 覆盖内容                                               |
-| ---------------------------------------- | ------ | ------------------------------------------------------ |
-| `src/lib/vitest/domain/schema.test.ts`   | 30     | 字段边界、跨字段规则、整单组合                         |
-| `src/lib/vitest/domain/workflow.test.ts` | 36     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限 |
-| `src/lib/vitest/domain/money.test.ts`    | 23     | 精度、输入归一化、格式化                               |
-| `src/lib/vitest/domain/wizard.test.ts`   | 18     | 步骤顺序、可达性、路由守卫                             |
-| `src/lib/vitest/data/seed.test.ts`       | 12     | 演示数据的结构、场景覆盖、审批留痕                     |
+| 测试文件                                          | 用例数 | 覆盖内容                                                         |
+| ------------------------------------------------- | ------ | ---------------------------------------------------------------- |
+| `src/lib/vitest/domain/schema.test.ts`            | 30     | 字段边界、跨字段规则、整单组合                                   |
+| `src/lib/vitest/domain/workflow.test.ts`          | 36     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限、提交时间 |
+| `src/lib/vitest/domain/money.test.ts`             | 23     | 精度、输入归一化、格式化                                         |
+| `src/lib/vitest/domain/wizard.test.ts`            | 18     | 步骤顺序、可达性、路由守卫                                       |
+| `src/lib/vitest/data/seed.test.ts`                | 12     | 演示数据的结构、场景覆盖、审批留痕                               |
+| `src/lib/vitest/components/request/RequestActions.test.ts` | 6  | 审批操作编排：提交成功/失败早返回、重新编辑（驳回走状态机 + 草稿原地编辑）、删除、提交后跳转与 `onsubmitted` 回调 |
+| `src/lib/vitest/data/requests.filter.test.ts`     | 17     | 申请单筛选、搜索、日期过滤、年度去重、聚合等 8 个纯函数           |
+| `src/lib/vitest/data/requests.load.test.ts`       | 3      | `loadRequests` 远程读取、失败/网络异常降级到 seed                 |
 
 `seed.test.ts` 中「每张单都能通过整单 schema 校验」这一条，
 让上述全部规则一次性作用于 40 条真实数据 —— 生成脚本若产出非法数据会立刻暴露。
+
+`RequestActions.test.ts` 与 `requests.filter.test.ts` / `requests.load.test.ts` 补齐了
+原先薄弱的两个维度：审批操作编排（状态机、仓储读写、失败分支与跳转的串联）与
+数据仓储（筛选、搜索、聚合、远程加载降级）。纯函数与组件层的解耦让编排测试
+无需真实 DOM 即可验证完整提交/重新编辑/删除链路。

@@ -5,11 +5,14 @@
 		ACTION_LABELS,
 		actionRequiresComment,
 		availableActions,
+		isDeletable,
 		transition
 	} from '$lib/domain/workflow';
-	import { updateRequest } from '$lib/data/requests';
+	import { deleteRequest, updateRequest } from '$lib/data/requests';
 	import { setActiveEditId, stepHref } from '$lib/domain/wizard';
 	import { loadDraftForEdit } from '$lib/state/wizardDraft';
+	import { resetRequestListFilters } from '$lib/state/requestListFilters';
+	import Modal from '$lib/components/common/Modal.svelte';
 	import type { AuditAction, TravelRequest, User } from '$lib/domain/types';
 
 	interface Props {
@@ -18,9 +21,19 @@
 		actor: User;
 		/** 无可用操作时展示的提示，审批页可能想换成别的措辞 */
 		emptyHint?: string;
+		/** 删除成功后回调（一般用于跳回列表），可选 */
+		ondeleted?: () => void;
+		/** 提交成功后回调（草稿详情页提交后直接回「我的申请」），可选 */
+		onsubmitted?: () => void;
 	}
 
-	let { request, actor, emptyHint = '当前状态下你没有可执行的操作' }: Props = $props();
+	let {
+		request,
+		actor,
+		emptyHint = '当前状态下你没有可执行的操作',
+		ondeleted,
+		onsubmitted
+	}: Props = $props();
 
 	// 能做什么完全由状态机决定，详情页与审批页共用同一套按钮逻辑
 	const actions = $derived(availableActions(request, actor));
@@ -30,9 +43,12 @@
 	// 草稿页「重新编辑」与「提交申请」并存：重新编辑降为次级（ghost），让提交更突出；
 	// 被驳回时重新编辑是唯一出口，保持主按钮（primary）。
 	const reeditSecondary = $derived(visibleActions.includes('submit'));
+	// 删除是状态机之外的「移除」操作，不进 availableActions，单独用 isDeletable 判定
+	const deletable = $derived(isDeletable(request, actor));
 
 	let feedback = $state<string | null>(null);
 	let showReject = $state(false);
+	let showDelete = $state(false);
 
 	/** 执行一次流转并落库；需要意见的动作（驳回）由调用方传入 comment */
 	function runAction(action: AuditAction, comment?: string): void {
@@ -51,11 +67,21 @@
 
 		updateRequest(result.request);
 		showReject = false;
+		// 草稿详情页「提交申请」提交后直接回到「我的申请」，由页面层决定去向
+		if (action === 'submit') onsubmitted?.();
 	}
 
 	function openReject(): void {
 		feedback = null;
 		showReject = true;
+	}
+
+	// 删除是破坏性操作，且不属于状态流转，故不经过 transition，直接移除数据；
+	// 权限已由 isDeletable 把关，这里只负责执行与后续跳转。
+	function onDeleteConfirm(): void {
+		deleteRequest(request.id);
+		showDelete = false;
+		ondeleted?.();
 	}
 
 	// 重新编辑：把数据回填进向导草稿并带上 ?edit=ID 跳转到发起页 —— 复用同一套排版，
@@ -115,6 +141,11 @@
 					</button>
 				{/if}
 			{/each}
+			{#if deletable}
+				<button type="button" class="btn btn--danger" onclick={() => (showDelete = true)}>
+					删除
+				</button>
+			{/if}
 		</div>
 	</div>
 {:else}
@@ -127,6 +158,16 @@
 	onclose={() => (showReject = false)}
 	onconfirm={(c) => runAction('reject', c)}
 />
+
+<Modal open={showDelete} title="删除草稿" onclose={() => (showDelete = false)}>
+	{#snippet body()}
+		<p class="modal__hint">删除后该草稿将无法恢复，确定要删除吗？</p>
+	{/snippet}
+	{#snippet actions()}
+		<button type="button" class="btn btn--ghost" onclick={() => (showDelete = false)}>取消</button>
+		<button type="button" class="btn btn--danger" onclick={onDeleteConfirm}>确认删除</button>
+	{/snippet}
+</Modal>
 
 <style>
 	.action-bar {

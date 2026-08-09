@@ -2,6 +2,7 @@
 	import './layout.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import type { Role } from '$lib/domain/types';
 	import favicon from '$lib/assets/favicon.svg';
 	import IdentitySwitcher from '$lib/components/layout/IdentitySwitcher.svelte';
 	import SideNav from '$lib/components/layout/SideNav.svelte';
@@ -13,6 +14,14 @@
 
 	// 申请详情（/travel/requests/[id]）为只读视角，隐藏角色切换开关，避免误切身份
 	const showSwitch = $derived(!page.url.pathname.startsWith('/travel/requests/'));
+
+	// 统计报表页面仅主管可见，员工与财务均不可切换
+	const disabledRoles = $derived.by<Role[]>(() => {
+		const path = page.url.pathname;
+		if (path === '/reports') return ['employee', 'finance'];
+		if (path === '/travel/approvals') return ['employee'];
+		return [];
+	});
 
 	// 在根部提供一次，整棵树通过 useIdentity() 读取
 	provideIdentity();
@@ -40,7 +49,7 @@
 
 	<div class="app-layout__main-col">
 		<header class="app-layout__header">
-			<IdentitySwitcher showSwitch={showSwitch} />
+			<IdentitySwitcher showSwitch={showSwitch} disabledRoles={disabledRoles} />
 		</header>
 
 		<main id="main" class="app-layout__main">
