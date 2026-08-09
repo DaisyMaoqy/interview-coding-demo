@@ -99,5 +99,11 @@ export function isActive(itemHref: string, pathname: string, search = ''): boole
 		if (itemHref === resolve('/travel/requests')) return !underRequests;
 	}
 
+	if (search.includes('from=reports')) {
+		const underRequests = pathname.startsWith(`${resolve('/travel/requests')}/`);
+		if (itemHref === resolve('/reports')) return underRequests;
+		if (itemHref === resolve('/travel/requests')) return !underRequests;
+	}
+
 	return pathname === itemHref || pathname.startsWith(`${itemHref}/`);
 }

@@ -28,18 +28,22 @@
 			? '/travel/approvals'
 			: from === 'requests'
 				? '/travel/requests'
-				: isApprover
-					? '/travel/approvals'
-					: '/travel/requests'
+				: from === 'reports'
+					? '/reports'
+					: isApprover
+						? '/travel/approvals'
+						: '/travel/requests'
 	);
 	const backLabel = $derived(
 		from === 'approvals'
 			? '待我审批'
 			: from === 'requests'
 				? '我的申请'
-				: isApprover
-					? '待我审批'
-					: '我的申请'
+				: from === 'reports'
+					? '统计报表'
+					: isApprover
+						? '待我审批'
+						: '我的申请'
 	);
 	// 从「待我审批」进来的详情是只读视角，底部通过/驳回等操作不展示
 	const showActions = $derived(from !== 'approvals');

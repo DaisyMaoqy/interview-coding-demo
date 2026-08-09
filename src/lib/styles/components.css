@@ -50,6 +50,9 @@
 	.identity-switcher__option--active {
 		@apply bg-white font-medium text-slate-900 shadow-sm;
 	}
+	.identity-switcher__option:disabled {
+		@apply cursor-not-allowed opacity-40;
+	}
 
 	/* ===== SideNav（src/lib/components/layout/SideNav.svelte） ===== */
 	.side-nav {

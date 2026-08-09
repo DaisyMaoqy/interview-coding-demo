@@ -10,15 +10,33 @@ import type { Role, User } from '$lib/domain/types';
  *
  * 用 context 持有而非模块级 `$state`：模块级状态在 SSR 下由所有请求共享，
  * 会造成用户之间串号。context 的生命周期跟随组件树，每个请求各自独立。
+ *
+ * 角色持久化到 localStorage，刷新页面后保持登录身份不变。
  */
+
+const STORAGE_KEY = 'identity-role';
+const VALID_ROLES: Set<string> = new Set(['employee', 'manager', 'finance']);
+
+function loadRole(): Role {
+	if (typeof localStorage === 'undefined') return 'employee';
+	// console.log('loadRole', localStorage.getItem(STORAGE_KEY))
+	const saved = localStorage.getItem(STORAGE_KEY);
+	return saved && VALID_ROLES.has(saved) ? (saved as Role) : 'employee';
+}
+
+function saveRole(role: Role): void {
+	if (typeof localStorage === 'undefined') return;
+	localStorage.setItem(STORAGE_KEY, role);
+}
 
 const IDENTITY_KEY = Symbol('identity');
 
 export class IdentityState {
-	role = $state<Role>('employee');
+	role = $state<Role>(loadRole());
 
 	/** 当前角色对应的登录人 */
 	get user(): User {
+		// console.log('user getter called', this.role);
 		return requireUser(IDENTITY_BY_ROLE[this.role]);
 	}
 
@@ -33,6 +51,7 @@ export class IdentityState {
 
 	switchTo(role: Role): void {
 		this.role = role;
+		saveRole(role);
 	}
 }
 

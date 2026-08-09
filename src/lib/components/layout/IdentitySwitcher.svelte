@@ -3,7 +3,7 @@
 	import type { Role } from '$lib/domain/types';
 	import { useIdentity } from '$lib/state/identity.svelte';
 
-	let { showSwitch = true }: { showSwitch?: boolean } = $props();
+	let { showSwitch = true, disabledRoles = [] }: { showSwitch?: boolean; disabledRoles?: Role[] } = $props();
 
 	const identity = useIdentity();
 
@@ -12,6 +12,8 @@
 		{ role: 'manager', hint: '主管审批' },
 		{ role: 'finance', hint: '财务审批' }
 	];
+
+	const disabledSet: ReadonlySet<Role> = $derived(new Set(disabledRoles));
 </script>
 
 <!--
@@ -31,10 +33,12 @@
 			{#each OPTIONS as option (option.role)}
 				{@const user = requireUser(IDENTITY_BY_ROLE[option.role])}
 				{@const selected = identity.role === option.role}
+				{@const disabled = disabledSet.has(option.role)}
 				<button
 					type="button"
 					aria-pressed={selected}
-					title="以 {user.name}（{user.title}）的身份{option.hint}"
+					disabled={disabled}
+					title={disabled ? `${user.name}（当前页面不可切换至此角色）` : `以 ${user.name}（${user.title}）的身份${option.hint}`}
 					onclick={() => identity.switchTo(option.role)}
 					class="identity-switcher__option {selected ? 'identity-switcher__option--active' : ''}"
 				>
