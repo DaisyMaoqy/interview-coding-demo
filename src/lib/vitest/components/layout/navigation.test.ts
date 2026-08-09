@@ -56,6 +56,7 @@ describe('isActive', () => {
 	describe('申请详情的入口归属', () => {
 		const detail = resolve('/travel/requests/[id]', { id: 'TR-0001' });
 		const approvals = resolve('/travel/approvals');
+		const reports = resolve('/reports');
 
 		it('不带 from 时详情归属「我的申请」', () => {
 			expect(isActive(requests, detail)).toBe(true);
@@ -71,6 +72,11 @@ describe('isActive', () => {
 			// 提交后由向导跳回详情即带此参数，应归属「我的申请」
 			expect(isActive(requests, detail, '?from=requests')).toBe(true);
 			expect(isActive(approvals, detail, '?from=requests')).toBe(false);
+		});
+
+		it('带 ?from=reports 时详情点亮「统计报表」而非「我的申请」', () => {
+			expect(isActive(reports, detail, '?from=reports')).toBe(true);
+			expect(isActive(requests, detail, '?from=reports')).toBe(false);
 		});
 	});
 

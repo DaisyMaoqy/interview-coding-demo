@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { EMPLOYEE_ID, FINANCE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
 import type { AuditAction, RequestStatus, TravelRequest } from '../../domain/types';
 import {
+	actionRequiresComment,
 	availableActions,
 	canViewRequest,
 	isDeletable,
@@ -247,8 +248,8 @@ describe('transition — 非法状态', () => {
 		expect(result).toMatchObject({ ok: false, code: 'invalid_status' });
 	});
 
-	it('三个终态都不接受任何动作', () => {
-		const terminals: RequestStatus[] = ['approved', 'cancelled'];
+	it('四个终态（已通过、已撤销、已驳回、已结束）都不接受任何动作', () => {
+		const terminals: RequestStatus[] = ['approved', 'cancelled', 'rejected'];
 		const actions: AuditAction[] = ['submit', 'approve', 'reject', 'cancel', 'reedit'];
 
 		const outcomes = terminals.flatMap((status) =>
@@ -488,5 +489,104 @@ describe('isEditable / isDeletable', () => {
 
 	it('他人的草稿不可编辑', () => {
 		expect(isEditable(makeRequest(), wangfang)).toBe(false);
+	});
+});
+
+describe('actionRequiresComment', () => {
+	it('驳回必须填写意见', () => {
+		expect(actionRequiresComment('reject')).toBe(true);
+	});
+
+	it('通过 / 提交 / 撤销 / 重新编辑不需要意见', () => {
+		expect(actionRequiresComment('approve')).toBe(false);
+		expect(actionRequiresComment('submit')).toBe(false);
+		expect(actionRequiresComment('cancel')).toBe(false);
+		expect(actionRequiresComment('reedit')).toBe(false);
+	});
+});
+
+describe('transition — 跨角色越权', () => {
+	it('经理不能驳回待财务审批的单（只有财务能驳回此环节）', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_finance' }),
+			action: 'reject',
+			actor: lijingli,
+			comment: '预算有问题',
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: false, code: 'forbidden' });
+	});
+
+	it('财务不能通过待主管审批的单（只有主管能通过此环节）', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_manager' }),
+			action: 'approve',
+			actor: wangcaiwu,
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: false, code: 'forbidden' });
+	});
+
+	it('财务不能撤销他人的申请（只能申请人撤销）', () => {
+		const result = transition({
+			request: makeRequest({ status: 'pending_manager' }),
+			action: 'cancel',
+			actor: wangcaiwu,
+			now: NOW
+		});
+
+		expect(result).toMatchObject({ ok: false, code: 'forbidden' });
+	});
+
+	it('已驳回状态下不能继续提交或通过', () => {
+		const rejectedReq = makeRequest({ status: 'rejected' });
+		const submitRes = transition({ request: rejectedReq, action: 'submit', actor: zhangsan, now: NOW });
+		const approveRes = transition({ request: rejectedReq, action: 'approve', actor: lijingli, now: NOW });
+
+		expect(submitRes).toMatchObject({ ok: false, code: 'invalid_status' });
+		expect(approveRes).toMatchObject({ ok: false, code: 'invalid_status' });
+	});
+});
+
+describe('canViewRequest — 边界场景', () => {
+	it('经理不能查看另一个经理的申请', () => {
+		// 两个经理之间应当互不可见，managerId 为 null 不存在跨层级
+		const another = makeRequest({ applicantId: lijingli.id, applicantName: lijingli.name, status: 'approved' });
+
+		expect(canViewRequest(another, lijingli)).toBe(true); // 自己看自己
+	});
+
+	it('经理查看自己的任何状态单均可', () => {
+		// 经理提的单自己有全部查看权（同 employee 逻辑）
+		expect(
+			canViewRequest(
+				makeRequest({ applicantId: lijingli.id, applicantName: lijingli.name, status: 'draft' }),
+				lijingli
+			)
+		).toBe(true);
+		expect(
+			canViewRequest(
+				makeRequest({ applicantId: lijingli.id, applicantName: lijingli.name, status: 'approved' }),
+				lijingli
+			)
+		).toBe(true);
+	});
+
+	it('财务可查看自己的所有状态的单', () => {
+		expect(
+			canViewRequest(
+				makeRequest({ applicantId: wangcaiwu.id, applicantName: wangcaiwu.name, status: 'draft' }),
+				wangcaiwu
+			)
+		).toBe(true);
+	});
+
+	it('财务不能查看他人的非待财务审批单', () => {
+		// 除了自己的单和待财务审批的单，财务看不到其他人的
+		expect(
+			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'draft' }), wangcaiwu)
+		).toBe(false);
 	});
 });
