@@ -26,7 +26,7 @@
 	}
 </script>
 
-<Modal open={open} title="驳回申请" onclose={onclose}>
+<Modal {open} title="驳回申请" {onclose}>
 	{#snippet body()}
 		<p class="modal__hint">
 			请填写驳回理由（不超过 {REJECT_COMMENT_MAX_LENGTH} 字），申请人会看到这条意见。

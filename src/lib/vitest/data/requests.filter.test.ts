@@ -38,12 +38,84 @@ function req(id: string, overrides: Partial<TravelRequest> = {}): TravelRequest 
 }
 
 const fixtures: TravelRequest[] = [
-	req('TR-0001', { status: 'draft', applicantId: 'u-1', reason: '上海出差', createdAt: '2026-03-10T02:00:00.000Z', legs: [{ id: 'l1', from: '上海', to: '北京', departDate: '2026-03-11', returnDate: '2026-03-12', transport: 'train' }] }),
-	req('TR-0002', { status: 'pending_manager', applicantId: 'u-1', reason: '北京会议', createdAt: '2026-05-01T02:00:00.000Z', legs: [{ id: 'l2', from: '北京', to: '广州', departDate: '2026-05-02', returnDate: '2026-05-03', transport: 'flight' }] }),
-	req('TR-0003', { status: 'pending_finance', applicantId: 'u-2', reason: 'Shenzhen 培训', createdAt: '2025-11-20T02:00:00.000Z', legs: [] }),
-	req('TR-0004', { status: 'approved', applicantId: 'u-2', reason: '成都考察', createdAt: '2026-08-01T02:00:00.000Z', budget: { transport: 20000, hotel: 15000, allowance: 5000, other: 0 }, legs: [{ id: 'l4a', from: '成都', to: '重庆', departDate: '2026-08-02', returnDate: '2026-08-03', transport: 'train' }, { id: 'l4b', from: '重庆', to: '成都', departDate: '2026-08-04', returnDate: '2026-08-05', transport: 'train' }] }),
-	req('TR-EDIT-2', { status: 'rejected', applicantId: 'u-1', reason: '作废', createdAt: '2026-01-15T02:00:00.000Z', legs: [] }),
-	req('TR-0006', { status: 'cancelled', applicantId: 'u-2', reason: '无', createdAt: '2026-02-02T02:00:00.000Z', legs: [] })
+	req('TR-0001', {
+		status: 'draft',
+		applicantId: 'u-1',
+		reason: '上海出差',
+		createdAt: '2026-03-10T02:00:00.000Z',
+		legs: [
+			{
+				id: 'l1',
+				from: '上海',
+				to: '北京',
+				departDate: '2026-03-11',
+				returnDate: '2026-03-12',
+				transport: 'train'
+			}
+		]
+	}),
+	req('TR-0002', {
+		status: 'pending_manager',
+		applicantId: 'u-1',
+		reason: '北京会议',
+		createdAt: '2026-05-01T02:00:00.000Z',
+		legs: [
+			{
+				id: 'l2',
+				from: '北京',
+				to: '广州',
+				departDate: '2026-05-02',
+				returnDate: '2026-05-03',
+				transport: 'flight'
+			}
+		]
+	}),
+	req('TR-0003', {
+		status: 'pending_finance',
+		applicantId: 'u-2',
+		reason: 'Shenzhen 培训',
+		createdAt: '2025-11-20T02:00:00.000Z',
+		legs: []
+	}),
+	req('TR-0004', {
+		status: 'approved',
+		applicantId: 'u-2',
+		reason: '成都考察',
+		createdAt: '2026-08-01T02:00:00.000Z',
+		budget: { transport: 20000, hotel: 15000, allowance: 5000, other: 0 },
+		legs: [
+			{
+				id: 'l4a',
+				from: '成都',
+				to: '重庆',
+				departDate: '2026-08-02',
+				returnDate: '2026-08-03',
+				transport: 'train'
+			},
+			{
+				id: 'l4b',
+				from: '重庆',
+				to: '成都',
+				departDate: '2026-08-04',
+				returnDate: '2026-08-05',
+				transport: 'train'
+			}
+		]
+	}),
+	req('TR-EDIT-2', {
+		status: 'rejected',
+		applicantId: 'u-1',
+		reason: '作废',
+		createdAt: '2026-01-15T02:00:00.000Z',
+		legs: []
+	}),
+	req('TR-0006', {
+		status: 'cancelled',
+		applicantId: 'u-2',
+		reason: '无',
+		createdAt: '2026-02-02T02:00:00.000Z',
+		legs: []
+	})
 ];
 
 describe('filterByStatus', () => {
@@ -54,7 +126,9 @@ describe('filterByStatus', () => {
 	});
 
 	it("'pending' 合并 pending_manager + pending_finance", () => {
-		const ids = filterByStatus(fixtures, 'pending').map((r) => r.id).sort();
+		const ids = filterByStatus(fixtures, 'pending')
+			.map((r) => r.id)
+			.sort();
 		expect(ids).toEqual(['TR-0002', 'TR-0003']);
 	});
 
@@ -79,7 +153,9 @@ describe('searchRequests', () => {
 
 	it('匹配行程的出发地或目的地', () => {
 		// 北京：TR-0001 的目的地、TR-0002 的事由与出发地
-		const ids = searchRequests(fixtures, '北京').map((r) => r.id).sort();
+		const ids = searchRequests(fixtures, '北京')
+			.map((r) => r.id)
+			.sort();
 		expect(ids).toEqual(['TR-0001', 'TR-0002']);
 	});
 
@@ -124,16 +200,16 @@ describe('nextRequestId', () => {
 
 describe('getRequestsByApplicant', () => {
 	it('按申请人聚合', () => {
-		expect(getRequestsByApplicant('u-1', fixtures).map((r) => r.id).sort()).toEqual([
-			'TR-0001',
-			'TR-0002',
-			'TR-EDIT-2'
-		]);
-		expect(getRequestsByApplicant('u-2', fixtures).map((r) => r.id).sort()).toEqual([
-			'TR-0003',
-			'TR-0004',
-			'TR-0006'
-		]);
+		expect(
+			getRequestsByApplicant('u-1', fixtures)
+				.map((r) => r.id)
+				.sort()
+		).toEqual(['TR-0001', 'TR-0002', 'TR-EDIT-2']);
+		expect(
+			getRequestsByApplicant('u-2', fixtures)
+				.map((r) => r.id)
+				.sort()
+		).toEqual(['TR-0003', 'TR-0004', 'TR-0006']);
 		expect(getRequestsByApplicant('u-x', fixtures)).toEqual([]);
 	});
 });
@@ -147,8 +223,22 @@ describe('summarizeLegs', () => {
 		// 成都→重庆→广州：中间重复的「重庆」只保留一处
 		const r = req('TR-LEG', {
 			legs: [
-				{ id: 'a', from: '成都', to: '重庆', departDate: '2026-08-02', returnDate: '2026-08-03', transport: 'train' },
-				{ id: 'b', from: '重庆', to: '广州', departDate: '2026-08-04', returnDate: '2026-08-05', transport: 'train' }
+				{
+					id: 'a',
+					from: '成都',
+					to: '重庆',
+					departDate: '2026-08-02',
+					returnDate: '2026-08-03',
+					transport: 'train'
+				},
+				{
+					id: 'b',
+					from: '重庆',
+					to: '广州',
+					departDate: '2026-08-04',
+					returnDate: '2026-08-05',
+					transport: 'train'
+				}
 			]
 		});
 		expect(summarizeLegs(r)).toBe('成都 → 重庆 → 广州');

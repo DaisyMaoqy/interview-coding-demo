@@ -46,19 +46,9 @@
 
 			{#if preset === 'custom'}
 				<div class="custom-range">
-					<input
-						type="date"
-						bind:value={customStart}
-						aria-label="开始日期"
-						class="date-input"
-					/>
+					<input type="date" bind:value={customStart} aria-label="开始日期" class="date-input" />
 					<span class="range-sep">—</span>
-					<input
-						type="date"
-						bind:value={customEnd}
-						aria-label="结束日期"
-						class="date-input"
-					/>
+					<input type="date" bind:value={customEnd} aria-label="结束日期" class="date-input" />
 				</div>
 			{/if}
 		</div>
@@ -99,7 +89,9 @@
 		background: var(--color-white);
 		color: var(--color-slate-500);
 		cursor: pointer;
-		transition: border-color 0.15s, color 0.15s;
+		transition:
+			border-color 0.15s,
+			color 0.15s;
 	}
 	.toggle-btn:hover {
 		border-color: var(--color-brand-600);
@@ -131,7 +123,9 @@
 		color: var(--color-slate-600);
 		font-size: 0.875rem;
 		cursor: pointer;
-		transition: border-color 0.15s, color 0.15s;
+		transition:
+			border-color 0.15s,
+			color 0.15s;
 	}
 	.filter-btn:hover {
 		border-color: var(--color-brand-600);

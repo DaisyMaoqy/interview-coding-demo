@@ -3,7 +3,8 @@
 	import type { Role } from '$lib/domain/types';
 	import { useIdentity } from '$lib/state/identity.svelte';
 
-	let { showSwitch = true, disabledRoles = [] }: { showSwitch?: boolean; disabledRoles?: Role[] } = $props();
+	let { showSwitch = true, disabledRoles = [] }: { showSwitch?: boolean; disabledRoles?: Role[] } =
+		$props();
 
 	const identity = useIdentity();
 
@@ -37,8 +38,10 @@
 				<button
 					type="button"
 					aria-pressed={selected}
-					disabled={disabled}
-					title={disabled ? `${user.name}（当前页面不可切换至此角色）` : `以 ${user.name}（${user.title}）的身份${option.hint}`}
+					{disabled}
+					title={disabled
+						? `${user.name}（当前页面不可切换至此角色）`
+						: `以 ${user.name}（${user.title}）的身份${option.hint}`}
 					onclick={() => identity.switchTo(option.role)}
 					class="identity-switcher__option {selected ? 'identity-switcher__option--active' : ''}"
 				>

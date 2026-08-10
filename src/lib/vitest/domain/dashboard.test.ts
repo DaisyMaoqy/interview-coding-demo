@@ -244,14 +244,18 @@ describe('managerOverview', () => {
 	});
 
 	it('全部拒绝时 passRate 为 0', () => {
-		const allRejected = deptRequests.slice(0, 3).map((r) => ({ ...r, status: 'rejected' as const }));
+		const allRejected = deptRequests
+			.slice(0, 3)
+			.map((r) => ({ ...r, status: 'rejected' as const }));
 		const overview = managerOverview(allRejected);
 
 		expect(overview.passRate).toBe(0);
 	});
 
 	it('全部通过时 passRate 为 1', () => {
-		const allApproved = deptRequests.slice(0, 3).map((r) => ({ ...r, status: 'approved' as const }));
+		const allApproved = deptRequests
+			.slice(0, 3)
+			.map((r) => ({ ...r, status: 'approved' as const }));
 		const overview = managerOverview(allApproved);
 
 		expect(overview.passRate).toBe(1);

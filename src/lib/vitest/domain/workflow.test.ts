@@ -461,13 +461,19 @@ describe('canViewRequest', () => {
 
 	it('财务可查看待财务审批的单（自己的二审队列）', () => {
 		expect(
-			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_finance' }), wangcaiwu)
+			canViewRequest(
+				makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_finance' }),
+				wangcaiwu
+			)
 		).toBe(true);
 	});
 
 	it('财务不能查看待主管审批或终态的单', () => {
 		expect(
-			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_manager' }), wangcaiwu)
+			canViewRequest(
+				makeRequest({ applicantId: EMPLOYEE_ID, status: 'pending_manager' }),
+				wangcaiwu
+			)
 		).toBe(false);
 		expect(
 			canViewRequest(makeRequest({ applicantId: EMPLOYEE_ID, status: 'approved' }), wangcaiwu)
@@ -542,8 +548,18 @@ describe('transition — 跨角色越权', () => {
 
 	it('已驳回状态下不能继续提交或通过', () => {
 		const rejectedReq = makeRequest({ status: 'rejected' });
-		const submitRes = transition({ request: rejectedReq, action: 'submit', actor: zhangsan, now: NOW });
-		const approveRes = transition({ request: rejectedReq, action: 'approve', actor: lijingli, now: NOW });
+		const submitRes = transition({
+			request: rejectedReq,
+			action: 'submit',
+			actor: zhangsan,
+			now: NOW
+		});
+		const approveRes = transition({
+			request: rejectedReq,
+			action: 'approve',
+			actor: lijingli,
+			now: NOW
+		});
 
 		expect(submitRes).toMatchObject({ ok: false, code: 'invalid_status' });
 		expect(approveRes).toMatchObject({ ok: false, code: 'invalid_status' });
@@ -553,7 +569,11 @@ describe('transition — 跨角色越权', () => {
 describe('canViewRequest — 边界场景', () => {
 	it('经理不能查看另一个经理的申请', () => {
 		// 两个经理之间应当互不可见，managerId 为 null 不存在跨层级
-		const another = makeRequest({ applicantId: lijingli.id, applicantName: lijingli.name, status: 'approved' });
+		const another = makeRequest({
+			applicantId: lijingli.id,
+			applicantName: lijingli.name,
+			status: 'approved'
+		});
 
 		expect(canViewRequest(another, lijingli)).toBe(true); // 自己看自己
 	});

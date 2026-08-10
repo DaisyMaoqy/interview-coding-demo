@@ -13,12 +13,7 @@
 		children: Snippet<[{ pageItems: T[] }]>;
 	}
 
-	let {
-		items,
-		pageSizeOptions = [5, 10, 20],
-		resetKey = undefined,
-		children
-	}: Props = $props();
+	let { items, pageSizeOptions = [5, 10, 20], resetKey = undefined, children }: Props = $props();
 
 	// 页码与每页条数由本组件统一持有，调用方不必再各自维护一份分页状态
 	let page = $state(1);

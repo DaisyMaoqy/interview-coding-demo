@@ -4,7 +4,12 @@
 	import { page } from '$app/state';
 	import { draft, resetDraft } from '$lib/state/wizardDraft';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { addRequest, createDraft, createRequest, updateRequestFromDraft } from '$lib/data/requests';
+	import {
+		addRequest,
+		createDraft,
+		createRequest,
+		updateRequestFromDraft
+	} from '$lib/data/requests';
 	import { travelFormSchema, validate } from '$lib/domain/schema';
 	import { stepHref, stepHrefWithFocus, setActiveEditId } from '$lib/domain/wizard';
 	import { formatYuan, budgetTotal } from '$lib/domain/money';
@@ -107,7 +112,9 @@
 	</div>
 	<BudgetBreakdown budget={previewRequest.budget} budgetNote={previewRequest.budgetNote} />
 
-	<p class="amount-summary">预算合计：<strong>¥{formatYuan(budgetTotal(previewRequest.budget))}</strong></p>
+	<p class="amount-summary">
+		预算合计：<strong>¥{formatYuan(budgetTotal(previewRequest.budget))}</strong>
+	</p>
 
 	{#if submitError}
 		<p class="field__error">{submitError}</p>

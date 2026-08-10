@@ -60,12 +60,18 @@ export function statusDistribution(requests: readonly TravelRequest[]): StatusSl
  * 近 `months` 个月（含当月）按月统计申请**量**（按 createdAt 计数，含草稿），缺失月份补 0。
  * 与「费用趋势」不同，这里看的是单量而非金额。
  */
-export function monthlyApplicationTrend(requests: readonly TravelRequest[], months = 12): MonthlyPoint[] {
+export function monthlyApplicationTrend(
+	requests: readonly TravelRequest[],
+	months = 12
+): MonthlyPoint[] {
 	const now = new Date();
 	const buckets: MonthlyPoint[] = [];
 	for (let i = months - 1; i >= 0; i--) {
 		const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-		buckets.push({ month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, amount: 0 });
+		buckets.push({
+			month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+			amount: 0
+		});
 	}
 	const indexByMonth = new Map(buckets.map((b, i) => [b.month, i]));
 	for (const r of requests) {
@@ -103,7 +109,11 @@ export interface DateRange {
 }
 
 /** 根据预设类型计算日期范围（end 含当天 23:59:59.999） */
-export function computeDateRange(preset: DatePreset, customStart?: Date, customEnd?: Date): DateRange {
+export function computeDateRange(
+	preset: DatePreset,
+	customStart?: Date,
+	customEnd?: Date
+): DateRange {
 	const now = new Date();
 	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
@@ -128,7 +138,18 @@ export function computeDateRange(preset: DatePreset, customStart?: Date, customE
 		}
 		case 'custom':
 			if (customStart && customEnd) {
-				return { start: customStart, end: new Date(customEnd.getFullYear(), customEnd.getMonth(), customEnd.getDate(), 23, 59, 59, 999) };
+				return {
+					start: customStart,
+					end: new Date(
+						customEnd.getFullYear(),
+						customEnd.getMonth(),
+						customEnd.getDate(),
+						23,
+						59,
+						59,
+						999
+					)
+				};
 			}
 			// 未选择起止日期时展示全部数据
 			return computeDateRange('all');
@@ -136,7 +157,10 @@ export function computeDateRange(preset: DatePreset, customStart?: Date, customE
 }
 
 /** 按日期范围筛选申请（createdAt 落在 [start, end] 内） */
-export function filterByDateRange(requests: readonly TravelRequest[], range: DateRange): TravelRequest[] {
+export function filterByDateRange(
+	requests: readonly TravelRequest[],
+	range: DateRange
+): TravelRequest[] {
 	const startTime = range.start.getTime();
 	const endTime = range.end.getTime();
 	return requests.filter((r) => {
@@ -144,4 +168,3 @@ export function filterByDateRange(requests: readonly TravelRequest[], range: Dat
 		return t >= startTime && t <= endTime;
 	});
 }
-

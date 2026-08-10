@@ -24,12 +24,7 @@
 {#if requests.length === 0}
 	<p class="empty-text">暂无匹配的申请记录</p>
 {:else}
-	<Pagination
-		items={requests}
-		pageSizeOptions={[5]}
-		{resetKey}
-		children={tableSnippet}
-	/>
+	<Pagination items={requests} pageSizeOptions={[5]} {resetKey} children={tableSnippet} />
 
 	{#snippet tableSnippet({ pageItems }: { pageItems: readonly TravelRequest[] })}
 		<div class="table-wrap">
@@ -55,10 +50,7 @@
 							<td><StatusBadge status={req.status} /></td>
 							<td class="app-table__amount">{formatYuan(budgetTotal(req.budget))}</td>
 							<td>
-								<a
-									href={resolve(`/travel/requests/${req.id}?from=reports`)}
-									class="view-link"
-								>
+								<a href={resolve(`/travel/requests/${req.id}?from=reports`)} class="view-link">
 									查看
 								</a>
 							</td>

@@ -141,20 +141,20 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 
 **操作人资格**
 
-| 动作                                   | 谁能执行                                                          |
-| -------------------------------------- | ----------------------------------------------------------------- |
-| `submit` `cancel` `reedit`             | 仅申请人本人                                                      |
-| `approve`(待主管审批) `reject`(主管)   | `role === 'manager'` **且不是申请人本人**                        |
-| `approve`(待财务审批) `reject`(财务)   | `role === 'finance'` **且不是申请人本人**                        |
+| 动作                                 | 谁能执行                                  |
+| ------------------------------------ | ----------------------------------------- |
+| `submit` `cancel` `reedit`           | 仅申请人本人                              |
+| `approve`(待主管审批) `reject`(主管) | `role === 'manager'` **且不是申请人本人** |
+| `approve`(待财务审批) `reject`(财务) | `role === 'finance'` **且不是申请人本人** |
 
 **其他约束**
 
-| 规则                                                 | 动机                                    |
-| ---------------------------------------------------- | --------------------------------------- |
-| 已通过的单不可撤销（`approved` 无 `cancel` 出边）    | 差旅已成行，撤销没有业务含义            |
-| 驳回必须填写意见                                     | 否则申请人不知道该改什么                |
-| 驳回意见不超过 200 字（`REJECT_COMMENT_MAX_LENGTH`） | 避免意见无限拉长，`transition` 直接拒绝 |
-| 只有本人的草稿可编辑、可删除                         | `isEditable` / `isDeletable`            |
+| 规则                                                 | 动机                                                     |
+| ---------------------------------------------------- | -------------------------------------------------------- |
+| 已通过的单不可撤销（`approved` 无 `cancel` 出边）    | 差旅已成行，撤销没有业务含义                             |
+| 驳回必须填写意见                                     | 否则申请人不知道该改什么                                 |
+| 驳回意见不超过 200 字（`REJECT_COMMENT_MAX_LENGTH`） | 避免意见无限拉长，`transition` 直接拒绝                  |
+| 只有本人的草稿可编辑、可删除                         | `isEditable` / `isDeletable`                             |
 | 每次提交都刷新 `submittedAt`                         | 重新编辑后再提交应以最新提交时间为准；时间按本地时区存储 |
 
 **查看权限（`canViewRequest`）**
@@ -224,16 +224,16 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 
 ## 六、校验规则的测试覆盖
 
-| 测试文件                                          | 用例数 | 覆盖内容                                                         |
-| ------------------------------------------------- | ------ | ---------------------------------------------------------------- |
-| `src/lib/vitest/domain/schema.test.ts`            | 30     | 字段边界、跨字段规则、整单组合                                   |
-| `src/lib/vitest/domain/workflow.test.ts`          | 36     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限、提交时间 |
-| `src/lib/vitest/domain/money.test.ts`             | 23     | 精度、输入归一化、格式化                                         |
-| `src/lib/vitest/domain/wizard.test.ts`            | 18     | 步骤顺序、可达性、路由守卫                                       |
-| `src/lib/vitest/data/seed.test.ts`                | 12     | 演示数据的结构、场景覆盖、审批留痕                               |
-| `src/lib/vitest/components/request/RequestActions.test.ts` | 6  | 审批操作编排：提交成功/失败早返回、重新编辑（驳回走状态机 + 草稿原地编辑）、删除、提交后跳转与 `onsubmitted` 回调 |
-| `src/lib/vitest/data/requests.filter.test.ts`     | 17     | 申请单筛选、搜索、日期过滤、年度去重、聚合等 8 个纯函数           |
-| `src/lib/vitest/data/requests.load.test.ts`       | 3      | `loadRequests` 远程读取、失败/网络异常降级到 seed                 |
+| 测试文件                                                   | 用例数 | 覆盖内容                                                                                                          |
+| ---------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
+| `src/lib/vitest/domain/schema.test.ts`                     | 30     | 字段边界、跨字段规则、整单组合                                                                                    |
+| `src/lib/vitest/domain/workflow.test.ts`                   | 36     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限、提交时间                                                  |
+| `src/lib/vitest/domain/money.test.ts`                      | 23     | 精度、输入归一化、格式化                                                                                          |
+| `src/lib/vitest/domain/wizard.test.ts`                     | 18     | 步骤顺序、可达性、路由守卫                                                                                        |
+| `src/lib/vitest/data/seed.test.ts`                         | 12     | 演示数据的结构、场景覆盖、审批留痕                                                                                |
+| `src/lib/vitest/components/request/RequestActions.test.ts` | 6      | 审批操作编排：提交成功/失败早返回、重新编辑（驳回走状态机 + 草稿原地编辑）、删除、提交后跳转与 `onsubmitted` 回调 |
+| `src/lib/vitest/data/requests.filter.test.ts`              | 17     | 申请单筛选、搜索、日期过滤、年度去重、聚合等 8 个纯函数                                                           |
+| `src/lib/vitest/data/requests.load.test.ts`                | 3      | `loadRequests` 远程读取、失败/网络异常降级到 seed                                                                 |
 
 `seed.test.ts` 中「每张单都能通过整单 schema 校验」这一条，
 让上述全部规则一次性作用于 40 条真实数据 —— 生成脚本若产出非法数据会立刻暴露。

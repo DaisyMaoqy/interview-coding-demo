@@ -19,8 +19,14 @@
 		onclear?: () => void;
 	}
 
-	let { requests, keyword = '', hasNoRequests, hasClearableFilter, resetKey, onclear }: Props =
-		$props();
+	let {
+		requests,
+		keyword = '',
+		hasNoRequests,
+		hasClearableFilter,
+		resetKey,
+		onclear
+	}: Props = $props();
 
 	// 空状态文案：区分「真的没申请单」与「被筛选/搜索过滤没了」，
 	const emptyTitle = $derived(

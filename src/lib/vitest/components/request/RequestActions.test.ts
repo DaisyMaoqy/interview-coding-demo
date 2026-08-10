@@ -23,8 +23,18 @@ const { transition } = workflow;
 
 // 组件测试只关心编排层，transition 用最小成功的替身即可（提交→pending_manager，
 // 重新编辑→draft）；失败用例在各自测试里临时改 mockReturnValue。
-function defaultTransition({ request, action }: { request: TravelRequest; action: string }): unknown {
-	if (action === 'submit') return { ok: true, request: { ...request, status: 'pending_manager', audit: [...request.audit] } };
+function defaultTransition({
+	request,
+	action
+}: {
+	request: TravelRequest;
+	action: string;
+}): unknown {
+	if (action === 'submit')
+		return {
+			ok: true,
+			request: { ...request, status: 'pending_manager', audit: [...request.audit] }
+		};
 	if (action === 'reedit') return { ok: true, request: { ...request, status: 'draft' } };
 	return { ok: false, code: 'invalid_status', message: '不支持的操作' };
 }
@@ -108,15 +118,12 @@ describe('RequestActions — 提交申请', () => {
 
 describe('RequestActions — 重新编辑', () => {
 	it('被驳回单：走状态机（rejected→draft）、落库、带 ?edit=ID 跳转', async () => {
-		render(
-			RequestActions,
-			{
-				props: {
-					request: makeRequest({ id: 'TR-0009', status: 'rejected' }),
-					actor: applicant
-				}
+		render(RequestActions, {
+			props: {
+				request: makeRequest({ id: 'TR-0009', status: 'rejected' }),
+				actor: applicant
 			}
-		);
+		});
 
 		await fireEvent.click(screen.getByText('重新编辑'));
 
@@ -127,15 +134,12 @@ describe('RequestActions — 重新编辑', () => {
 	});
 
 	it('草稿单：跳过状态机、不落库，但仍带 ?edit=ID 跳转', async () => {
-		render(
-			RequestActions,
-			{
-				props: {
-					request: makeRequest({ id: 'TR-0009', status: 'draft' }),
-					actor: applicant
-				}
+		render(RequestActions, {
+			props: {
+				request: makeRequest({ id: 'TR-0009', status: 'draft' }),
+				actor: applicant
 			}
-		);
+		});
 
 		await fireEvent.click(screen.getByText('重新编辑'));
 
@@ -160,10 +164,9 @@ describe('RequestActions — 删除（草稿）', () => {
 	});
 
 	it('非本人草稿不渲染删除按钮', () => {
-		render(
-			RequestActions,
-			{ props: { request: makeRequest({ applicantId: 'u-other' }), actor: applicant } }
-		);
+		render(RequestActions, {
+			props: { request: makeRequest({ applicantId: 'u-other' }), actor: applicant }
+		});
 		expect(screen.queryByText('删除')).toBeNull();
 	});
 });

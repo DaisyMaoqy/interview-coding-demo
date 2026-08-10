@@ -15,7 +15,9 @@ const FILTER_BTN_LABEL = '时间筛选';
 
 describe('DateFilter', () => {
 	it('默认隐藏筛选面板', () => {
-		render(DateFilter, { props: { preset: 'all', customStart: '', customEnd: '', visible: false } });
+		render(DateFilter, {
+			props: { preset: 'all', customStart: '', customEnd: '', visible: false }
+		});
 		expect(screen.queryByText('全部')).toBeNull();
 		expect(screen.queryByText('本月')).toBeNull();
 	});
@@ -30,7 +32,9 @@ describe('DateFilter', () => {
 	});
 
 	it('点击筛选器图标展开面板，再点折叠', async () => {
-		render(DateFilter, { props: { preset: 'all', customStart: '', customEnd: '', visible: false } });
+		render(DateFilter, {
+			props: { preset: 'all', customStart: '', customEnd: '', visible: false }
+		});
 		expect(screen.queryByText('本月')).toBeNull();
 
 		await fireEvent.click(screen.getByLabelText(FILTER_BTN_LABEL));
@@ -41,7 +45,9 @@ describe('DateFilter', () => {
 	});
 
 	it('选中预设高亮为 active 态', () => {
-		render(DateFilter, { props: { preset: 'thisMonth', customStart: '', customEnd: '', visible: true } });
+		render(DateFilter, {
+			props: { preset: 'thisMonth', customStart: '', customEnd: '', visible: true }
+		});
 		const btn = screen.getByText('本月');
 
 		expect(btn.getAttribute('aria-pressed')).toBe('true');
@@ -49,13 +55,17 @@ describe('DateFilter', () => {
 	});
 
 	it('自定义时显示起止日期输入框', () => {
-		render(DateFilter, { props: { preset: 'custom', customStart: '2026-03-01', customEnd: '2026-03-31', visible: true } });
+		render(DateFilter, {
+			props: { preset: 'custom', customStart: '2026-03-01', customEnd: '2026-03-31', visible: true }
+		});
 		expect(screen.getByLabelText('开始日期')).toBeTruthy();
 		expect(screen.getByLabelText('结束日期')).toBeTruthy();
 	});
 
 	it('自定义预设下切换为其他预设后日期输入框消失', async () => {
-		render(DateFilter, { props: { preset: 'custom', customStart: '', customEnd: '', visible: true } });
+		render(DateFilter, {
+			props: { preset: 'custom', customStart: '', customEnd: '', visible: true }
+		});
 		expect(screen.getByLabelText('开始日期')).toBeTruthy();
 
 		await fireEvent.click(screen.getByText('全部'));
@@ -65,7 +75,13 @@ describe('DateFilter', () => {
 	it('点击重置按钮触发 onreset 回调', async () => {
 		let resetCalled = false;
 		render(DateFilter, {
-			props: { preset: 'thisMonth', customStart: '', customEnd: '', visible: false, onreset: () => (resetCalled = true) }
+			props: {
+				preset: 'thisMonth',
+				customStart: '',
+				customEnd: '',
+				visible: false,
+				onreset: () => (resetCalled = true)
+			}
 		});
 		await fireEvent.click(screen.getByLabelText('重置筛选'));
 

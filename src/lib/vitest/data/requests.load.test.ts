@@ -71,7 +71,11 @@ describe('loadRequests', () => {
 	});
 
 	it('云端返回非 2xx：降级到 seed，不写入远端数据', async () => {
-		vi.mocked(fetch).mockResolvedValue({ ok: false, status: 500, json: async () => [] } as Response);
+		vi.mocked(fetch).mockResolvedValue({
+			ok: false,
+			status: 500,
+			json: async () => []
+		} as Response);
 
 		await loadRequests();
 

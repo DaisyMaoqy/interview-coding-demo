@@ -103,8 +103,7 @@
 			maxlength={200}
 			placeholder="超过 10,000 元时必填；说明用途以便审批"
 			value={$draft.budgetNote}
-			oninput={(e) => patchDraft({ budgetNote: e.currentTarget.value })}
-		></textarea>
+			oninput={(e) => patchDraft({ budgetNote: e.currentTarget.value })}></textarea>
 		<p class="field__hint">已输入 {$draft.budgetNote?.length ?? 0}/200</p>
 		{#if errors.budgetNote}<p class="field__error">{errors.budgetNote}</p>{/if}
 	</label>

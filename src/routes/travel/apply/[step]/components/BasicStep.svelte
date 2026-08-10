@@ -2,7 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import { basicSchema, validate, REASON_MIN_LENGTH, type BasicInput, type FieldErrors } from '$lib/domain/schema';
+	import {
+		basicSchema,
+		validate,
+		REASON_MIN_LENGTH,
+		type BasicInput,
+		type FieldErrors
+	} from '$lib/domain/schema';
 	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { URGENCY_LABELS } from '$lib/domain/workflow';
 	import type { Urgency } from '$lib/domain/types';
@@ -41,10 +47,11 @@
 			maxlength={200}
 			placeholder="请说明出差目的，不少于 10 个字"
 			value={$draft.reason}
-			oninput={(e) => patchDraft({ reason: e.currentTarget.value })}
-		></textarea>
+			oninput={(e) => patchDraft({ reason: e.currentTarget.value })}></textarea>
 		{#if $draft.reason.length < REASON_MIN_LENGTH}
-			<p class="field__hint">还差 {REASON_MIN_LENGTH - $draft.reason.length} 字（至少 {REASON_MIN_LENGTH} 字）</p>
+			<p class="field__hint">
+				还差 {REASON_MIN_LENGTH - $draft.reason.length} 字（至少 {REASON_MIN_LENGTH} 字）
+			</p>
 		{:else}
 			<p class="field__hint">已输入 {$draft.reason.length}/200</p>
 		{/if}

@@ -2,7 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import { tripsSchema, validate, type LegInput, type TripsInput, type FieldErrors } from '$lib/domain/schema';
+	import {
+		tripsSchema,
+		validate,
+		type LegInput,
+		type TripsInput,
+		type FieldErrors
+	} from '$lib/domain/schema';
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { TRANSPORT_LABELS } from '$lib/domain/workflow';
 	import type { Transport } from '$lib/domain/types';
@@ -97,7 +103,9 @@
 							value={leg.departDate}
 							oninput={(e) => updateLeg(i, { departDate: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'departDate')}<p class="field__error">{errorFor(i, 'departDate')}</p>{/if}
+						{#if errorFor(i, 'departDate')}<p class="field__error">
+								{errorFor(i, 'departDate')}
+							</p>{/if}
 					</label>
 					<label class="field">
 						<span class="field__label">返回日期</span>
@@ -107,7 +115,9 @@
 							value={leg.returnDate}
 							oninput={(e) => updateLeg(i, { returnDate: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'returnDate')}<p class="field__error">{errorFor(i, 'returnDate')}</p>{/if}
+						{#if errorFor(i, 'returnDate')}<p class="field__error">
+								{errorFor(i, 'returnDate')}
+							</p>{/if}
 					</label>
 					<label class="field">
 						<span class="field__label">交通方式</span>
@@ -131,7 +141,11 @@
 	<button type="button" class="btn btn--ghost" onclick={addLeg}>+ 添加一段行程</button>
 </section>
 
-<WizardFooter prevHref={stepHref(prevStep('trips')!, editId)} primaryLabel="下一步" onPrimary={onNext} />
+<WizardFooter
+	prevHref={stepHref(prevStep('trips')!, editId)}
+	primaryLabel="下一步"
+	onPrimary={onNext}
+/>
 
 <style>
 	.leg {

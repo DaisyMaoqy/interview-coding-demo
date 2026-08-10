@@ -61,12 +61,16 @@
 		}
 		return result;
 	});
-	const sortedRequests = $derived([...finalFiltered].sort(
-		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-	));
+	const sortedRequests = $derived(
+		[...finalFiltered].sort(
+			(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		)
+	);
 
 	// 筛选条件改变 → 分页回到首页
-	const filterKey = $derived(`${preset}:${selectedStatus ?? ''}:${selectedMonth ?? ''}:${customStart}:${customEnd}`);
+	const filterKey = $derived(
+		`${preset}:${selectedStatus ?? ''}:${selectedMonth ?? ''}:${customStart}:${customEnd}`
+	);
 
 	// ---- 图表聚合（仅对日期筛选后的数据做聚合） ----
 	const overview = $derived(managerOverview(dateFiltered));
@@ -79,8 +83,13 @@
 	);
 
 	const statusOption = $derived<EChartsOption>({
-		color: STATUS_ORDER.filter((s) => status.some((d) => d.status === s)).map((s) => STATUS_COLORS[s]),
-		tooltip: { trigger: 'item', formatter: (p: any) => `${p.name}：${p.value} 单（${p.percent ?? 0}%）` },
+		color: STATUS_ORDER.filter((s) => status.some((d) => d.status === s)).map(
+			(s) => STATUS_COLORS[s]
+		),
+		tooltip: {
+			trigger: 'item',
+			formatter: (p: any) => `${p.name}：${p.value} 单（${p.percent ?? 0}%）`
+		},
 		legend: { bottom: 0, textStyle: { color: '#64748b' } },
 		series: [
 			{
@@ -109,7 +118,16 @@
 			axisLabel: { formatter: (v: number) => String(v) },
 			splitLine: { lineStyle: { color: '#f1f5f9' } }
 		},
-		series: [{ name: '申请量', type: 'line', smooth: true, showSymbol: false, areaStyle: { opacity: 0.12 }, data: trend.map((p) => p.amount) }]
+		series: [
+			{
+				name: '申请量',
+				type: 'line',
+				smooth: true,
+				showSymbol: false,
+				areaStyle: { opacity: 0.12 },
+				data: trend.map((p) => p.amount)
+			}
+		]
 	});
 
 	// ---- 图表点击交互 ----
@@ -154,7 +172,13 @@
 </Panel>
 
 {#snippet header()}
-	<DateFilter bind:preset bind:customStart bind:customEnd bind:visible={showDateFilter} onreset={resetAllFilters} />
+	<DateFilter
+		bind:preset
+		bind:customStart
+		bind:customEnd
+		bind:visible={showDateFilter}
+		onreset={resetAllFilters}
+	/>
 {/snippet}
 
 <style>

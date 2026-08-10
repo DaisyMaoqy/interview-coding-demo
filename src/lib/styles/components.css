@@ -207,13 +207,13 @@
 		@apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900;
 	}
 	.field__input:focus-visible {
-		@apply border-brand-500 outline-none ring-2 ring-brand-500/30;
+		@apply border-brand-500 ring-2 ring-brand-500/30 outline-none;
 	}
 	.field__error {
 		@apply text-xs text-rose-600;
 	}
 	.field__hint {
-		@apply text-xs text-slate-400 ml-auto;
+		@apply ml-auto text-xs text-slate-400;
 	}
 	.radio-row {
 		@apply flex flex-wrap gap-4;

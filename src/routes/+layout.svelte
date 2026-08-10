@@ -49,7 +49,7 @@
 
 	<div class="app-layout__main-col">
 		<header class="app-layout__header">
-			<IdentitySwitcher showSwitch={showSwitch} disabledRoles={disabledRoles} />
+			<IdentitySwitcher {showSwitch} {disabledRoles} />
 		</header>
 
 		<main id="main" class="app-layout__main">

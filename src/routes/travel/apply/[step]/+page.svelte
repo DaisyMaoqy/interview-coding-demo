@@ -64,7 +64,8 @@
 -->
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 {#if isEditing}
-	<a class="edit-back" href={resolve('/travel/requests')} onclick={backToRequests}>← 返回我的申请</a>
+	<a class="edit-back" href={resolve('/travel/requests')} onclick={backToRequests}>← 返回我的申请</a
+	>
 {/if}
 
 <PageHeader title={isEditing ? '编辑申请' : '发起申请'} description={current.description} />
@@ -83,8 +84,8 @@
 					<span
 						class="step-nav__badge"
 						class:step-nav__badge--active={active}
-						class:step-nav__badge--done={!active && item.completed}
-					>{i + 1}</span>
+						class:step-nav__badge--done={!active && item.completed}>{i + 1}</span
+					>
 					{item.step.title}
 				</a>
 			{:else}
@@ -132,7 +133,9 @@
 		padding: 0.375rem 0.625rem;
 		border-radius: var(--radius-lg);
 		color: var(--color-slate-500);
-		transition: background-color 0.15s ease, color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
 	}
 	.step-nav__link:hover {
 		background-color: var(--color-slate-100);
