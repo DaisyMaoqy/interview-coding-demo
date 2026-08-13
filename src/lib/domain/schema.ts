@@ -88,7 +88,7 @@ export const tripsSchema = z.object({
 			// 这样 UI 能高亮具体某段而不是给一句笼统的「行程有冲突」
 			const sorted = legs
 				.map((leg, index) => ({ leg, index }))
-				.sort((a, b) => a.leg.departDate.localeCompare(b.leg.departDate));
+				.sort((a, b) => a.leg.departDate.localeCompare(b.leg.departDate)); // 按出发日期升序
 
 			for (let i = 1; i < sorted.length; i++) {
 				const prev = sorted[i - 1];

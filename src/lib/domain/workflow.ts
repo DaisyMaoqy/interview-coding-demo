@@ -219,8 +219,8 @@ export function transition({
 	now = new Date(),
 	auditId
 }: TransitionInput): TransitionResult {
-	const candidates = TRANSITIONS[action];
-	const byStatus = candidates.filter((rule) => rule.from === request.status);
+	const candidates = TRANSITIONS[action]; // 当前状态下所有可能的流转规则
+	const byStatus = candidates.filter((rule) => rule.from === request.status); // 筛选符合当前状态的规则
 
 	if (byStatus.length === 0) {
 		return {
@@ -230,7 +230,7 @@ export function transition({
 		};
 	}
 
-	const rule = byStatus.find((r) => canActAs(r.actor, actor, request));
+	const rule = byStatus.find((r) => canActAs(r.actor, actor, request)); // 找到符合当前用户的规则
 	if (!rule) {
 		// 自审是最容易撞上的一种越权，单独给一句更具体的提示
 		const selfApproval = actor.id === request.applicantId && action !== 'cancel';
