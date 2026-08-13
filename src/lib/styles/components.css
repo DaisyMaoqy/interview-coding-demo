@@ -209,6 +209,15 @@
 	.field__input:focus-visible {
 		@apply border-brand-500 ring-2 ring-brand-500/30 outline-none;
 	}
+	.field--invalid .field__input {
+		@apply border-rose-500;
+	}
+	.field--invalid .field__input:focus-visible {
+		@apply border-rose-500 ring-rose-500/30;
+	}
+	.field__required {
+		@apply ml-0.5 text-rose-500;
+	}
 	.field__error {
 		@apply text-xs text-rose-600;
 	}

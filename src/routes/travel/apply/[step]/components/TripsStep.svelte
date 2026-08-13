@@ -12,6 +12,7 @@
 	import { nextStep, stepHref, prevStep } from '$lib/domain/wizard';
 	import { TRANSPORT_LABELS } from '$lib/domain/workflow';
 	import type { Transport } from '$lib/domain/types';
+	import Field from '$lib/components/form/Field.svelte';
 	import WizardFooter from './WizardFooter.svelte';
 
 	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
@@ -36,17 +37,27 @@
 		};
 	}
 
-	// 每次改动都生成新数组并写回草稿，保证响应式与 localStorage 持久化都生效
+	// 每次改动都生成新数组并写回草稿，保证响应式与 localStorage 持久化都生效；
+	// 写回后立即全量重校验，从而让每个字段的错误实时跟随输入变化
 	function updateLeg(index: number, patch: Partial<LegInput>): void {
 		patchDraft({ legs: $draft.legs.map((leg, i) => (i === index ? { ...leg, ...patch } : leg)) });
+		revalidateLegs();
 	}
 
 	function addLeg(): void {
 		patchDraft({ legs: [...$draft.legs, newLeg()] });
+		revalidateLegs();
 	}
 
 	function removeLeg(index: number): void {
 		patchDraft({ legs: $draft.legs.filter((_, i) => i !== index) });
+		revalidateLegs();
+	}
+
+	function revalidateLegs(): void {
+		const result = validate<TripsInput>(tripsSchema, $draft);
+		// 整张表通过则清空错误；否则保留扁平化后的逐字段错误
+		errors = result.ok ? {} : result.errors;
 	}
 
 	function errorFor(index: number, field: string): string | undefined {
@@ -77,50 +88,37 @@
 					<button type="button" class="leg__remove" onclick={() => removeLeg(i)}>删除</button>
 				</div>
 				<div class="leg__grid">
-					<label class="field">
-						<span class="field__label">出发地</span>
+					<Field label="出发地" required error={errorFor(i, 'from')}>
 						<input
 							class="field__input"
 							value={leg.from}
 							oninput={(e) => updateLeg(i, { from: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'from')}<p class="field__error">{errorFor(i, 'from')}</p>{/if}
-					</label>
-					<label class="field">
-						<span class="field__label">目的地</span>
+					</Field>
+					<Field label="目的地" required error={errorFor(i, 'to')}>
 						<input
 							class="field__input"
 							value={leg.to}
 							oninput={(e) => updateLeg(i, { to: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'to')}<p class="field__error">{errorFor(i, 'to')}</p>{/if}
-					</label>
-					<label class="field">
-						<span class="field__label">出发日期</span>
+					</Field>
+					<Field label="出发日期" required error={errorFor(i, 'departDate')}>
 						<input
 							type="date"
 							class="field__input"
 							value={leg.departDate}
 							oninput={(e) => updateLeg(i, { departDate: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'departDate')}<p class="field__error">
-								{errorFor(i, 'departDate')}
-							</p>{/if}
-					</label>
-					<label class="field">
-						<span class="field__label">返回日期</span>
+					</Field>
+					<Field label="返回日期" required error={errorFor(i, 'returnDate')}>
 						<input
 							type="date"
 							class="field__input"
 							value={leg.returnDate}
 							oninput={(e) => updateLeg(i, { returnDate: e.currentTarget.value })}
 						/>
-						{#if errorFor(i, 'returnDate')}<p class="field__error">
-								{errorFor(i, 'returnDate')}
-							</p>{/if}
-					</label>
-					<label class="field">
-						<span class="field__label">交通方式</span>
+					</Field>
+					<Field label="交通方式" error={errorFor(i, 'transport')}>
 						<select
 							class="field__input"
 							value={leg.transport}
@@ -130,7 +128,7 @@
 								<option value={t.value}>{t.label}</option>
 							{/each}
 						</select>
-					</label>
+					</Field>
 				</div>
 			</div>
 		{/each}

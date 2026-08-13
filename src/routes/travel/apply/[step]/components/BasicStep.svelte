@@ -2,16 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { draft, patchDraft } from '$lib/state/wizardDraft';
-	import {
-		basicSchema,
-		validate,
-		REASON_MIN_LENGTH,
-		type BasicInput,
-		type FieldErrors
-	} from '$lib/domain/schema';
+	import { basicSchema, validate, type BasicInput, type FieldErrors } from '$lib/domain/schema';
 	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { URGENCY_LABELS } from '$lib/domain/workflow';
 	import type { Urgency } from '$lib/domain/types';
+	import Field from '$lib/components/form/Field.svelte';
 	import WizardFooter from './WizardFooter.svelte';
 
 	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
@@ -23,6 +18,25 @@
 	).map((value) => ({ value, label: URGENCY_LABELS[value] }));
 
 	let errors = $state<FieldErrors>({});
+
+	// 出差事由输入实时校验
+	function onReasonInput(e: Event): void {
+		const val = (e.currentTarget as HTMLTextAreaElement).value;
+		patchDraft({ reason: val });
+		const result = validate<BasicInput>(basicSchema, { ...$draft, reason: val });
+		if (!result.ok) {
+			errors = { ...errors, reason: result.errors.reason };
+			return;
+		}
+		const newErrors = { ...errors };
+		delete newErrors.reason;
+		errors = newErrors;
+	}
+
+	// 字数提示：错误优先，故仅在无错误时显示实时计数
+	function hintForReason(): string {
+		return `已输入 ${$draft.reason.length}/200`;
+	}
 
 	function onNext(): void {
 		const result = validate<BasicInput>(basicSchema, $draft);
@@ -38,8 +52,7 @@
 </script>
 
 <section class="step-card">
-	<label class="field">
-		<span class="field__label">出差事由</span>
+	<Field label="出差事由" required error={errors.reason} hint={hintForReason()}>
 		<textarea
 			id="reason"
 			class="field__input"
@@ -47,16 +60,8 @@
 			maxlength={200}
 			placeholder="请说明出差目的，不少于 10 个字"
 			value={$draft.reason}
-			oninput={(e) => patchDraft({ reason: e.currentTarget.value })}></textarea>
-		{#if $draft.reason.length < REASON_MIN_LENGTH}
-			<p class="field__hint">
-				还差 {REASON_MIN_LENGTH - $draft.reason.length} 字（至少 {REASON_MIN_LENGTH} 字）
-			</p>
-		{:else}
-			<p class="field__hint">已输入 {$draft.reason.length}/200</p>
-		{/if}
-		{#if errors.reason}<p class="field__error">{errors.reason}</p>{/if}
-	</label>
+			oninput={onReasonInput}></textarea>
+	</Field>
 
 	<fieldset class="field">
 		<legend class="field__label">紧急程度</legend>

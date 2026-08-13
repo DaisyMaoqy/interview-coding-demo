@@ -6,6 +6,7 @@
 	import { nextStep, stepHref } from '$lib/domain/wizard';
 	import { centsToYuan, parseYuanInput, budgetTotal, formatYuan } from '$lib/domain/money';
 	import type { Budget } from '$lib/domain/types';
+	import Field from '$lib/components/form/Field.svelte';
 	import WizardFooter from './WizardFooter.svelte';
 
 	// 编辑态由 URL 的 ?edit=ID 决定，步骤跳转需带上它以保持编辑上下文
@@ -43,6 +44,18 @@
 		texts[key] = value;
 		const cents = parseYuanInput(value);
 		if (cents !== null) patchDraft({ budget: { ...$draft.budget, [key]: cents } });
+		revalidateBudget();
+	}
+
+	/** 把当前文本折算后整段重校验，让金额/说明的错误随输入实时清除 */
+	function revalidateBudget(): void {
+		const next: Budget = { ...$draft.budget };
+		for (const f of FIELDS) {
+			next[f.key] = parseYuanInput(texts[f.key]) ?? 0;
+		}
+		const payload: BudgetInput = { budget: next, budgetNote: $draft.budgetNote };
+		const result = validate<BudgetInput>(budgetSchema, payload);
+		errors = result.ok ? {} : result.errors;
 	}
 
 	/** 非空但解析不出的文本（如「abc」），给字段级提示而非笼统的「合计需大于 0」 */
@@ -79,8 +92,7 @@
 
 <section class="step-card">
 	{#each FIELDS as f (f.key)}
-		<label class="field">
-			<span class="field__label">{f.label}（元）</span>
+		<Field label={`${f.label}（元）`} error={fieldError(f.key)}>
 			<input
 				class="field__input"
 				type="text"
@@ -89,24 +101,25 @@
 				value={texts[f.key]}
 				oninput={(e) => onInput(f.key, e.currentTarget.value)}
 			/>
-			{#if fieldError(f.key)}
-				<p class="field__error">{fieldError(f.key)}</p>
-			{/if}
-		</label>
+		</Field>
 	{/each}
 
-	<label class="field">
-		<span class="field__label">预算说明（选填）</span>
+	<Field
+		label="预算说明（选填）"
+		error={errors.budgetNote}
+		hint={`已输入 ${$draft.budgetNote?.length ?? 0}/200`}
+	>
 		<textarea
 			class="field__input"
 			rows="3"
 			maxlength={200}
 			placeholder="超过 10,000 元时必填；说明用途以便审批"
 			value={$draft.budgetNote}
-			oninput={(e) => patchDraft({ budgetNote: e.currentTarget.value })}></textarea>
-		<p class="field__hint">已输入 {$draft.budgetNote?.length ?? 0}/200</p>
-		{#if errors.budgetNote}<p class="field__error">{errors.budgetNote}</p>{/if}
-	</label>
+			oninput={(e) => {
+				patchDraft({ budgetNote: e.currentTarget.value });
+				revalidateBudget();
+			}}></textarea>
+	</Field>
 
 	<p class="amount-summary">预算合计：<strong>¥{formatYuan(total)}</strong></p>
 </section>
