@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from './Icon.svelte';
+	import Icon from '../common/Icon.svelte';
 
 	interface Props {
 		/** 搜索词（双向绑定） */

@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { HOME } from '$lib/routes';
+import { HOME } from '$lib/core/routes';
 
 /**
  * 站点根路径没有独立内容，直接落到「我的申请」。

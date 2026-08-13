@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
-	import Pagination from '$lib/components/common/Pagination.svelte';
+	import Pagination from '$lib/components/form/Pagination.svelte';
 	import RequestCard from './RequestCard.svelte';
 	import type { TravelRequest } from '$lib/domain/types';
 

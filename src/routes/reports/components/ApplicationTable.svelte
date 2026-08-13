@@ -3,7 +3,7 @@
 	import type { TravelRequest } from '$lib/domain/types';
 	import { budgetTotal, formatYuan } from '$lib/domain/money';
 	import { formatDate } from '$lib/format/date';
-	import Pagination from '$lib/components/common/Pagination.svelte';
+	import Pagination from '$lib/components/form/Pagination.svelte';
 	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
 
 	interface Props {

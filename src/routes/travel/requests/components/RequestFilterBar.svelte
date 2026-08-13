@@ -1,7 +1,7 @@
 <script lang="ts">
-	import FilterTabs from '$lib/components/common/FilterTabs.svelte';
-	import SearchInput from '$lib/components/common/SearchInput.svelte';
-	import UnitSelect from '$lib/components/common/UnitSelect.svelte';
+	import FilterTabs from '$lib/components/form/FilterTabs.svelte';
+	import SearchInput from '$lib/components/form/SearchInput.svelte';
+	import UnitSelect from '$lib/components/form/UnitSelect.svelte';
 	import Icon from '$lib/components/common/Icon.svelte';
 	import type { StatusFilter } from '$lib/data/requests';
 

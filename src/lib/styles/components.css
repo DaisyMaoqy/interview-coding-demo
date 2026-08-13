@@ -103,7 +103,7 @@
 		@apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-card;
 	}
 
-	/* ===== SearchInput（src/lib/components/common/SearchInput.svelte） ===== */
+	/* ===== SearchInput（src/lib/components/form/SearchInput.svelte） ===== */
 	.search-input {
 		@apply relative;
 	}
@@ -114,7 +114,7 @@
 		@apply h-9 w-full rounded-lg border border-slate-200 bg-white pr-3 pl-9 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:border-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:w-64;
 	}
 
-	/* ===== FilterTabs（src/lib/components/common/FilterTabs.svelte） ===== */
+	/* ===== FilterTabs（src/lib/components/form/FilterTabs.svelte） ===== */
 	.filter-tabs {
 		@apply flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1;
 	}
@@ -128,7 +128,7 @@
 		@apply ml-1 text-xs text-slate-400;
 	}
 
-	/* ===== UnitSelect（src/lib/components/common/UnitSelect.svelte） ===== */
+	/* ===== UnitSelect（src/lib/components/form/UnitSelect.svelte） ===== */
 	.unit-select {
 		@apply flex h-9 items-center gap-1.5 rounded-lg border-0 bg-slate-100 px-2.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand-500;
 	}
@@ -231,7 +231,7 @@
 		@apply inline-flex items-center gap-1.5 text-sm text-slate-700;
 	}
 	.empty {
-		@apply rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400;
+		@apply mb-3 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400;
 	}
 
 	/* ===== 金额合计行（向导预算步 / 预览步复用的「预算合计」展示） ===== */

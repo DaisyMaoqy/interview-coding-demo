@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
-	import Pagination from '$lib/components/common/Pagination.svelte';
+	import Pagination from '$lib/components/form/Pagination.svelte';
 	import ApprovalCard from './components/ApprovalCard.svelte';
 	import RejectDialog from '../components/RejectDialog.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';

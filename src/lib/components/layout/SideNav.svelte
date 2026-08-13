@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { HOME } from '$lib/routes';
+	import { HOME } from '$lib/core/routes';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import Icon from '$lib/components/common/Icon.svelte';
 	import { isActive, visibleSections } from './navigation';
