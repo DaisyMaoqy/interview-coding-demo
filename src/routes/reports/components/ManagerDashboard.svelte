@@ -88,6 +88,7 @@
 		),
 		tooltip: {
 			trigger: 'item',
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			formatter: (p: any) => `${p.name}：${p.value} 单（${p.percent ?? 0}%）`
 		},
 		legend: { bottom: 0, textStyle: { color: '#64748b' } },
