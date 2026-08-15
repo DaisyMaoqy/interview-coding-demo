@@ -7,6 +7,7 @@
 	import { flattenFields } from '$lib/domain/applicationTypes';
 	import { draft, resetDraft } from '$lib/state/wizardDraft';
 	import { useIdentity } from '$lib/state/identity.svelte';
+	import { useApplicationType } from '$lib/state/applicationType.svelte';
 	import {
 		addRequest,
 		createDraft,
@@ -29,6 +30,7 @@
 	let { type, step }: Props = $props();
 
 	const identity = useIdentity();
+	const appType = useApplicationType();
 	const editId = $derived(page.url.searchParams.get('edit'));
 
 	let attempted = $state(false);
@@ -71,9 +73,9 @@
 			setActiveEditId(null);
 			resetDraft();
 			resetRequestListFilters('draft');
-			// 返回列表时带上类型，列表按该类型筛选
-			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			await goto(`${resolve('/requests')}?type=${type}`);
+			// 把全局类型对齐到刚存草稿的类型，返回列表即按该类型展示、便于看到这张单
+			appType.switchTo(type);
+			await goto(resolve('/requests'));
 		} catch {
 			savingDraft = false;
 		}
@@ -107,9 +109,9 @@
 			setActiveEditId(null);
 			resetDraft();
 			resetRequestListFilters();
-			// 返回列表时带上类型，列表按该类型筛选
-			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			await goto(`${resolve('/requests')}?type=${type}`);
+			// 把全局类型对齐到刚提交的类型，返回列表即按该类型展示、便于看到这张单
+			appType.switchTo(type);
+			await goto(resolve('/requests'));
 		} catch {
 			submitting = false;
 		}

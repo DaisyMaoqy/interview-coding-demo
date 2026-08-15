@@ -14,6 +14,7 @@
 	} from '$lib/domain/wizard';
 	import { getRequestById } from '$lib/data/requests';
 	import { resetRequestListFilters } from '$lib/state/requestListFilters';
+	import { useApplicationType } from '$lib/state/applicationType.svelte';
 	import { APPLICATION_TYPES } from '$lib/domain/applicationTypes';
 	import type { PageData } from './$types';
 
@@ -26,6 +27,7 @@
 	const type = $derived(data.type);
 	const slug = $derived(data.step);
 	const stepDef = $derived(stepBySlug(type, slug));
+	const appType = useApplicationType();
 
 	// 步骤条的可达性由草稿实际填写情况决定：已完成 + 第一个未完成可点，其余置灰，
 	// 防止用户跳到预算页却看到空行程。
@@ -64,15 +66,14 @@
 	});
 
 	function backToRequests(): void {
+		// 把全局类型对齐到正在编辑的类型，返回列表即按该类型展示、便于看到这张单
+		appType.switchTo(type);
 		resetRequestListFilters();
 	}
 </script>
 
-<!-- eslint-disable svelte/no-navigation-without-resolve -->
 {#if isEditing}
-	<a class="edit-back" href={`${resolve('/requests')}?type=${type}`} onclick={backToRequests}
-		>← 返回我的申请</a
-	>
+	<a class="edit-back" href={resolve('/requests')} onclick={backToRequests}>← 返回我的申请</a>
 {/if}
 
 <PageHeader
@@ -80,6 +81,8 @@
 	description={stepDef.description}
 />
 
+<!-- stepHref 内部已用 resolve() 构造地址，但 ESLint 无法跨函数追踪，故整段豁免该规则 -->
+<!-- eslint-disable svelte/no-navigation-without-resolve -->
 <ol class="step-nav">
 	{#each steps as item, i (item.step.slug)}
 		{@const active = item.step.slug === slug}
