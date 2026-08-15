@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Panel from '$lib/components/common/Panel.svelte';
@@ -32,13 +31,10 @@
 	// 返回去向随入口：?from=approvals 回待我审批，?from=requests 回我的申请；
 	// 直接输入 URL（无 from）时按身份兜底：审批人回待我审批，员工回我的申请
 	const isApprover = $derived(actor.role === 'manager' || actor.role === 'finance');
-	// 「我的申请」返回带上类型，回到对应类型的列表筛选态
-	const myRequestsHref = $derived(`${resolve('/requests')}?type=${request.type}`);
-	// 由统计报表进入时，回链带上 URL 上的 ?type=，回到对应类型的报表视图
-	const reportsTypeQuery = $derived(page.url.searchParams.get('type') ?? '');
-	const reportsBackHref = $derived(
-		reportsTypeQuery ? `${resolve('/reports')}?type=${reportsTypeQuery}` : resolve('/reports')
-	);
+	// 返回「我的申请」不再带 ?type=：列表按全局持久化类型展示，点导航不会切走类型
+	const myRequestsHref = resolve('/requests');
+	// 由统计报表进入时，回链回到统计报表（类型由全局持久化类型决定）
+	const reportsBackHref = resolve('/reports');
 	const backHref = $derived(
 		from === 'approvals'
 			? resolve('/approvals')
@@ -66,8 +62,6 @@
 </script>
 
 <!-- 头部内容 -->
-<!-- 返回地址含 ?type= 查询参数，resolve 无法内联生成，故豁免该规则 -->
-<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 <a href={backHref} class="back-link">
 	<span aria-hidden="true">←</span> 返回{backLabel}
 </a>
@@ -115,13 +109,11 @@
 			{actor}
 			ondeleted={() => {
 				// 删除后按原入口返回，我的申请场景带回类型筛选
-				// eslint-disable-next-line svelte/no-navigation-without-resolve
 				goto(backHref);
 			}}
 			onsubmitted={() => {
 				resetRequestListFilters();
 				// 提交后回到「我的申请」，带上类型筛选
-				// eslint-disable-next-line svelte/no-navigation-without-resolve
 				goto(myRequestsHref);
 			}}
 		/>

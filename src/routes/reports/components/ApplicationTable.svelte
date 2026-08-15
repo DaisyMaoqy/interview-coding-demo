@@ -23,8 +23,8 @@
 	const metricTitle = $derived(
 		type === 'leave' ? '请假天数' : type === 'travel' ? '申请金额' : '金额/时长'
 	);
-	// 「查看」回链附带 ?type=，让详情页「返回统计报表」时保持当前类型筛选
-	const typeQuery = $derived(type === 'all' ? '' : `&type=${type}`);
+	// 「查看」回链只带 ?from=reports（用于详情页高亮归属），不再带 ?type=——
+	// 返回统计报表时由全局持久化类型决定展示哪个类型，避免点导航切走类型
 </script>
 
 {#if requests.length === 0}
@@ -57,9 +57,7 @@
 							<td><StatusBadge status={req.status} /></td>
 							<td class="app-table__amount">{metric.value}</td>
 							<td>
-								<a href={resolve(`/requests/${req.id}?from=reports${typeQuery}`)} class="view-link">
-									查看
-								</a>
+								<a href={resolve(`/requests/${req.id}?from=reports`)} class="view-link"> 查看 </a>
 							</td>
 						</tr>
 					{/each}

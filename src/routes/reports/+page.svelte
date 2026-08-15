@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
+	import { useApplicationType } from '$lib/state/applicationType.svelte';
 	import { requestsStore, filterByType } from '$lib/data/requests';
 	import {
 		APPLICATION_TYPE_VALUES,
@@ -14,6 +12,7 @@
 	import ManagerDashboard from './components/ManagerDashboard.svelte';
 
 	const identity = useIdentity();
+	const appType = useApplicationType();
 	// 报表数据随请求数据集变化（含启动时的 Mock 加载）自动刷新
 	const all = $derived($requestsStore);
 	// 主管只查看本部门员工（不含自己、排除草稿）的申请数据
@@ -26,11 +25,10 @@
 		)
 	);
 
-	// 类型以 URL 的 ?type= 为单一数据源：导航「统计报表」带类型进入即默认该类型，
-	// 在报表页切换类型只改写 ?type=（replaceState）并停留本页，由下方派生重算统计
-	const selectedType = $derived<ApplicationType | 'all'>(
-		(page.url.searchParams.get('type') as ApplicationType) ?? 'all'
-	);
+	// 是否以「全部类型」局部视图查看报表（不写回全局类型）
+	let showAll = $state(false);
+	// 默认按持久化的全局申请类型查看；选「全部类型」则局部覆盖，且不随全局类型变
+	const selectedType = $derived<ApplicationType | 'all'>(showAll ? 'all' : appType.value);
 	const visibleRequests = $derived(
 		selectedType === 'all' ? deptRequests : filterByType(deptRequests, selectedType)
 	);
@@ -39,13 +37,16 @@
 	);
 	const description = $derived(`${typeLabel}统计与审批效率`);
 
-	// 切换类型：停留报表页，仅更新 ?type= 查询参数（不新增历史记录）
+	// 切换类型：选具体类型即写入全局持久化类型（侧栏品牌区同步）；
+	// 选「全部类型」仅作报表内局部视图，不改动全局类型
 	function changeReportType(event: Event): void {
 		const type = (event.currentTarget as HTMLSelectElement).value;
-		const target = type === 'all' ? resolve('/reports') : `${resolve('/reports')}?type=${type}`;
-		// 需附带 query 参数，resolve 写在模板字符串内，故逐行豁免该规则
-		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		goto(target, { replaceState: true });
+		if (type !== 'all') {
+			showAll = false;
+			appType.switchTo(type as ApplicationType);
+		} else {
+			showAll = true;
+		}
 	}
 
 	// URL 直达时自动纠正非主管身份，无需手动点切换按钮

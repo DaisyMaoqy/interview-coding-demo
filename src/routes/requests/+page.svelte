@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
-	import { untrack } from 'svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import RequestFilterBar from './components/RequestFilterBar.svelte';
 	import RequestList from './components/RequestList.svelte';
-	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { useIdentity } from '$lib/state/identity.svelte';
+	import { useApplicationType } from '$lib/state/applicationType.svelte';
 	import { requestListFilters } from '$lib/state/requestListFilters';
 	import {
 		distinctYears,
@@ -23,6 +22,7 @@
 	import { firstStep } from '$lib/domain/wizard';
 
 	const identity = useIdentity();
+	const appType = useApplicationType();
 
 	/** 筛选 tab：「审批中」是 pending_manager + pending_finance 两个状态的合集 */
 	const FILTERS: ReadonlyArray<{ value: StatusFilter; label: string }> = [
@@ -42,19 +42,18 @@
 	let keyword = $state(savedFilters.keyword);
 	let year = $state<number | 'all'>(savedFilters.year);
 	let month = $state<number | 'all'>(savedFilters.month);
-	// 类型筛选优先取 URL 的 ?type=：侧栏切换申请类型时默认按该类型查询
-	let typeFilter = $state<ApplicationType | 'all'>(
-		(page.url.searchParams.get('type') as ApplicationType) ?? 'all'
-	);
+	// 类型筛选默认取持久化的全局申请类型（侧栏「切换申请类型」即设它），
+	// 不再从 URL 的 ?type= 读取——点导航不会改类型。
+	// 该筛选可写（本地能临时选「全部」）又需随全局类型自动跟随，无法用纯 $derived，
+	// 故此处用 $state + $effect，豁免该规则
+	// eslint-disable-next-line svelte/prefer-writable-derived
+	let typeFilter = $state<ApplicationType | 'all'>(appType.value);
 
-	// 同一路由内仅 query 变化（如已在列表页切换类型）时组件不重挂载，
-	// 这里把 ?type= 同步进本地筛选态；用 untrack 避免写回时把自己变成依赖造成循环
+	// 主动切换申请类型（侧栏下拉）时把列表筛选同步到该类型；
+	// 本地选「全部」不回写全局类型，故此处只单向同步 store → 本地筛选，
+	// 且 effect 仅在 appType.value 变化时重跑，不会把本地「全部」覆盖掉
 	$effect(() => {
-		const t = page.url.searchParams.get('type');
-		if (!t) return;
-		untrack(() => {
-			if (t !== typeFilter) typeFilter = t as ApplicationType | 'all';
-		});
+		typeFilter = appType.value;
 	});
 
 	// 任一筛选维度变化都同步回 store，供「返回我的申请」等跨页导航恢复
@@ -101,8 +100,8 @@
 		month = 'all';
 	}
 
-	// 「发起申请」跟随当前类型：列表按某类型筛选时，新建也走该类型的向导
-	const applyType = $derived(typeFilter === 'all' ? 'travel' : typeFilter);
+	// 「发起申请」跟随类型：列表按某类型筛选时走该向导；选「全部」时走全局当前类型
+	const applyType = $derived(typeFilter === 'all' ? appType.value : typeFilter);
 	const applyHref = $derived(
 		resolve('/apply/[type]/[step]', { type: applyType, step: firstStep(applyType) })
 	);
