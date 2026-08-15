@@ -1,13 +1,17 @@
 <script lang="ts">
 	import type { EChartsOption } from 'echarts';
 	import type * as echarts from 'echarts';
-	import type { RequestStatus, TravelRequest } from '$lib/domain/types';
+	import type { ApplicationType, RequestStatus } from '$lib/domain/types';
+	import type { Request } from '$lib/domain/types';
 	import {
 		statusDistribution,
 		monthlyApplicationTrend,
+		monthlyLeaveDays,
+		leaveTypeDistribution,
+		leaveOverview,
 		managerOverview,
 		STATUS_COLORS,
-		STATUS_ORDER,
+		LEAVE_TYPE_COLORS,
 		CHART_COLORS,
 		computeDateRange,
 		filterByDateRange,
@@ -19,13 +23,21 @@
 	import DateFilter from './DateFilter.svelte';
 	import ApplicationTable from './ApplicationTable.svelte';
 
-	let { requests }: { requests: readonly TravelRequest[] } = $props();
+	let {
+		requests,
+		/** 看板当前类型筛选；'leave' 时图表与卡片切换为请假语义指标 */
+		type = 'all'
+	}: { requests: readonly Request[]; type?: ApplicationType | 'all' } = $props();
+
+	// 当前是否为请假视图：驱动图表/卡片/表头的差异化渲染
+	const isLeave = $derived(type === 'leave');
 
 	// ---- 筛选状态 ----
 	let preset = $state<DatePreset>('all');
 	let customStart = $state('');
 	let customEnd = $state('');
 	let selectedStatus = $state<RequestStatus | null>(null);
+	let selectedLeaveType = $state<string | null>(null);
 	let selectedMonth = $state<string | null>(null);
 	let showDateFilter = $state(false);
 
@@ -39,6 +51,7 @@
 	function resetAllFilters(): void {
 		resetDateFilter();
 		selectedStatus = null;
+		selectedLeaveType = null;
 		selectedMonth = null;
 	}
 
@@ -56,6 +69,13 @@
 		if (selectedStatus) {
 			result = result.filter((r) => r.status === selectedStatus);
 		}
+		if (selectedLeaveType) {
+			result = result.filter(
+				(r) =>
+					r.type === 'leave' &&
+					(r.fields as Record<string, unknown>).leaveType === selectedLeaveType
+			);
+		}
 		if (selectedMonth) {
 			result = result.filter((r) => r.createdAt.slice(0, 7) === selectedMonth);
 		}
@@ -69,27 +89,43 @@
 
 	// 筛选条件改变 → 分页回到首页
 	const filterKey = $derived(
-		`${preset}:${selectedStatus ?? ''}:${selectedMonth ?? ''}:${customStart}:${customEnd}`
+		`${preset}:${selectedStatus ?? ''}:${selectedLeaveType ?? ''}:${selectedMonth ?? ''}:${customStart}:${customEnd}`
 	);
 
 	// ---- 图表聚合（仅对日期筛选后的数据做聚合） ----
 	const overview = $derived(managerOverview(dateFiltered));
-	const status = $derived(statusDistribution(dateFiltered));
-	const trend = $derived(monthlyApplicationTrend(dateFiltered));
+	const leave = $derived(leaveOverview(dateFiltered));
 
-	// 状态标签名 → 状态 key 的反向映射
-	const LABEL_TO_STATUS: Record<string, RequestStatus> = $derived(
-		Object.fromEntries(status.map((s) => [s.name, s.status]))
+	// 饼图数据：请假视图看「请假类型分布」，其余看「申请状态分布」
+	const pieSlices = $derived(
+		isLeave
+			? leaveTypeDistribution(dateFiltered).map((s) => ({
+					name: s.name,
+					value: s.count,
+					key: s.value,
+					color: LEAVE_TYPE_COLORS[s.value] ?? CHART_COLORS[0]
+				}))
+			: statusDistribution(dateFiltered).map((s) => ({
+					name: s.name,
+					value: s.value,
+					key: s.status,
+					color: STATUS_COLORS[s.status]
+				}))
 	);
 
+	// 趋势：请假视图看「请假天数」，其余看「申请量」
+	const trend = $derived(
+		isLeave ? monthlyLeaveDays(dateFiltered) : monthlyApplicationTrend(dateFiltered)
+	);
+	const trendName = $derived(isLeave ? '请假天数' : '申请量');
+	const trendUnit = $derived(isLeave ? '天' : '单');
+
 	const statusOption = $derived<EChartsOption>({
-		color: STATUS_ORDER.filter((s) => status.some((d) => d.status === s)).map(
-			(s) => STATUS_COLORS[s]
-		),
+		color: pieSlices.map((s) => s.color),
 		tooltip: {
 			trigger: 'item',
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			formatter: (p: any) => `${p.name}：${p.value} 单（${p.percent ?? 0}%）`
+			formatter: (p: any) => `${p.name}：${p.value} ${trendUnit}（${p.percent ?? 0}%）`
 		},
 		legend: { bottom: 0, textStyle: { color: '#64748b' } },
 		series: [
@@ -98,14 +134,14 @@
 				radius: ['42%', '68%'],
 				center: ['50%', '45%'],
 				label: { formatter: '{b}\n{d}%' },
-				data: status.map((d) => ({ name: d.name, value: d.value }))
+				data: pieSlices.map((s) => ({ name: s.name, value: s.value }))
 			}
 		]
 	});
 
 	const trendOption = $derived<EChartsOption>({
 		color: CHART_COLORS,
-		tooltip: { trigger: 'axis', valueFormatter: (v) => `${v as number} 单` },
+		tooltip: { trigger: 'axis', valueFormatter: (v) => `${v as number} ${trendUnit}` },
 		grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
 		xAxis: {
 			type: 'category',
@@ -121,7 +157,7 @@
 		},
 		series: [
 			{
-				name: '申请量',
+				name: trendName,
 				type: 'line',
 				smooth: true,
 				showSymbol: false,
@@ -134,9 +170,16 @@
 	// ---- 图表点击交互 ----
 	function onPieReady(chart: echarts.ECharts): void {
 		chart.on('click', (params: { name?: string }) => {
-			const key: RequestStatus | undefined = LABEL_TO_STATUS[params.name ?? ''];
-			if (!key) return;
-			selectedStatus = selectedStatus === key ? null : key;
+			const slice = pieSlices.find((s) => s.name === params.name);
+			if (!slice) return;
+			if (isLeave) {
+				selectedLeaveType = selectedLeaveType === slice.key ? null : slice.key;
+				selectedStatus = null;
+			} else {
+				selectedStatus =
+					selectedStatus === (slice.key as RequestStatus) ? null : (slice.key as RequestStatus);
+				selectedLeaveType = null;
+			}
 			selectedMonth = null;
 			resetDateFilter();
 		});
@@ -148,6 +191,7 @@
 			if (!month) return;
 			selectedMonth = selectedMonth === month ? null : month;
 			selectedStatus = null;
+			selectedLeaveType = null;
 			resetDateFilter();
 		});
 	}
@@ -156,20 +200,23 @@
 <div class="cards">
 	<StatCard label="申请总数" value={String(overview.total)} />
 	<StatCard label="待处理" value={String(overview.pending)} />
+	{#if isLeave}
+		<StatCard label="请假总天数" value={`${leave.totalDays} 天`} />
+	{/if}
 	<StatCard label="通过率" value={`${(overview.passRate * 100).toFixed(1)}%`} />
 </div>
 
 <div class="grid">
-	<Panel title="申请状态分布">
+	<Panel title={isLeave ? '请假类型分布' : '申请状态分布'}>
 		<Chart option={statusOption} onReady={onPieReady} />
 	</Panel>
-	<Panel title="近 12 个月申请量趋势">
+	<Panel title={isLeave ? '近 12 个月请假天数趋势' : '近 12 个月申请量趋势'}>
 		<Chart option={trendOption} onReady={onLineReady} />
 	</Panel>
 </div>
 
 <Panel title="申请记录" actions={header}>
-	<ApplicationTable requests={sortedRequests} resetKey={filterKey} />
+	<ApplicationTable requests={sortedRequests} {type} resetKey={filterKey} />
 </Panel>
 
 {#snippet header()}

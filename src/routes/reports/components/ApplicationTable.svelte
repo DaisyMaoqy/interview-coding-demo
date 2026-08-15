@@ -1,24 +1,30 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { TravelRequest } from '$lib/domain/types';
-	import { budgetTotal, formatYuan } from '$lib/domain/money';
+	import type { ApplicationType, Request } from '$lib/domain/types';
+	import { requestMetric, requestSummary } from '$lib/data/requests';
 	import { formatDate } from '$lib/format/date';
 	import Pagination from '$lib/components/form/Pagination.svelte';
 	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
 
 	interface Props {
-		requests: readonly TravelRequest[];
+		requests: readonly Request[];
+		/** 看板当前类型筛选；用于「查看」回链与表头措辞，'all' 表示混合 */
+		type?: ApplicationType | 'all';
 		resetKey?: unknown;
 	}
 
-	let { requests, resetKey = undefined }: Props = $props();
+	let { requests, type = 'all', resetKey = undefined }: Props = $props();
 
-	function tripChain(req: TravelRequest): string {
-		if (req.legs.length === 0) return '—';
-		const from = req.legs[0].from;
-		const tos = req.legs.map((l) => l.to);
-		return [from, ...tos].join(' → ');
-	}
+	// 摘要列：差旅=行程城市链，请假=类型+日期区间（requestSummary 已按类型分支）
+	const summaryTitle = $derived(
+		type === 'leave' ? '请假信息' : type === 'travel' ? '行程明细' : '申请摘要'
+	);
+	// 指标列：差旅=预算金额，请假=请假天数（requestMetric 已按类型分支）
+	const metricTitle = $derived(
+		type === 'leave' ? '请假天数' : type === 'travel' ? '申请金额' : '金额/时长'
+	);
+	// 「查看」回链附带 ?type=，让详情页「返回统计报表」时保持当前类型筛选
+	const typeQuery = $derived(type === 'all' ? '' : `&type=${type}`);
 </script>
 
 {#if requests.length === 0}
@@ -26,31 +32,35 @@
 {:else}
 	<Pagination items={requests} pageSizeOptions={[5]} {resetKey} children={tableSnippet} />
 
-	{#snippet tableSnippet({ pageItems }: { pageItems: readonly TravelRequest[] })}
+	{#snippet tableSnippet({ pageItems }: { pageItems: readonly Request[] })}
 		<div class="table-wrap">
 			<table class="app-table">
 				<thead>
 					<tr>
 						<th scope="col">单号</th>
 						<th scope="col">申请人</th>
-						<th scope="col">行程明细</th>
+						<th scope="col">{summaryTitle}</th>
 						<th scope="col">申请日期</th>
 						<th scope="col">申请状态</th>
-						<th scope="col">申请金额</th>
+						<th scope="col">{metricTitle}</th>
 						<th scope="col">操作</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each pageItems as req (req.id)}
+						{@const metric = requestMetric(req)}
 						<tr>
 							<td class="app-table__id">{req.id}</td>
 							<td>{req.applicantName}</td>
-							<td class="app-table__trip">{tripChain(req)}</td>
+							<td class="app-table__trip">{requestSummary(req)}</td>
 							<td>{formatDate(req.createdAt)}</td>
 							<td><StatusBadge status={req.status} /></td>
-							<td class="app-table__amount">{formatYuan(budgetTotal(req.budget))}</td>
+							<td class="app-table__amount">{metric.value}</td>
 							<td>
-								<a href={resolve(`/travel/requests/${req.id}?from=reports`)} class="view-link">
+								<a
+									href={resolve(`/travel/requests/${req.id}?from=reports${typeQuery}`)}
+									class="view-link"
+								>
 									查看
 								</a>
 							</td>

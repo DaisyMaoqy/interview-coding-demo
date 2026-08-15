@@ -1,12 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import seed from '../../data/seed.json' with { type: 'json' };
 import { MANAGER_ID } from '../../domain/org';
-import type { TravelRequest } from '../../domain/types';
+import type { Request } from '../../domain/types';
 import {
 	computeDateRange,
 	filterByDateRange,
 	statusDistribution,
 	monthlyApplicationTrend,
+	monthlyLeaveDays,
+	leaveTypeDistribution,
+	leaveOverview,
+	leaveDays,
 	managerOverview,
 	STATUS_ORDER
 } from '../../domain/dashboard';
@@ -19,7 +23,7 @@ import {
  * 研发部主管（不含自己）的统计口径与页面一致。
  */
 
-const requests = seed as TravelRequest[];
+const requests = seed as unknown as Request[];
 
 /** 研发部除主管（李经理）以外的员工申请，且排除草稿 === 页面 deptRequests 等价物 */
 const deptRequests = requests.filter((r) => r.applicantId !== MANAGER_ID && r.status !== 'draft');
@@ -198,7 +202,7 @@ describe('monthlyApplicationTrend', () => {
 
 	it('欠缺月份补 0', () => {
 		// 制造只有 3 月和 6 月的数据；用 months=6 则窗口含 3~8 月
-		const sparse: TravelRequest[] = [
+		const sparse: Request[] = [
 			{ ...deptRequests[0], createdAt: '2026-03-15T00:00:00.000Z' },
 			{ ...deptRequests[0], createdAt: '2026-03-20T00:00:00.000Z' },
 			{ ...deptRequests[0], createdAt: '2026-06-01T00:00:00.000Z' }
@@ -210,6 +214,91 @@ describe('monthlyApplicationTrend', () => {
 		expect(trend.find((p) => p.month.endsWith('-03'))?.amount).toBe(2);
 		expect(trend.find((p) => p.month.endsWith('-06'))?.amount).toBe(1);
 		expect(trend.find((p) => p.month.endsWith('-04'))?.amount).toBe(0);
+	});
+});
+
+// ─── 请假语义指标（leaveDays / monthlyLeaveDays / leaveTypeDistribution / leaveOverview） ──
+
+describe('请假语义指标', () => {
+	// 构造可控的差旅/请假混合数据集
+	const leave = (leaveType: string, start: string, end: string, createdAt: string): Request => ({
+		id: `LV-${leaveType}-${createdAt}`,
+		type: 'leave',
+		applicantId: 'u1',
+		applicantName: '甲',
+		department: 'rd',
+		status: 'approved',
+		createdAt,
+		updatedAt: createdAt,
+		audit: [],
+		fields: { reason: 'x', leaveType, leaveStart: start, leaveEnd: end }
+	});
+
+	it('leaveDays 仅对 leave 类型有效，且含首尾两天', () => {
+		const oneDay = leave('annual', '2026-03-01', '2026-03-01', '2026-03-10T00:00:00.000Z');
+		const threeDay = leave('sick', '2026-03-01', '2026-03-03', '2026-03-10T00:00:00.000Z');
+		const travelLike = { ...oneDay, type: 'travel' as const };
+
+		expect(leaveDays(oneDay)).toBe(1);
+		expect(leaveDays(threeDay)).toBe(3);
+		expect(leaveDays(travelLike)).toBe(0);
+		// 缺日期返回 0
+		expect(leaveDays({ ...oneDay, fields: { leaveType: 'annual' } })).toBe(0);
+	});
+
+	it('monthlyLeaveDays 按月累加请假天数，非 leave 不计入，缺失月补 0', () => {
+		const clean: Request[] = [
+			leave('annual', '2026-03-01', '2026-03-03', '2026-03-10T00:00:00.000Z'), // 3 月 +3 天
+			leave('sick', '2026-03-05', '2026-03-06', '2026-03-12T00:00:00.000Z'), // 3 月 +2 天
+			leave('personal', '2026-06-01', '2026-06-01', '2026-06-01T00:00:00.000Z'), // 6 月 +1 天
+			{
+				...leave('annual', '2026-03-01', '2026-03-01', '2026-03-01T00:00:00.000Z'),
+				type: 'travel' as const
+			} // 不计入
+		];
+		const trend = monthlyLeaveDays(clean, 6);
+		expect(trend.length).toBe(6);
+		expect(trend.find((p) => p.month.endsWith('-03'))?.amount).toBe(5); // 3 + 2
+		expect(trend.find((p) => p.month.endsWith('-06'))?.amount).toBe(1);
+		expect(trend.find((p) => p.month.endsWith('-04'))?.amount).toBe(0);
+	});
+
+	it('leaveTypeDistribution 按请假类型计数，过滤 0 值', () => {
+		const data: Request[] = [
+			leave('annual', '2026-03-01', '2026-03-01', '2026-03-01T00:00:00.000Z'),
+			leave('annual', '2026-03-02', '2026-03-02', '2026-03-01T00:00:00.000Z'),
+			leave('sick', '2026-03-03', '2026-03-03', '2026-03-01T00:00:00.000Z')
+		];
+		const dist = leaveTypeDistribution(data);
+
+		const annual = dist.find((s) => s.value === 'annual');
+		const sick = dist.find((s) => s.value === 'sick');
+		expect(annual?.count).toBe(2);
+		expect(sick?.count).toBe(1);
+		expect(dist.find((s) => s.value === 'personal')).toBeUndefined();
+	});
+
+	it('leaveOverview 汇总单数、总天数、平均天数', () => {
+		const data: Request[] = [
+			leave('annual', '2026-03-01', '2026-03-03', '2026-03-01T00:00:00.000Z'), // 3 天
+			leave('sick', '2026-03-01', '2026-03-02', '2026-03-01T00:00:00.000Z') // 2 天
+		];
+		const ov = leaveOverview(data);
+
+		expect(ov.count).toBe(2);
+		expect(ov.totalDays).toBe(5);
+		expect(ov.avgDays).toBeCloseTo(2.5);
+	});
+
+	it('leaveOverview 空输入返回全 0', () => {
+		expect(leaveOverview([])).toEqual({ count: 0, totalDays: 0, avgDays: 0 });
+	});
+
+	it('seed 数据的请假概览可正常计算（不抛错、总天数 > 0）', () => {
+		const leaves = requests.filter((r) => r.type === 'leave');
+		const ov = leaveOverview(leaves);
+		expect(ov.count).toBe(leaves.length);
+		expect(ov.totalDays).toBeGreaterThan(0);
 	});
 });
 
@@ -271,10 +360,10 @@ describe('managerOverview', () => {
 // ─── 研发部主管统计口径集成验证 ──────────────────────────────────────
 
 describe('研发部主管统计口径', () => {
-	it('排除主管本人和草稿后计数正确（研发部 40 条，主管 4 条，非主管草稿 5 条 → 31 条）', () => {
+	it('排除主管本人和草稿后计数正确（seed 共 59 条：travel 40 + leave 19；主管 7 条、草稿 10 条 → 部门 44 条）', () => {
 		// 这个数字由 seed 数据决定；seed.test 已保证数据量稳定
-		expect(requests.length).toBe(40);
-		expect(deptRequests.length).toBe(31);
+		expect(requests.length).toBe(59);
+		expect(deptRequests.length).toBe(44);
 	});
 
 	it('排除了主管后 deptRequests 不含主管本人的申请', () => {
