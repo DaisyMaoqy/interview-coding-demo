@@ -31,14 +31,20 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
  * `new Date()` 会静默滚到 3 月 2 日。
  */
 /** YYYY-MM-DD 日期字符串校验，供配置驱动的字段构建器复用 */
-export const dateStringSchema = z
-	.string()
-	.trim()
-	.regex(DATE_PATTERN, '请选择日期')
-	.refine((value) => {
-		const date = new Date(`${value}T00:00:00Z`);
-		return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-	}, '日期不存在');
+export const dateStringSchema = z.preprocess(
+	// 未选择时字段值是 undefined / null，先归一成空串，让下面的 .min(1) 命中「请选择日期」，
+	// 而不是被 z.string() 的「类型错误」挡在前面（那会给出泛型/英文消息）
+	(v) => (v === undefined || v === null ? '' : v),
+	z
+		.string()
+		.trim()
+		.min(1, '请选择日期')
+		.regex(DATE_PATTERN, '请选择日期')
+		.refine((value) => {
+			const date = new Date(`${value}T00:00:00Z`);
+			return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+		}, '日期不存在')
+);
 
 const dateString = dateStringSchema;
 

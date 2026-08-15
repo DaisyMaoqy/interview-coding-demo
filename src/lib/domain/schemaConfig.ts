@@ -62,7 +62,9 @@ function fieldToShape(f: FieldDef): ShapeResult {
 				(obj, ctx) => {
 					const from = obj[f.fromKey];
 					const to = obj[f.toKey];
-					if (typeof from === 'string' && typeof to === 'string' && to < from) {
+					// 两端都填了才比较；任一端为空时由 dateStringSchema 报「请选择日期」，
+					// 这里不再介入（否则空串会被字典序判成「结束早于开始」而出错提示）
+					if (from && to && to < from) {
 						ctx.addIssue({
 							code: 'custom',
 							message: `${f.label}的结束日期不能早于开始日期`,
