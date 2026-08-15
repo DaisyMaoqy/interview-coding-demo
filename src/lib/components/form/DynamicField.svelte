@@ -65,6 +65,8 @@
 	const fieldError = $derived(revealError(primaryPath, altPath));
 
 	// 字段失焦即视为「已交互」，之后错误随输入实时更新；dateRange 两个框各自标记。
+	// 输入（oninput）时也标记 touched：让错误在「首次输入过程中」就实时出现，
+	// 不必等到失焦——满足「输入中也要实时校验」的交互。
 	function touch(): void {
 		markTouched(primaryPath);
 	}
@@ -85,6 +87,7 @@
 		moneyText = text;
 		const cents = parseYuanInput(text);
 		scopePatch(field.key, cents ?? undefined);
+		touch();
 	}
 </script>
 
@@ -96,7 +99,10 @@
 				rows="4"
 				placeholder={field.placeholder}
 				value={String(value ?? '')}
-				oninput={(e) => scopePatch(field.key, e.currentTarget.value)}
+				oninput={(e) => {
+					scopePatch(field.key, e.currentTarget.value);
+					touch();
+				}}
 				onblur={touch}></textarea>
 		{:else}
 			<input
@@ -104,7 +110,10 @@
 				type="text"
 				placeholder={field.placeholder}
 				value={String(value ?? '')}
-				oninput={(e) => scopePatch(field.key, e.currentTarget.value)}
+				oninput={(e) => {
+					scopePatch(field.key, e.currentTarget.value);
+					touch();
+				}}
 				onblur={touch}
 			/>
 		{/if}
@@ -129,7 +138,10 @@
 			class="input"
 			type="date"
 			value={String(value ?? '')}
-			oninput={(e) => scopePatch(field.key, e.currentTarget.value)}
+			oninput={(e) => {
+				scopePatch(field.key, e.currentTarget.value);
+				touch();
+			}}
 			onblur={touch}
 		/>
 	</Field>
@@ -140,7 +152,10 @@
 				class="input"
 				type="date"
 				value={String(scopeValue[field.fromKey] ?? '')}
-				oninput={(e) => scopePatch(field.fromKey, e.currentTarget.value)}
+				oninput={(e) => {
+					scopePatch(field.fromKey, e.currentTarget.value);
+					touchAlt();
+				}}
 				onblur={touchAlt}
 				aria-label={`${field.label}开始`}
 			/>
@@ -149,7 +164,10 @@
 				class="input"
 				type="date"
 				value={String(scopeValue[field.toKey] ?? '')}
-				oninput={(e) => scopePatch(field.toKey, e.currentTarget.value)}
+				oninput={(e) => {
+					scopePatch(field.toKey, e.currentTarget.value);
+					touch();
+				}}
 				onblur={touch}
 				aria-label={`${field.label}结束`}
 			/>
