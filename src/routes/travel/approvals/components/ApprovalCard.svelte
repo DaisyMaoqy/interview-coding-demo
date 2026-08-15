@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import StatusBadge from '$lib/components/request/StatusBadge.svelte';
-	import { summarizeLegs, requestTotal } from '$lib/data/requests';
-	import { formatYuan } from '$lib/domain/money';
+	import { requestSummary, requestMetric } from '$lib/data/requests';
 	import { formatDate, formatDateTime } from '$lib/format';
 	import { availableActions } from '$lib/domain/workflow';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import type { TravelRequest } from '$lib/domain/types';
+	import type { Request } from '$lib/domain/types';
+	import { APPLICATION_TYPE_LABELS } from '$lib/domain/types';
 
 	interface Props {
-		request: TravelRequest;
+		request: Request;
 		/** 是否被选入批量通过 */
 		selected: boolean;
 		/** 勾选状态切换时回调，由父组件维护选择集合 */
 		ontoggle: (id: string) => void;
-		onapprove: (request: TravelRequest) => void;
-		onreject: (request: TravelRequest) => void;
+		onapprove: (request: Request) => void;
+		onreject: (request: Request) => void;
 	}
 
 	let { request, selected, ontoggle, onapprove, onreject }: Props = $props();
@@ -25,6 +25,8 @@
 	const actions = $derived(availableActions(request, identity.user));
 	const canApprove = $derived(actions.includes('approve'));
 	const canReject = $derived(actions.includes('reject'));
+	// 卡片底部指标随类型变化（差旅=预算合计，请假=请假天数）
+	const metric = $derived(requestMetric(request));
 </script>
 
 <div class="approval-card">
@@ -54,17 +56,18 @@
 			class="approval-card__reason"
 			href={resolve(`/travel/requests/${request.id}?from=approvals`)}
 		>
-			{request.reason}
+			<span class="approval-card__type">{APPLICATION_TYPE_LABELS[request.type]}</span>
+			{String(request.fields.reason ?? '')}
 		</a>
 		<p class="approval-card__meta">
-			{request.id} · {summarizeLegs(request)} · {formatDate(request.createdAt)}
+			{request.id} · {requestSummary(request)} · {formatDate(request.createdAt)}
 		</p>
 	</div>
 
 	<div class="approval-card__foot">
 		<div class="approval-card__amount-group">
-			<span class="approval-card__amount-label">预算合计</span>
-			<span class="approval-card__amount">¥{formatYuan(requestTotal(request))}</span>
+			<span class="approval-card__amount-label">{metric.label}</span>
+			<span class="approval-card__amount">{metric.value}</span>
 		</div>
 		<div class="approval-card__actions">
 			{#if canApprove}
@@ -149,6 +152,16 @@
 	}
 	.approval-card__reason:hover {
 		color: var(--color-brand-700);
+	}
+	.approval-card__type {
+		display: inline-block;
+		margin-right: 0.4rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: var(--radius-sm);
+		background: var(--color-brand-50);
+		color: var(--color-brand-700);
+		font-size: 0.7rem;
+		font-weight: 600;
 	}
 	.approval-card__meta {
 		margin-top: 0.25rem;

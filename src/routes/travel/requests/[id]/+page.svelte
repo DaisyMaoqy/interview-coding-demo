@@ -28,7 +28,12 @@
 		<p class="notice-card__text">
 			当前身份（{identity.user.name}）没有权限查看这张申请
 		</p>
-		<a href={resolve('/travel/requests')} class="notice-card__action btn btn--primary">
+		<!-- 返回地址含 ?type= 查询参数，resolve 无法内联生成，故豁免该规则 -->
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
+		<a
+			href={`${resolve('/travel/requests')}?type=${request.type}`}
+			class="notice-card__action btn btn--primary"
+		>
 			返回我的申请
 		</a>
 	</div>

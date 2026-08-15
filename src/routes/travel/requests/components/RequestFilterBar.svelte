@@ -4,6 +4,11 @@
 	import UnitSelect from '$lib/components/form/UnitSelect.svelte';
 	import Icon from '$lib/components/common/Icon.svelte';
 	import type { StatusFilter } from '$lib/data/requests';
+	import {
+		APPLICATION_TYPE_VALUES,
+		APPLICATION_TYPE_LABELS,
+		type ApplicationType
+	} from '$lib/domain/types';
 
 	interface Props {
 		/** 状态筛选值（双向绑定） */
@@ -14,6 +19,8 @@
 		year: number | 'all';
 		/** 月份筛选（双向绑定），'all' 表示全部 */
 		month: number | 'all';
+		/** 申请类型筛选（双向绑定），'all' 表示全部 */
+		type: ApplicationType | 'all';
 		statusOptions: ReadonlyArray<{ value: StatusFilter; label: string; count: number }>;
 		yearOptions: ReadonlyArray<{ value: number | 'all'; label: string }>;
 		monthOptions: ReadonlyArray<{ value: number | 'all'; label: string }>;
@@ -27,6 +34,7 @@
 		keyword = $bindable(),
 		year = $bindable(),
 		month = $bindable(),
+		type = $bindable(),
 		statusOptions,
 		yearOptions,
 		monthOptions,
@@ -60,6 +68,12 @@
 <!-- 第二行：年 / 月 / 关键字，默认收起 -->
 {#if showFilters}
 	<div class="filter-bar__row">
+		<select class="filter-bar__select" bind:value={type} aria-label="按申请类型筛选">
+			<option value="all">全部类型</option>
+			{#each APPLICATION_TYPE_VALUES as t (t)}
+				<option value={t}>{APPLICATION_TYPE_LABELS[t]}</option>
+			{/each}
+		</select>
 		<UnitSelect bind:value={year} options={yearOptions} unit="年" ariaLabel="按年份筛选" />
 		<UnitSelect bind:value={month} options={monthOptions} unit="月" ariaLabel="按月份筛选" />
 		<SearchInput bind:value={keyword} placeholder="搜索事由或目的地" ariaLabel="搜索事由或目的地" />
@@ -121,6 +135,14 @@
 		align-items: center;
 		justify-content: flex-end;
 		gap: 0.5rem;
+	}
+	.filter-bar__select {
+		height: 2.25rem;
+		padding: 0 0.5rem;
+		border: 1px solid var(--color-slate-200);
+		border-radius: 0.5rem;
+		background: var(--color-white);
+		font-size: 0.875rem;
 	}
 	.filter-bar__clear {
 		font-size: 0.875rem;

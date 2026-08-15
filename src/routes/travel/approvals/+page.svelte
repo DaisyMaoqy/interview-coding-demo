@@ -7,7 +7,8 @@
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestsStore, updateRequest, sortBySubmittedAtDesc } from '$lib/data/requests';
 	import { canViewRequest, transition } from '$lib/domain/workflow';
-	import type { RequestStatus, TravelRequest } from '$lib/domain/types';
+	import type { RequestStatus } from '$lib/domain/types';
+	import type { Request } from '$lib/domain/types';
 
 	const identity = useIdentity();
 
@@ -52,7 +53,7 @@
 
 	// 通过/驳回只描述意图，具体落到 pending_finance 还是 approved 由状态机决定。
 	// 主管通过停在待财务审批，财务通过才归档，见 workflow.ts 的 TRANSITIONS。
-	function approve(request: TravelRequest): void {
+	function approve(request: Request): void {
 		const res = transition({ request, action: 'approve', actor: identity.user });
 		if (res.ok) {
 			updateRequest(res.request);
@@ -69,10 +70,10 @@
 	}
 
 	// 驳回需填意见：意见与校验由 RejectDialog，这里只拿到最终 comment 去流转
-	let rejectTarget = $state<TravelRequest | null>(null);
+	let rejectTarget = $state<Request | null>(null);
 	let rejectError = $state<string | null>(null);
 
-	function openReject(request: TravelRequest): void {
+	function openReject(request: Request): void {
 		rejectTarget = request;
 		rejectError = null;
 	}
@@ -126,7 +127,7 @@
 			resetKey={approvalResetKey}
 			children={approvalListSnippet}
 		/>
-		{#snippet approvalListSnippet({ pageItems }: { pageItems: TravelRequest[] })}
+		{#snippet approvalListSnippet({ pageItems }: { pageItems: Request[] })}
 			<ul class="approval-list">
 				{#each pageItems as request (request.id)}
 					<li>

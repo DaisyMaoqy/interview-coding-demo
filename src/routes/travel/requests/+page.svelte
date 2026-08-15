@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
+	import { untrack } from 'svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import RequestFilterBar from './components/RequestFilterBar.svelte';
 	import RequestList from './components/RequestList.svelte';
+	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestListFilters } from '$lib/state/requestListFilters';
@@ -10,12 +12,15 @@
 		distinctYears,
 		filterByDate,
 		filterByStatus,
+		filterByType,
 		getRequestsByApplicant,
 		requestsStore,
 		searchRequests,
 		sortBySubmittedAtDesc,
 		type StatusFilter
 	} from '$lib/data/requests';
+	import { type ApplicationType } from '$lib/domain/types';
+	import { firstStep } from '$lib/domain/wizard';
 
 	const identity = useIdentity();
 
@@ -37,6 +42,20 @@
 	let keyword = $state(savedFilters.keyword);
 	let year = $state<number | 'all'>(savedFilters.year);
 	let month = $state<number | 'all'>(savedFilters.month);
+	// 类型筛选优先取 URL 的 ?type=：侧栏切换申请类型时默认按该类型查询
+	let typeFilter = $state<ApplicationType | 'all'>(
+		(page.url.searchParams.get('type') as ApplicationType) ?? 'all'
+	);
+
+	// 同一路由内仅 query 变化（如已在列表页切换类型）时组件不重挂载，
+	// 这里把 ?type= 同步进本地筛选态；用 untrack 避免写回时把自己变成依赖造成循环
+	$effect(() => {
+		const t = page.url.searchParams.get('type');
+		if (!t) return;
+		untrack(() => {
+			if (t !== typeFilter) typeFilter = t as ApplicationType | 'all';
+		});
+	});
 
 	// 任一筛选维度变化都同步回 store，供「返回我的申请」等跨页导航恢复
 	$effect(() => {
@@ -49,9 +68,14 @@
 		sortBySubmittedAtDesc(getRequestsByApplicant(identity.user.id, $requestsStore))
 	);
 	const years = $derived(distinctYears(mine));
-	// 三个维度正交：状态 → 年/月 → 关键字，叠加生效
+	// 维度正交：状态 → 类型 → 年/月 → 关键字，叠加生效
 	const visible = $derived(
-		searchRequests(filterByDate(filterByStatus(mine, activeFilter), year, month), keyword)
+		(() => {
+			const byStatus = filterByStatus(mine, activeFilter);
+			const byDate = filterByDate(byStatus, year, month);
+			const byType = typeFilter === 'all' ? byDate : filterByType(byDate, typeFilter);
+			return searchRequests(byType, keyword);
+		})()
 	);
 
 	// 状态 tab：数量徽标只看状态分布，不受搜索词影响（FilterTabs 直接吃 count）
@@ -77,13 +101,19 @@
 		month = 'all';
 	}
 
+	// 「发起申请」跟随当前类型：列表按某类型筛选时，新建也走该类型的向导
+	const applyType = $derived(typeFilter === 'all' ? 'travel' : typeFilter);
+	const applyHref = $derived(
+		resolve('/apply/[type]/[step]', { type: applyType, step: firstStep(applyType) })
+	);
+
 	// 筛选条件拼接串：任一维度变化都令分页回到首页
 	const filterKey = $derived(`${activeFilter}|${keyword}|${year}|${month}`);
 </script>
 
-<PageHeader title="我的申请" description="{identity.user.name} 发起的全部差旅申请">
+<PageHeader title="我的申请" description="{identity.user.name} 发起的全部申请">
 	{#snippet actions()}
-		<a href={resolve('/travel/apply')} class="btn btn--primary">发起申请</a>
+		<a href={applyHref} class="btn btn--primary">发起申请</a>
 	{/snippet}
 </PageHeader>
 
@@ -92,6 +122,7 @@
 	bind:keyword
 	bind:year
 	bind:month
+	bind:type={typeFilter}
 	statusOptions={filterOptions}
 	{yearOptions}
 	{monthOptions}

@@ -11,12 +11,11 @@
 	import { deleteRequest, updateRequest } from '$lib/data/requests';
 	import { setActiveEditId, stepHref } from '$lib/domain/wizard';
 	import { loadDraftForEdit } from '$lib/state/wizardDraft';
-	import { resetRequestListFilters } from '$lib/state/requestListFilters';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import type { AuditAction, TravelRequest, User } from '$lib/domain/types';
+	import type { AuditAction, Request, User } from '$lib/domain/types';
 
 	interface Props {
-		request: TravelRequest;
+		request: Request;
 		/** 当前操作者；切角色即切人，自审规则由 workflow 统一拦截 */
 		actor: User;
 		/** 无可用操作时展示的提示，审批页可能想换成别的措辞 */
@@ -100,7 +99,7 @@
 			loadDraftForEdit(result.request);
 			// 目标地址由 stepHref() 内部 resolve() 生成，ESLint 无法跨模块追踪，故豁免
 			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			goto(stepHref('basic', result.request.id));
+			goto(stepHref(request.type, 'basic', result.request.id));
 			return;
 		}
 
@@ -108,7 +107,7 @@
 		loadDraftForEdit(request);
 		// 目标地址由 stepHref() 内部 resolve() 生成，ESLint 无法跨模块追踪，故豁免
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		goto(stepHref('basic', request.id));
+		goto(stepHref(request.type, 'basic', request.id));
 	}
 </script>
 

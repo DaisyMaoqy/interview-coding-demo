@@ -3,11 +3,11 @@
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
 	import Pagination from '$lib/components/form/Pagination.svelte';
 	import RequestCard from './RequestCard.svelte';
-	import type { TravelRequest } from '$lib/domain/types';
+	import type { Request } from '$lib/domain/types';
 
 	interface Props {
 		/** 已筛选过的待渲染列表（完整集合，分页切片在此处理） */
-		requests: readonly TravelRequest[];
+		requests: readonly Request[];
 		/** 搜索词，透传给卡片做命中高亮 */
 		keyword?: string;
 		/** 该用户名下一张单都没有 —— 决定空状态给「去发起」还是「清筛选」 */
@@ -42,7 +42,7 @@
 	<EmptyState title={emptyTitle}>
 		{#snippet action()}
 			{#if hasNoRequests}
-				<a href={resolve('/travel/apply')} class="btn btn--primary">发起第一张申请</a>
+				<a href={resolve('/apply/travel/basic')} class="btn btn--primary">发起第一张申请</a>
 			{:else if hasClearableFilter}
 				<!-- 仅状态栏导致为空时不给「清除筛选」：该按钮清不掉状态栏，点了没反应更让人困惑 -->
 				<button type="button" onclick={onclear} class="btn btn--ghost">清除筛选</button>
@@ -56,7 +56,7 @@
 		{resetKey}
 		children={requestListSnippet}
 	/>
-	{#snippet requestListSnippet({ pageItems }: { pageItems: TravelRequest[] })}
+	{#snippet requestListSnippet({ pageItems }: { pageItems: Request[] })}
 		<ul class="request-list">
 			{#each pageItems as request (request.id)}
 				<li><RequestCard {request} {keyword} /></li>
