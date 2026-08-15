@@ -111,7 +111,11 @@
 	{/each}
 </ol>
 
-<StepRenderer {type} step={stepDef} />
+<!-- 按 step slug 强制重挂载：每进入一个步骤都重置该步的「已交互 / 已提交」状态，
+	 避免上一步的 touched/attempted 残留污染当前步的实时校验展示。 -->
+{#key slug}
+	<StepRenderer {type} step={stepDef} />
+{/key}
 
 <style>
 	.step-nav {

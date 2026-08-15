@@ -8,9 +8,21 @@
 		scopePatch: (key: string, value: unknown) => void;
 		basePath?: string;
 		errors?: Record<string, string>;
+		touched?: Record<string, boolean>;
+		attempted?: boolean;
+		markTouched?: (path: string) => void;
 	}
 
-	let { field, scopeValue, scopePatch, basePath = '', errors = {} }: Props = $props();
+	let {
+		field,
+		scopeValue,
+		scopePatch,
+		basePath = '',
+		errors = {},
+		touched = {},
+		attempted = false,
+		markTouched = () => {}
+	}: Props = $props();
 
 	const rows = $derived(
 		Array.isArray(scopeValue[field.key]) ? (scopeValue[field.key] as Record<string, unknown>[]) : []
@@ -59,6 +71,9 @@
 						scopePatch={(k, v) => patchRow(index, k, v)}
 						basePath={`${childBase}${index}.`}
 						{errors}
+						{touched}
+						{attempted}
+						{markTouched}
 					/>
 				{/each}
 			</div>

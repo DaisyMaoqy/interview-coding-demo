@@ -36,18 +36,22 @@
 	let submitError = $state('');
 	let savingDraft = $state(false);
 
-	// 表单步校验当前步 schema；预览步校验整单 schema。仅在用户尝试前进后才展示错误，
-	// 避免初次进入就满屏红字。
-	const errors = $derived(
-		(() => {
-			if (!attempted) return {};
-			const result = validate(
-				step.kind === 'preview' ? buildTypeSchema(type) : buildStepSchema(type, step.slug),
-				$draft
-			);
-			return result.ok ? {} : result.errors;
-		})()
-	);
+	// 已交互字段的点号路径集合（与 errors 的 key 对齐）。
+	// 「实时校验」策略：错误始终在后台计算（allErrors），但只有被 touched 过、或已
+	// 点击过「下一步/提交」（attempted）的字段才把错误展示出来，避免初次进入满屏红字。
+	let touched = $state<Record<string, boolean>>({});
+
+	function markTouched(path: string): void {
+		touched = { ...touched, [path]: true };
+	}
+
+	const allErrors = $derived.by(() => {
+		const result = validate(
+			step.kind === 'preview' ? buildTypeSchema(type) : buildStepSchema(type, step.slug),
+			$draft
+		);
+		return result.ok ? {} : result.errors;
+	});
 
 	const previewFields = $derived(flattenFields(type));
 	const isPreview = $derived(step.kind === 'preview');
@@ -119,7 +123,10 @@
 		<DynamicForm
 			fields={step.fields}
 			value={$draft}
-			{errors}
+			errors={allErrors}
+			{touched}
+			{attempted}
+			{markTouched}
 			onPatch={(k, v) => draft.update((d) => ({ ...d, [k]: v }))}
 		/>
 	{/if}

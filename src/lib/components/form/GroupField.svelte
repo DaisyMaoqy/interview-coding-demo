@@ -8,9 +8,21 @@
 		scopePatch: (key: string, value: unknown) => void;
 		basePath?: string;
 		errors?: Record<string, string>;
+		touched?: Record<string, boolean>;
+		attempted?: boolean;
+		markTouched?: (path: string) => void;
 	}
 
-	let { field, scopeValue, scopePatch, basePath = '', errors = {} }: Props = $props();
+	let {
+		field,
+		scopeValue,
+		scopePatch,
+		basePath = '',
+		errors = {},
+		touched = {},
+		attempted = false,
+		markTouched = () => {}
+	}: Props = $props();
 
 	const groupValue = $derived((scopeValue[field.key] as Record<string, unknown>) ?? {});
 	const childBase = $derived(basePath ? `${basePath}${field.key}.` : `${field.key}.`);
@@ -30,6 +42,9 @@
 				scopePatch={patch}
 				basePath={childBase}
 				{errors}
+				{touched}
+				{attempted}
+				{markTouched}
 			/>
 		{/each}
 	</div>

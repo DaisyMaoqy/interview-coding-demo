@@ -9,19 +9,54 @@
 		value: Record<string, unknown>;
 		errors?: Record<string, string>;
 		onPatch: (key: string, value: unknown) => void;
+		touched?: Record<string, boolean>;
+		attempted?: boolean;
+		markTouched?: (path: string) => void;
 	}
 
-	let { fields, value, errors = {}, onPatch }: Props = $props();
+	let {
+		fields,
+		value,
+		errors = {},
+		onPatch,
+		touched = {},
+		attempted = false,
+		markTouched = () => {}
+	}: Props = $props();
 </script>
 
 <div class="dynamic-form">
 	{#each fields as field (field.key)}
 		{#if field.kind === 'group'}
-			<GroupField {field} scopeValue={value} scopePatch={onPatch} {errors} />
+			<GroupField
+				{field}
+				scopeValue={value}
+				scopePatch={onPatch}
+				{errors}
+				{touched}
+				{attempted}
+				{markTouched}
+			/>
 		{:else if field.kind === 'repeatable'}
-			<RepeatableField {field} scopeValue={value} scopePatch={onPatch} {errors} />
+			<RepeatableField
+				{field}
+				scopeValue={value}
+				scopePatch={onPatch}
+				{errors}
+				{touched}
+				{attempted}
+				{markTouched}
+			/>
 		{:else}
-			<DynamicField {field} scopeValue={value} scopePatch={onPatch} {errors} />
+			<DynamicField
+				{field}
+				scopeValue={value}
+				scopePatch={onPatch}
+				{errors}
+				{touched}
+				{attempted}
+				{markTouched}
+			/>
 		{/if}
 	{/each}
 </div>
