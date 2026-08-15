@@ -82,8 +82,10 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 		items: [
 			{
 				href: resolve('/reports'),
+				// 统计报表也按类型聚合，导航进入时带上当前类型
+				hrefFor: (type) => `${resolve('/reports')}?type=${type}`,
 				label: '统计报表',
-				description: '团队差旅成本与审批效率',
+				description: '团队申请统计与审批效率',
 				icon: 'chart',
 				// 统计报表是面向领导（主管）的管理视图，员工与财务无需也无法查看
 				visibleTo: ['manager']

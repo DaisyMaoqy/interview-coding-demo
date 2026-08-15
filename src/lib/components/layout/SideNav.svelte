@@ -44,12 +44,18 @@
 		return item.hrefFor ? item.hrefFor(currentType as ApplicationType) : item.href;
 	}
 
-	// 切换类型默认进入「我的申请」，并按该类型筛选数据（列表页读取 ?type=）
+	// 切换类型：在报表页时停留报表页并重算统计；其余页面默认进入「我的申请」按该类型筛选
 	function switchType(event: Event): void {
 		const type = (event.currentTarget as HTMLSelectElement).value;
+		const target =
+			page.url.pathname === resolve('/reports')
+				? type === 'all'
+					? resolve('/reports')
+					: `${resolve('/reports')}?type=${type}`
+				: `${resolve('/travel/requests')}?type=${type}`;
 		// 需附带 query 参数，resolve 写在模板字符串内，故逐行豁免该规则
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		goto(`${resolve('/travel/requests')}?type=${type}`);
+		goto(target);
 	}
 </script>
 
