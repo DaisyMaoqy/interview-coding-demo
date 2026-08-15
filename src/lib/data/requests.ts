@@ -1,9 +1,18 @@
 import seed from './seed.json' with { type: 'json' };
 import { PENDING_STATUSES } from '$lib/domain/types';
-import type { RequestStatus, TravelRequest, User, UserId } from '$lib/domain/types';
-import { budgetTotal } from '$lib/domain/money';
+import type {
+	ApplicationType,
+	Budget,
+	Request,
+	RequestStatus,
+	TravelFields,
+	User,
+	UserId
+} from '$lib/domain/types';
+import { APPLICATION_TYPES, LEAVE_TYPE_OPTIONS } from '$lib/domain/applicationTypes';
+import { budgetTotal, formatYuan } from '$lib/domain/money';
 import { transition } from '$lib/domain/workflow';
-import type { TravelFormInput } from '$lib/domain/schema';
+import type { TripLeg } from '$lib/domain/types';
 import { writable, get } from 'svelte/store';
 import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
 import { toLocalISO } from '$lib/format/date';
@@ -33,17 +42,19 @@ export type StatusFilter = 'all' | RequestStatus | 'pending';
  */
 const STORAGE_KEY = 'travel-requests';
 
-function readStorage(): TravelRequest[] | null {
+function readStorage(): Request[] | null {
 	if (typeof localStorage === 'undefined') return null;
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
-		return raw ? (JSON.parse(raw) as TravelRequest[]) : null;
+		const parsed = raw ? (JSON.parse(raw) as Request[]) : null;
+		// 丢弃缓存里缺 `type` 的旧形状数据，避免污染新模型
+		return parsed ? parsed.filter((r) => 'type' in r) : null;
 	} catch {
 		return null;
 	}
 }
 
-function writeStorage(list: TravelRequest[]): void {
+function writeStorage(list: Request[]): void {
 	if (typeof localStorage === 'undefined') return;
 	try {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
@@ -53,9 +64,9 @@ function writeStorage(list: TravelRequest[]): void {
 }
 
 /** 工作数据集：随加载结果变化，页面通过 store 订阅自动更新 */
-export const requestsStore = writable<TravelRequest[]>(readStorage() ?? (seed as TravelRequest[]));
+export const requestsStore = writable<Request[]>(readStorage() ?? (seed as unknown as Request[]));
 
-function byUpdatedDesc(a: TravelRequest, b: TravelRequest): number {
+function byUpdatedDesc(a: Request, b: Request): number {
 	return b.updatedAt.localeCompare(a.updatedAt);
 }
 
@@ -65,7 +76,7 @@ function byUpdatedDesc(a: TravelRequest, b: TravelRequest): number {
  * 草稿没有 `submittedAt`，用空串兜底沉到末尾，保证有实际提交记录的单据始终排在前面。
  * 列表（我的申请 / 待我审批）统一走此排序，让卡片以提交时间先后呈现。
  */
-export function sortBySubmittedAtDesc(requests: readonly TravelRequest[]): TravelRequest[] {
+export function sortBySubmittedAtDesc(requests: readonly Request[]): Request[] {
 	return [...requests].sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''));
 }
 
@@ -73,7 +84,7 @@ export function sortBySubmittedAtDesc(requests: readonly TravelRequest[]): Trave
 export async function loadRequests(): Promise<void> {
 	const base = PUBLIC_MOCK_BASE_URL;
 	if (!base) {
-		requestsStore.set(readStorage() ?? (seed as TravelRequest[]));
+		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
 		return;
 	}
 
@@ -82,28 +93,28 @@ export async function loadRequests(): Promise<void> {
 	try {
 		const res = await fetch(`${base}/api/travel/applications`, { signal: controller.signal });
 		if (!res.ok) throw new Error(`Mock 接口返回 ${res.status}`);
-		const data = (await res.json()) as TravelRequest[];
+		const data = (await res.json()) as Request[];
 		const sorted = [...data].sort(byUpdatedDesc);
 		writeStorage(sorted);
 		requestsStore.set(sorted);
 	} catch {
 		// 超时（AbortError）或网络错误：降级到缓存 / seed，保证页面永远有数据
-		requestsStore.set(readStorage() ?? (seed as TravelRequest[]));
+		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
 	} finally {
 		clearTimeout(timer);
 	}
 }
 
 /** 全部申请单（按更新时间倒序，与 Mock 响应约定一致） */
-export function getAllRequests(): readonly TravelRequest[] {
+export function getAllRequests(): readonly Request[] {
 	return get(requestsStore);
 }
 
 /** 按业务单号取单条；不存在返回 undefined（详情页据此走「未找到」分支） */
 export function getRequestById(
 	id: string,
-	requests: readonly TravelRequest[] = get(requestsStore)
-): TravelRequest | undefined {
+	requests: readonly Request[] = get(requestsStore)
+): Request | undefined {
 	return requests.find((r) => r.id === id);
 }
 
@@ -113,7 +124,7 @@ export function getRequestById(
  * 写操作只落本地（与 loadRequests 的缓存策略一致）：云端 Mock 是只读的，
  * 这里改了不会回写，刷新后若 Mock 优先加载会丢掉改动 —— 演示范围内可接受。
  */
-export function updateRequest(updated: TravelRequest): void {
+export function updateRequest(updated: Request): void {
 	requestsStore.update((list) => {
 		const next = list.map((r) => (r.id === updated.id ? updated : r));
 		writeStorage(next);
@@ -139,8 +150,8 @@ export function deleteRequest(id: string): void {
 /** 某用户发起的全部申请（我的申请 / 待我审批都从这里再按角色筛） */
 export function getRequestsByApplicant(
 	applicantId: UserId,
-	requests: readonly TravelRequest[] = get(requestsStore)
-): TravelRequest[] {
+	requests: readonly Request[] = get(requestsStore)
+): Request[] {
 	return requests.filter((r) => r.applicantId === applicantId);
 }
 
@@ -152,29 +163,35 @@ export function getRequestsByApplicant(
  * - 其余：精确匹配该状态
  */
 export function filterByStatus(
-	requests: readonly TravelRequest[],
+	requests: readonly Request[],
 	filter: StatusFilter | undefined
-): TravelRequest[] {
+): Request[] {
 	if (!filter || filter === 'all') return [...requests];
 	if (filter === 'pending')
 		return requests.filter((r) => PENDING_STATUSES.some((s) => r.status === s));
 	return requests.filter((r) => r.status === filter);
 }
 
+/** 按申请类型过滤（列表/统计按业务线切分） */
+export function filterByType(requests: readonly Request[], type: ApplicationType): Request[] {
+	return requests.filter((r) => r.type === type);
+}
+
 /**
  * 按事由与目的地（行程任意一段的 from/to）模糊搜索。
- * 大小写不敏感，空串视为不过滤。
+ * 大小写不敏感，空串视为不过滤。非差旅类型（无 legs）仅匹配事由。
  */
-export function searchRequests(
-	requests: readonly TravelRequest[],
-	keyword: string
-): TravelRequest[] {
+export function searchRequests(requests: readonly Request[], keyword: string): Request[] {
 	const kw = keyword.trim().toLowerCase();
 	if (kw === '') return [...requests];
 
 	return requests.filter((r) => {
-		const inReason = r.reason.toLowerCase().includes(kw);
-		const inLeg = r.legs.some(
+		const fields = r.fields as Partial<TravelFields>;
+		const inReason = String(fields.reason ?? '')
+			.toLowerCase()
+			.includes(kw);
+		const legs = (fields.legs ?? []) as TripLeg[];
+		const inLeg = legs.some(
 			(leg) => leg.from.toLowerCase().includes(kw) || leg.to.toLowerCase().includes(kw)
 		);
 		return inReason || inLeg;
@@ -188,10 +205,10 @@ export function searchRequests(
  * 用 UTC 解析，与 seed 生成（Date.UTC）保持一致，避免时区导致跨月错位。
  */
 export function filterByDate(
-	requests: readonly TravelRequest[],
+	requests: readonly Request[],
 	year: number | 'all',
 	month: number | 'all'
-): TravelRequest[] {
+): Request[] {
 	return requests.filter((r) => {
 		const d = new Date(r.createdAt);
 		if (year !== 'all' && d.getUTCFullYear() !== year) return false;
@@ -201,32 +218,95 @@ export function filterByDate(
 }
 
 /** 数据里出现过的年份（倒序），用于年份下拉框的可选项 */
-export function distinctYears(requests: readonly TravelRequest[]): number[] {
+export function distinctYears(requests: readonly Request[]): number[] {
 	const years = new Set<number>();
 	for (const r of requests) years.add(new Date(r.createdAt).getUTCFullYear());
 	return [...years].sort((a, b) => b - a);
 }
 
-/** 行程摘要，形如「北京 → 上海 → 广州」 */
-export function summarizeLegs(request: TravelRequest): string {
-	if (request.legs.length === 0) return '无行程';
-	const stops = request.legs.flatMap((leg) => [leg.from, leg.to]);
+/** 行程摘要，形如「北京 → 上海 → 广州」（差旅专用；空行程返回「无行程」） */
+export function summarizeLegs(request: Request): string {
+	const legs = (request.fields as Partial<TravelFields>).legs as TripLeg[] | undefined;
+	if (!legs || legs.length === 0) return '无行程';
+	const stops = legs.flatMap((leg) => [leg.from, leg.to]);
 	return [...new Set(stops)].join(' → ');
 }
 
 /** 预算合计（分） */
-export function requestTotal(request: TravelRequest): number {
-	return budgetTotal(request.budget);
+export function requestTotal(request: Request): number {
+	const budget = (request.fields as Partial<TravelFields>).budget as Budget | undefined;
+	return budget ? budgetTotal(budget) : 0;
 }
 
-/** 由现有单号（TR-####）推算下一个，保证新单号唯一且连续 */
-export function nextRequestId(requests: readonly TravelRequest[] = get(requestsStore)): string {
+/**
+ * 卡片副标题：随申请类型给出一行摘要。
+ * 差旅=行程城市链；请假=请假类型 + 日期区间。取代原本写死差旅的 summarizeLegs，
+ * 让列表 / 审批卡片对新增类型也能给出有意义的描述。
+ */
+export function requestSummary(request: Request): string {
+	if (request.type === 'leave') {
+		const f = request.fields as Record<string, unknown>;
+		const start = f.leaveStart as string | undefined;
+		const end = f.leaveEnd as string | undefined;
+		const type = f.leaveType as string | undefined;
+		const typeLabel = type ? (LEAVE_TYPE_OPTIONS.find((o) => o.value === type)?.label ?? type) : '';
+		const range = [start, end].filter(Boolean).join(' ~ ');
+		return [typeLabel, range].filter(Boolean).join(' · ') || '请假申请';
+	}
+	return summarizeLegs(request);
+}
+
+/**
+ * 卡片底部指标：差旅=预算合计（元），请假=请假天数。
+ * 返回 { label, value } 由卡片直接渲染，避免卡片内部再按类型分支。
+ */
+export function requestMetric(request: Request): { label: string; value: string } {
+	if (request.type === 'leave') {
+		const f = request.fields as Record<string, unknown>;
+		const start = f.leaveStart as string | undefined;
+		const end = f.leaveEnd as string | undefined;
+		const days =
+			start && end
+				? Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1)
+				: 0;
+		return { label: '请假天数', value: `${days} 天` };
+	}
+	return { label: '预算合计', value: `¥${formatYuan(requestTotal(request))}` };
+}
+
+/** 由现有单号（如 TR-#### / LV-####）推算下一个，保证新单号唯一且连续 */
+export function nextRequestId(
+	type: ApplicationType,
+	requests: readonly Request[] = get(requestsStore)
+): string {
+	const prefix = APPLICATION_TYPES[type].idPrefix;
 	let max = 0;
 	for (const r of requests) {
-		const n = Number(r.id.replace(/^TR-/, ''));
+		if (!r.id.startsWith(`${prefix}-`)) continue;
+		const n = Number(r.id.slice(prefix.length + 1));
 		if (Number.isFinite(n) && n > max) max = n;
 	}
-	return `TR-${String(max + 1).padStart(4, '0')}`;
+	return `${prefix}-${String(max + 1).padStart(4, '0')}`;
+}
+
+function buildBase(
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	applicant: User
+): Request {
+	const now = toLocalISO();
+	return {
+		id: nextRequestId(type),
+		type,
+		applicantId: applicant.id,
+		applicantName: applicant.name,
+		department: applicant.department,
+		status: 'draft',
+		createdAt: now,
+		updatedAt: now,
+		audit: [],
+		fields
+	};
 }
 
 /**
@@ -235,24 +315,12 @@ export function nextRequestId(requests: readonly TravelRequest[] = get(requestsS
  * 内部走 workflow 的 submit 流转，自动追加首条 audit（记录提交人与提交时间），
  * 与「草稿再提交」共用同一套状态机，避免规则漂移。
  */
-export function createRequest(input: TravelFormInput, applicant: User): TravelRequest {
-	const now = toLocalISO();
-	const base: TravelRequest = {
-		id: nextRequestId(),
-		applicantId: applicant.id,
-		applicantName: applicant.name,
-		department: applicant.department,
-		reason: input.reason,
-		urgency: input.urgency,
-		legs: input.legs,
-		budget: input.budget,
-		budgetNote: input.budgetNote,
-		status: 'draft',
-		createdAt: now,
-		updatedAt: now,
-		audit: []
-	};
-
+export function createRequest(
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	applicant: User
+): Request {
+	const base = buildBase(type, fields, applicant);
 	const result = transition({ request: base, action: 'submit', actor: applicant });
 	if (!result.ok) throw new Error(result.message);
 	return result.request;
@@ -264,27 +332,16 @@ export function createRequest(input: TravelFormInput, applicant: User): TravelRe
  * 草稿不要求字段齐全，直接落当前填写内容；无审计、无提交时间，状态停 `draft`。
  * 用户可从「我的申请」的草稿卡片继续编辑。
  */
-export function createDraft(input: TravelFormInput, applicant: User): TravelRequest {
-	const now = toLocalISO();
-	return {
-		id: nextRequestId(),
-		applicantId: applicant.id,
-		applicantName: applicant.name,
-		department: applicant.department,
-		reason: input.reason,
-		urgency: input.urgency,
-		legs: input.legs,
-		budget: input.budget,
-		budgetNote: input.budgetNote,
-		status: 'draft',
-		createdAt: now,
-		updatedAt: now,
-		audit: []
-	};
+export function createDraft(
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	applicant: User
+): Request {
+	return buildBase(type, fields, applicant);
 }
 
 /** 把新单插入工作数据集（置顶）并同步 localStorage 缓存 */
-export function addRequest(request: TravelRequest): void {
+export function addRequest(request: Request): void {
 	requestsStore.update((list) => {
 		const next = [request, ...list];
 		writeStorage(next);
@@ -295,25 +352,23 @@ export function addRequest(request: TravelRequest): void {
 /**
  * 重新编辑后提交：在原有申请上套用新表单数据并走 submit 流转（draft → pending_manager）。
  *
- * 与 {@link createRequest} 的区别是**不生成新的 TR 编号** —— 保留原单号、申请人、
+ * 与 {@link createRequest} 的区别是**不生成新的编号** —— 保留原单号、申请人、
  * 创建时间、审计轨迹，只更新用户填写部分并追加一条新的提交审计。被驳回 → 草稿 →
  * 再提交的闭环由此闭合。
  */
 export function updateRequestFromDraft(
 	id: string,
-	input: TravelFormInput,
+	type: ApplicationType,
+	fields: Record<string, unknown>,
 	actor: User
-): TravelRequest {
+): Request {
 	const existing = getRequestById(id);
 	if (!existing) throw new Error('申请不存在');
 	const now = new Date().toISOString();
-	const updated: TravelRequest = {
+	const updated: Request = {
 		...existing,
-		reason: input.reason,
-		urgency: input.urgency,
-		legs: input.legs,
-		budget: input.budget,
-		budgetNote: input.budgetNote,
+		type,
+		fields,
 		updatedAt: now
 	};
 	const result = transition({ request: updated, action: 'submit', actor });

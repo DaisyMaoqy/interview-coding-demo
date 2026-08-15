@@ -5,7 +5,7 @@ import { setActiveEditId, getActiveEditId, stepHref } from '$lib/domain/wizard';
 import { goto } from '$app/navigation';
 import { updateRequest, deleteRequest } from '$lib/data/requests';
 import RequestActions from '../../../../routes/travel/requests/[id]/components/RequestActions.svelte';
-import type { TravelRequest, User } from '$lib/domain/types';
+import type { Request, TravelRequest, User } from '$lib/domain/types';
 
 // 模块级 mock：把「会改外部状态 / 会跳转」的依赖替换成可观测的替身，
 // 从而断言编排层（runAction / onReedit / onDeleteConfirm）的副作用顺序与早退分支。
@@ -23,13 +23,7 @@ const { transition } = workflow;
 
 // 组件测试只关心编排层，transition 用最小成功的替身即可（提交→pending_manager，
 // 重新编辑→draft）；失败用例在各自测试里临时改 mockReturnValue。
-function defaultTransition({
-	request,
-	action
-}: {
-	request: TravelRequest;
-	action: string;
-}): unknown {
+function defaultTransition({ request, action }: { request: Request; action: string }): unknown {
 	if (action === 'submit')
 		return {
 			ok: true,
@@ -55,28 +49,30 @@ function makeUser(overrides: Partial<User> = {}): User {
 function makeRequest(overrides: Partial<TravelRequest> = {}): TravelRequest {
 	return {
 		id: 'TR-0001',
+		type: 'travel',
 		applicantId: 'u-self',
 		applicantName: '本人',
 		department: '测试部',
-		reason: '出差',
-		urgency: 'normal',
-		legs: [],
-		budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
-		budgetNote: '',
 		status: 'draft',
 		createdAt: '2026-03-10T02:00:00.000Z',
 		updatedAt: '2026-03-10T02:00:00.000Z',
 		audit: [],
+		fields: {
+			reason: '出差',
+			urgency: 'normal',
+			legs: [],
+			budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
+			budgetNote: ''
+		},
 		...overrides
 	};
 }
 
 const applicant = makeUser();
-const manager = makeUser({ id: 'u-mgr', role: 'manager', name: '主管' });
 
 beforeEach(() => {
 	// 默认成功流转；失败用例在内部临时改写
-	vi.mocked(transition).mockImplementation(defaultTransition as typeof transition);
+	vi.mocked(transition).mockImplementation(defaultTransition as unknown as typeof transition);
 	vi.mocked(goto).mockClear();
 	vi.mocked(updateRequest).mockClear();
 	vi.mocked(deleteRequest).mockClear();
@@ -130,7 +126,7 @@ describe('RequestActions — 重新编辑', () => {
 		expect(updateRequest).toHaveBeenCalledWith(expect.objectContaining({ status: 'draft' }));
 		// setActiveEditId 必须先于 stepHref 执行，否则 URL 丢掉 ?edit=ID、编辑态退化为新建
 		expect(getActiveEditId()).toBe('TR-0009');
-		expect(goto).toHaveBeenCalledWith(stepHref('basic', 'TR-0009'));
+		expect(goto).toHaveBeenCalledWith(stepHref('travel', 'basic', 'TR-0009'));
 	});
 
 	it('草稿单：跳过状态机、不落库，但仍带 ?edit=ID 跳转', async () => {
@@ -145,7 +141,7 @@ describe('RequestActions — 重新编辑', () => {
 
 		expect(updateRequest).not.toHaveBeenCalled();
 		expect(getActiveEditId()).toBe('TR-0009');
-		expect(goto).toHaveBeenCalledWith(stepHref('basic', 'TR-0009'));
+		expect(goto).toHaveBeenCalledWith(stepHref('travel', 'basic', 'TR-0009'));
 	});
 });
 

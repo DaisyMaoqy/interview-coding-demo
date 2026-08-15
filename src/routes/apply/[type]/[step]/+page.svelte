@@ -3,15 +3,19 @@
 	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
-	import { draft, loadDraftForEdit } from '$lib/state/wizardDraft';
-	import { evaluateSteps, stepHref, getActiveEditId, setActiveEditId } from '$lib/domain/wizard';
+	import StepRenderer from '$lib/components/form/StepRenderer.svelte';
+	import { draft, ensureDraftType, loadDraftForEdit } from '$lib/state/wizardDraft';
+	import {
+		evaluateSteps,
+		stepHref,
+		getActiveEditId,
+		setActiveEditId,
+		stepBySlug
+	} from '$lib/domain/wizard';
 	import { getRequestById } from '$lib/data/requests';
 	import { resetRequestListFilters } from '$lib/state/requestListFilters';
+	import { APPLICATION_TYPES } from '$lib/domain/applicationTypes';
 	import type { PageData } from './$types';
-	import BasicStep from './components/BasicStep.svelte';
-	import TripsStep from './components/TripsStep.svelte';
-	import BudgetStep from './components/BudgetStep.svelte';
-	import PreviewStep from './components/PreviewStep.svelte';
 
 	interface Props {
 		data: PageData;
@@ -19,21 +23,23 @@
 
 	let { data }: Props = $props();
 
-	const current = $derived(data.step);
+	const type = $derived(data.type);
+	const slug = $derived(data.step);
+	const stepDef = $derived(stepBySlug(type, slug));
+
 	// 步骤条的可达性由草稿实际填写情况决定：已完成 + 第一个未完成可点，其余置灰，
 	// 防止用户跳到预算页却看到空行程。
-	const steps = $derived(evaluateSteps($draft));
+	const steps = $derived(evaluateSteps(type, $draft));
+
+	const isEditing = $derived(page.url.searchParams.has('edit'));
+
+	// 新建入口进入某类型向导：确保草稿桶对应此类型，跨类型不串台。
+	$effect(() => {
+		if (!isEditing) ensureDraftType(type);
+	});
 
 	// 重新编辑进入向导时 URL 带 ?edit=ID；外壳据此同步编辑态与回填草稿，
 	// 这样直接打开编辑链接或刷新也能恢复。普通新建不带该参数，则清掉编辑态。
-	const isEditing = $derived(page.url.searchParams.has('edit'));
-
-	// 从编辑页返回「我的申请」：重新编辑会改变单据状态（rejected → draft，再提交 →
-	// pending_manager），若仍沿用进入编辑前的筛选 tab，刚编辑的单子会从列表里"消失"。
-	// 因此返回即重置筛选为全部，保证看得到这张单子。
-	function backToRequests(): void {
-		resetRequestListFilters();
-	}
 	$effect(() => {
 		const id = page.url.searchParams.get('edit');
 		if (id) {
@@ -56,29 +62,33 @@
 		const el = document.getElementById(focus);
 		if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	});
+
+	function backToRequests(): void {
+		resetRequestListFilters();
+	}
 </script>
 
-<!--
-	本页所有 href 均来自 stepHref()/stepHrefWithFocus()，其内部已调用 resolve()。
-	ESLint 无法跨模块追踪函数返回值，故整页豁免该规则。
--->
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 {#if isEditing}
-	<a class="edit-back" href={resolve('/travel/requests')} onclick={backToRequests}>← 返回我的申请</a
+	<a class="edit-back" href={`${resolve('/travel/requests')}?type=${type}`} onclick={backToRequests}
+		>← 返回我的申请</a
 	>
 {/if}
 
-<PageHeader title={isEditing ? '编辑申请' : '发起申请'} description={current.description} />
+<PageHeader
+	title={isEditing ? '编辑申请' : `发起${APPLICATION_TYPES[type].label}`}
+	description={stepDef.description}
+/>
 
 <ol class="step-nav">
 	{#each steps as item, i (item.step.slug)}
-		{@const active = item.step.slug === current.slug}
+		{@const active = item.step.slug === slug}
 		<li class="step-nav__item">
 			{#if item.reachable}
 				<a
 					class="step-nav__link"
 					class:step-nav__link--active={active}
-					href={stepHref(item.step.slug, page.url.searchParams.get('edit'))}
+					href={stepHref(type, item.step.slug, page.url.searchParams.get('edit'))}
 					aria-current={active ? 'step' : undefined}
 				>
 					<span
@@ -101,18 +111,9 @@
 	{/each}
 </ol>
 
-{#if current.slug === 'basic'}
-	<BasicStep />
-{:else if current.slug === 'trips'}
-	<TripsStep />
-{:else if current.slug === 'budget'}
-	<BudgetStep />
-{:else if current.slug === 'preview'}
-	<PreviewStep />
-{/if}
+<StepRenderer {type} step={stepDef} />
 
 <style>
-	/* 向导步骤栏（仅本页使用，按「页面级样式语义化」就近放在 scoped 样式里） */
 	.step-nav {
 		display: flex;
 		flex-wrap: wrap;
@@ -180,7 +181,6 @@
 	.step-nav__sep {
 		color: var(--color-slate-300);
 	}
-	/* 编辑态返回入口：页面左上角，与导航高亮的「我的申请」呼应 */
 	.edit-back {
 		display: inline-flex;
 		align-items: center;

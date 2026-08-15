@@ -1,22 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { sortBySubmittedAtDesc } from '$lib/data/requests';
-import type { TravelRequest } from '$lib/domain/types';
+import type { Request } from '$lib/domain/types';
 
-function makeRequest(id: string, submittedAt: string | undefined): TravelRequest {
+function makeRequest(id: string, submittedAt: string | undefined): Request {
 	return {
 		id,
+		type: 'travel',
 		applicantId: 'u1',
 		applicantName: '张三',
 		department: '研发部',
-		reason: '事由',
-		urgency: 'normal',
-		legs: [],
-		budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
 		status: 'pending_manager',
 		createdAt: '2026-01-01T00:00:00.000Z',
 		updatedAt: '2026-01-01T00:00:00.000Z',
 		submittedAt,
-		audit: []
+		audit: [],
+		fields: {
+			reason: '事由',
+			urgency: 'normal',
+			legs: [],
+			budget: { transport: 0, hotel: 0, allowance: 0, other: 0 }
+		}
 	};
 }
 

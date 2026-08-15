@@ -63,6 +63,14 @@ export type Urgency = (typeof URGENCY_VALUES)[number];
 export const TRANSPORT_VALUES = ['train', 'flight', 'car', 'other'] as const;
 export type Transport = (typeof TRANSPORT_VALUES)[number];
 
+/** 申请类型；字面量元组是唯一真相，类型与 UI 文案（APPLICATION_TYPE_LABELS）由此推导 */
+export const APPLICATION_TYPE_VALUES = ['travel', 'leave'] as const;
+export type ApplicationType = (typeof APPLICATION_TYPE_VALUES)[number];
+export const APPLICATION_TYPE_LABELS: Record<ApplicationType, string> = {
+	travel: '差旅申请',
+	leave: '请假申请'
+};
+
 /** 行程单段；形状与 schema.ts 的 `LegInput` 一致（见文件头 import） */
 export type TripLeg = LegInput;
 
@@ -86,19 +94,22 @@ export interface AuditEntry {
 	comment?: string;
 }
 
-export interface TravelRequest {
-	/** 业务单号，形如 TR-0012 */
+/**
+ * 通用申请单。
+ *
+ * 与早期「差旅专属」模型相比，关键变化是新增 `type` 判别字段，
+ * 并把原先平铺的差旅字段（reason/legs/budget…）收敛进 `fields` 业务字段包。
+ * 不同申请类型的字段各异，故 `fields` 用 `Record<string, unknown>` 承载，
+ * 具体结构由 `applicationTypes.ts` 的 `FieldDef` 配置与 Zod 推导共同约束。
+ */
+export interface Request {
+	/** 业务单号，形如 TR-0012 / LV-0007，前缀见 ApplicationTypeDef.idPrefix */
 	id: string;
+	/** 申请类型判别字段 */
+	type: ApplicationType;
 	applicantId: UserId;
 	applicantName: string;
 	department: string;
-	/** 出差事由 */
-	reason: string;
-	urgency: Urgency;
-	legs: TripLeg[];
-	budget: Budget;
-	/** 预算超过阈值时的说明，见 schema.ts 的 BUDGET_NOTE_THRESHOLD_CENTS */
-	budgetNote?: string;
 	status: RequestStatus;
 	/** ISO */
 	createdAt: string;
@@ -108,4 +119,20 @@ export interface TravelRequest {
 	submittedAt?: string;
 	/** 按时间正序 */
 	audit: AuditEntry[];
+	/** 业务字段包：键为 FieldDef.key，值随申请类型不同而变化 */
+	fields: Record<string, unknown>;
 }
+
+/** 差旅申请的业务字段（与 schema.ts 的 `TravelFormInput` 对应，经 `request.fields` 访问） */
+export interface TravelFields {
+	/** 出差事由 */
+	reason: string;
+	urgency: Urgency;
+	legs: TripLeg[];
+	budget: Budget;
+	/** 预算超过阈值时的说明，见 schema.ts 的 BUDGET_NOTE_THRESHOLD_CENTS */
+	budgetNote?: string;
+}
+
+/** 差旅申请：通用单的特化，便于既有差旅组件以强类型读取 `request.fields` */
+export type TravelRequest = Request & { fields: TravelFields };

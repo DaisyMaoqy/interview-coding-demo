@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import seed from '../../data/seed.json' with { type: 'json' };
 import { FINANCE_ID, MANAGER_ID, findUser } from '../../domain/org';
-import { travelFormSchema } from '../../domain/schema';
-import type { RequestStatus, TravelRequest } from '../../domain/types';
+import { buildTypeSchema } from '../../domain/schemaConfig';
+import type { Budget, Request, RequestStatus } from '../../domain/types';
 
 /**
  * seed.json 是 `npm run seed` 的产物，同时也是 Apifox Mock 响应的副本。
@@ -12,7 +12,7 @@ import type { RequestStatus, TravelRequest } from '../../domain/types';
  * 脚本改坏或有人手改 JSON，会在这里被拦下，而不是等页面出现空图表才发现。
  */
 
-const requests = seed as TravelRequest[];
+const requests = seed as unknown as Request[];
 
 // 两级审批实际会产生的全部状态。
 const ACTIVE_STATUSES: RequestStatus[] = [
@@ -24,8 +24,11 @@ const ACTIVE_STATUSES: RequestStatus[] = [
 	'cancelled'
 ];
 
-function budgetSum(request: TravelRequest): number {
-	const { transport, hotel, allowance, other } = request.budget;
+function budgetSum(request: Request): number {
+	// 仅差旅单有预算字段；请假等其它类型无预算，计为 0
+	const budget = (request.fields as Record<string, unknown>).budget as Budget | undefined;
+	if (!budget) return 0;
+	const { transport, hotel, allowance, other } = budget;
 	return transport + hotel + allowance + other;
 }
 
@@ -51,10 +54,11 @@ describe('seed 数据结构', () => {
 		expect(mismatched).toEqual([]);
 	});
 
-	it('每张单都能通过整单 schema 校验', () => {
-		// 领域层的全部校验规则在此一次性作用于真实数据
+	it('每张单都能通过各自类型的整单 schema 校验', () => {
+		// 领域层的全部校验规则在此一次性作用于真实数据；
+		// 不同申请类型用各自的 schema（差旅 / 请假字段形状不同）
 		const invalid = requests
-			.map((r) => ({ id: r.id, result: travelFormSchema.safeParse(r) }))
+			.map((r) => ({ id: r.id, result: buildTypeSchema(r.type).safeParse(r.fields) }))
 			.filter(({ result }) => !result.success)
 			.map(({ id, result }) => ({ id, issues: result.error?.issues }));
 

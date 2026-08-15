@@ -10,8 +10,7 @@ import {
 	createDraft,
 	deleteRequest
 } from '$lib/data/requests';
-import type { TravelRequest, User } from '$lib/domain/types';
-import type { TravelFormInput } from '$lib/domain/schema';
+import type { Request, User } from '$lib/domain/types';
 
 describe('getRequestById', () => {
 	it('按单号返回匹配的申请', () => {
@@ -27,9 +26,9 @@ describe('getRequestById', () => {
 
 describe('updateRequest', () => {
 	it('替换同 id 的记录并写回 localStorage 缓存', () => {
-		const original = getRequestById('TR-0040') as TravelRequest;
+		const original = getRequestById('TR-0040') as Request;
 		// 用一份改了状态的新对象模拟一次流转结果
-		const updated: TravelRequest = { ...original, status: 'approved' };
+		const updated: Request = { ...original, status: 'approved' };
 
 		updateRequest(updated);
 
@@ -38,7 +37,7 @@ describe('updateRequest', () => {
 		// 从 store 直接读也应一致
 		expect(get(requestsStore).find((r) => r.id === 'TR-0040')?.status).toBe('approved');
 		// localStorage 缓存被刷新：重开一个“会话”读到的是改后的值
-		const cached = JSON.parse(localStorage.getItem('travel-requests') ?? '[]') as TravelRequest[];
+		const cached = JSON.parse(localStorage.getItem('travel-requests') ?? '[]') as Request[];
 		expect(cached.find((r) => r.id === 'TR-0040')?.status).toBe('approved');
 
 		// 还原，避免影响其它用例 / 演示数据
@@ -49,20 +48,22 @@ describe('updateRequest', () => {
 
 describe('deleteRequest', () => {
 	it('从工作数据集移除该 id 并同步 localStorage 缓存', () => {
-		const victim: TravelRequest = {
+		const victim: Request = {
 			id: 'TR-DELETE-TEST',
+			type: 'travel',
 			applicantId: 'u-test',
 			applicantName: '测试员',
 			department: '测试部',
-			reason: '待测删除的草稿',
-			urgency: 'normal',
-			legs: [],
-			budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
-			budgetNote: '',
 			status: 'draft',
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
-			audit: []
+			audit: [],
+			fields: {
+				reason: '待测删除的草稿',
+				urgency: 'normal',
+				legs: [],
+				budget: { transport: 0, hotel: 0, allowance: 0, other: 0 }
+			}
 		};
 		addRequest(victim);
 		expect(getRequestById('TR-DELETE-TEST')?.id).toBe('TR-DELETE-TEST');
@@ -71,7 +72,7 @@ describe('deleteRequest', () => {
 
 		// 内存与缓存双重消失，且不污染其它数据
 		expect(getRequestById('TR-DELETE-TEST')).toBeUndefined();
-		const cached = JSON.parse(localStorage.getItem('travel-requests') ?? '[]') as TravelRequest[];
+		const cached = JSON.parse(localStorage.getItem('travel-requests') ?? '[]') as Request[];
 		expect(cached.find((r) => r.id === 'TR-DELETE-TEST')).toBeUndefined();
 	});
 });
@@ -87,7 +88,7 @@ describe('createRequest', () => {
 			role: 'employee',
 			managerId: null
 		};
-		const input: TravelFormInput = {
+		const input: Record<string, unknown> = {
 			reason: '去北京参加技术大会并拜访重点客户',
 			urgency: 'normal',
 			legs: [
@@ -104,7 +105,7 @@ describe('createRequest', () => {
 			budgetNote: ''
 		};
 
-		const created = createRequest(input, applicant);
+		const created = createRequest('travel', input, applicant);
 
 		expect(created.status).toBe('pending_manager');
 		expect(created.applicantId).toBe('u-test');
@@ -126,7 +127,7 @@ describe('createRequest', () => {
 			role: 'employee',
 			managerId: null
 		};
-		const input: TravelFormInput = {
+		const input: Record<string, unknown> = {
 			reason: '只是先存个草稿',
 			urgency: 'normal',
 			legs: [],
@@ -134,7 +135,7 @@ describe('createRequest', () => {
 			budgetNote: ''
 		};
 
-		const draftReq = createDraft(input, applicant);
+		const draftReq = createDraft('travel', input, applicant);
 
 		expect(draftReq.status).toBe('draft');
 		expect(draftReq.audit).toHaveLength(0);

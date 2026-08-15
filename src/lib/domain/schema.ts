@@ -30,7 +30,8 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
  * 除了格式，还要确认它是真实存在的日期 —— `2026-02-30` 符合正则但不存在，
  * `new Date()` 会静默滚到 3 月 2 日。
  */
-const dateString = z
+/** YYYY-MM-DD 日期字符串校验，供配置驱动的字段构建器复用 */
+export const dateStringSchema = z
 	.string()
 	.trim()
 	.regex(DATE_PATTERN, '请选择日期')
@@ -38,6 +39,8 @@ const dateString = z
 		const date = new Date(`${value}T00:00:00Z`);
 		return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 	}, '日期不存在');
+
+const dateString = dateStringSchema;
 
 /** 金额（分）：非负整数，且不超过千万元，避免误输一长串数字 */
 const centsAmount = z

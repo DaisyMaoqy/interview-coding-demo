@@ -1,53 +1,55 @@
 import { resolve } from '$app/paths';
 import type { z } from 'zod';
-import { basicSchema, budgetSchema, tripsSchema } from './schema';
+import type { ApplicationType } from './types';
+import { APPLICATION_TYPES, type StepDef } from './applicationTypes';
+import { buildStepSchema } from './schemaConfig';
 
 /**
- * 新建向导的步骤定义。
+ * 新建向导的步骤定义，改为由 `applicationTypes.ts` 注册表驱动。
  *
- * 步骤顺序、URL slug、标题、对应 schema 全部集中在 WIZARD_STEPS 一处 ——
- * 增删步骤或调整顺序只改这个数组，步骤条、路由校验、上/下一步导航自动跟随。
+ * 步骤顺序、URL slug、标题全部从 `APPLICATION_TYPES[type].steps` 派生 ——
+ * 增删步骤或调整顺序只改注册表，步骤条、路由校验、上/下一步导航自动跟随。
+ * 不再有硬编码的 `WIZARD_STEPS` 数组。
  */
 
-export const WIZARD_STEPS = [
-	{ slug: 'basic', title: '基本信息', description: '出差事由与紧急程度', schema: basicSchema },
-	{ slug: 'trips', title: '行程明细', description: '出发地、目的地与日期', schema: tripsSchema },
-	{ slug: 'budget', title: '费用预算', description: '分项预算与说明', schema: budgetSchema },
-	// 预览步没有独立 schema，提交时统一跑 travelFormSchema
-	{ slug: 'preview', title: '预览确认', description: '核对信息后提交', schema: null }
-] as const;
-
-export type WizardStep = (typeof WIZARD_STEPS)[number];
-export type WizardSlug = WizardStep['slug'];
-
-export const FIRST_STEP: WizardSlug = WIZARD_STEPS[0].slug;
-export const LAST_STEP: WizardSlug = WIZARD_STEPS[WIZARD_STEPS.length - 1].slug;
-
-const SLUGS: readonly string[] = WIZARD_STEPS.map((step) => step.slug);
-
-/** 路由参数守卫：把任意字符串收窄成合法 slug */
-export function isWizardSlug(value: string): value is WizardSlug {
-	return SLUGS.includes(value);
+/** 某类型的全部步骤定义 */
+export function getSteps(type: ApplicationType): StepDef[] {
+	return APPLICATION_TYPES[type].steps;
 }
 
-export function stepIndex(slug: WizardSlug): number {
-	return WIZARD_STEPS.findIndex((step) => step.slug === slug);
+export function firstStep(type: ApplicationType): string {
+	return getSteps(type)[0].slug;
 }
 
-export function stepBySlug(slug: WizardSlug): WizardStep {
-	return WIZARD_STEPS[stepIndex(slug)];
+export function lastStep(type: ApplicationType): string {
+	const steps = getSteps(type);
+	return steps[steps.length - 1].slug;
+}
+
+/** 路由参数守卫：把任意字符串收窄成某类型下的合法 slug */
+export function isStepSlug(type: ApplicationType, value: string): value is string {
+	return getSteps(type).some((step) => step.slug === value);
+}
+
+export function stepIndex(type: ApplicationType, slug: string): number {
+	return getSteps(type).findIndex((step) => step.slug === slug);
+}
+
+export function stepBySlug(type: ApplicationType, slug: string): StepDef {
+	return getSteps(type)[stepIndex(type, slug)];
 }
 
 /** 上一步的 slug，首步返回 null */
-export function prevStep(slug: WizardSlug): WizardSlug | null {
-	const index = stepIndex(slug);
-	return index > 0 ? WIZARD_STEPS[index - 1].slug : null;
+export function prevStep(type: ApplicationType, slug: string): string | null {
+	const index = stepIndex(type, slug);
+	return index > 0 ? getSteps(type)[index - 1].slug : null;
 }
 
 /** 下一步的 slug，末步返回 null */
-export function nextStep(slug: WizardSlug): WizardSlug | null {
-	const index = stepIndex(slug);
-	return index < WIZARD_STEPS.length - 1 ? WIZARD_STEPS[index + 1].slug : null;
+export function nextStep(type: ApplicationType, slug: string): string | null {
+	const steps = getSteps(type);
+	const index = stepIndex(type, slug);
+	return index < steps.length - 1 ? steps[index + 1].slug : null;
 }
 
 /**
@@ -55,7 +57,7 @@ export function nextStep(slug: WizardSlug): WizardSlug | null {
  * （上一步/下一步、预览里的「修改」）都带上 `?edit=ID`，保持编辑上下文不丢。
  *
  * 用模块级变量而非响应式 store，是因为步骤跳转是命令式调用；刷新时由向导外壳
- * 读取 URL 上的 `?edit` 重新同步（见 `apply/[step]/+page.svelte`）。
+ * 读取 URL 上的 `?edit` 重新同步（见 `apply/[type]/[step]/+page.svelte`）。
  */
 let activeEditId: string | null = null;
 
@@ -67,8 +69,12 @@ export function getActiveEditId(): string | null {
 	return activeEditId;
 }
 
-export function stepHref(slug: WizardSlug, editId: string | null = activeEditId): string {
-	const base = resolve('/travel/apply/[step]', { step: slug });
+export function stepHref(
+	type: ApplicationType,
+	slug: string,
+	editId: string | null = activeEditId
+): string {
+	const base = resolve('/apply/[type]/[step]', { type, step: slug });
 	return editId ? `${base}?edit=${editId}` : base;
 }
 
@@ -76,15 +82,16 @@ export function stepHref(slug: WizardSlug, editId: string | null = activeEditId)
  * 预览页「修改」按钮的目标地址。
  *
  * `focus` 用于让目标页聚焦并滚动到具体字段，例如
- * `stepHrefWithFocus('trips', 'leg-1')` → `/apply/trips?focus=leg-1`。
+ * `stepHrefWithFocus('travel', 'trips', 'leg-1')` → `/apply/travel/trips?focus=leg-1`。
  * 编辑态下自动带上 `?edit=ID`，避免改完一步跳回「新建」上下文。
  */
 export function stepHrefWithFocus(
-	slug: WizardSlug,
+	type: ApplicationType,
+	slug: string,
 	focus: string,
 	editId: string | null = activeEditId
 ): string {
-	const base = stepHref(slug, editId);
+	const base = stepHref(type, slug, editId);
 	return `${base}${base.includes('?') ? '&' : '?'}focus=${encodeURIComponent(focus)}`;
 }
 
@@ -95,28 +102,39 @@ export function stepHrefWithFocus(
  * 不允许直接跳到更后面的步骤 —— 否则用户会在预算页看到空行程，
  * 而跨字段规则（如日期重叠）根本无从校验。
  *
+ * @param type 当前申请类型
  * @param draft 当前草稿，可能只填了一部分
  */
-export function evaluateSteps(draft: unknown): Array<{
-	step: WizardStep;
-	completed: boolean;
-	reachable: boolean;
-}> {
-	const completions = WIZARD_STEPS.map((step) =>
-		step.schema ? isStepComplete(step.schema, draft) : false
-	);
+export function evaluateSteps(
+	type: ApplicationType,
+	draft: unknown
+): Array<{ step: StepDef; completed: boolean; reachable: boolean }> {
+	const steps = getSteps(type);
+
+	// 预览步没有独立 schema：当所有 form 步都完成时视为完成
+	const completions = steps.map((step) => {
+		if (step.kind === 'preview') {
+			return steps
+				.filter((s) => s.kind === 'form')
+				.every((s) => isStepComplete(type, s.slug, draft));
+		}
+		return isStepComplete(type, step.slug, draft);
+	});
 
 	// 第一个未完成步骤的下标；全部完成时为 length
 	const firstIncomplete = completions.findIndex((done) => !done);
-	const frontier = firstIncomplete === -1 ? WIZARD_STEPS.length : firstIncomplete;
+	const frontier = firstIncomplete === -1 ? steps.length : firstIncomplete;
 
-	return WIZARD_STEPS.map((step, index) => ({
+	return steps.map((step, index) => ({
 		step,
-		completed: completions[index],
+		// 预览步没有独立 schema，完成与否由提交动作决定，永远不算「已完成」，
+		// 但它是否可达仍取决于前面所有 form 步是否填完（见上面的 frontier 计算）。
+		completed: step.kind === 'preview' ? false : (completions[index] as boolean),
 		reachable: index <= frontier
 	}));
 }
 
-function isStepComplete(schema: z.ZodType, draft: unknown): boolean {
-	return schema.safeParse(draft).success;
+function isStepComplete(type: ApplicationType, slug: string, draft: unknown): boolean {
+	const schema = buildStepSchema(type, slug);
+	return (schema as z.ZodType).safeParse(draft).success;
 }

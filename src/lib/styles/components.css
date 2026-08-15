@@ -58,15 +58,6 @@
 	.side-nav {
 		@apply flex h-full flex-col gap-6 px-3 py-4;
 	}
-	.side-nav__brand {
-		@apply flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
-	}
-	.side-nav__brand-mark {
-		@apply grid size-8 place-items-center rounded-lg bg-brand-600 text-sm font-semibold text-white;
-	}
-	.side-nav__brand-name {
-		@apply text-[15px] font-semibold tracking-tight text-slate-800;
-	}
 	.side-nav__section {
 		@apply flex flex-col gap-1;
 	}

@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
-import { FIRST_STEP, stepHref } from '$lib/domain/wizard';
+import { resolve } from '$app/paths';
+import { firstStep } from '$lib/domain/wizard';
 
-/** 「发起申请」进来先到向导首步，首步是哪一步由 WIZARD_STEPS 决定 */
+/** 兼容旧链接：原「发起申请」入口重定向到统一向导的差旅首步 */
 export function load() {
-	redirect(307, stepHref(FIRST_STEP));
+	redirect(307, resolve('/apply/[type]/[step]', { type: 'travel', step: firstStep('travel') }));
 }

@@ -1,47 +1,53 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getAllRequests, getRequestById, loadRequests, requestsStore } from '$lib/data/requests';
-import type { TravelRequest } from '$lib/domain/types';
+import type { Request } from '$lib/domain/types';
 import seed from '$lib/data/seed.json' with { type: 'json' };
 
 // loadRequests 是全仓唯一的异步/网络逻辑，此前零测试。这里 mock 掉 `fetch` 与
 // `PUBLIC_MOCK_BASE_URL`，把三条降级路径（成功 / !res.ok / 网络错误 / 无 base）逐一覆盖。
 vi.mock('$env/static/public', () => ({ PUBLIC_MOCK_BASE_URL: 'https://mock.test' }));
 
-const SEED = seed as TravelRequest[];
+const SEED = seed as unknown as Request[];
 
-function remoteData(): TravelRequest[] {
+function remoteData(): Request[] {
 	return [
 		{
 			id: 'TR-REMOTE-A',
+			type: 'travel',
 			applicantId: 'u-1',
 			applicantName: '甲',
 			department: '部门',
-			reason: '远端A',
-			urgency: 'normal',
-			legs: [],
-			budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
-			budgetNote: '',
 			status: 'draft',
 			createdAt: '2026-01-01T00:00:00.000Z',
 			// 较早
 			updatedAt: '2026-01-01T00:00:00.000Z',
-			audit: []
+			audit: [],
+			fields: {
+				reason: '远端A',
+				urgency: 'normal',
+				legs: [],
+				budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
+				budgetNote: ''
+			}
 		},
 		{
 			id: 'TR-REMOTE-B',
+			type: 'travel',
 			applicantId: 'u-1',
 			applicantName: '甲',
 			department: '部门',
-			reason: '远端B',
-			urgency: 'normal',
-			legs: [],
-			budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
-			budgetNote: '',
 			status: 'draft',
 			createdAt: '2026-06-01T00:00:00.000Z',
 			// 较晚
 			updatedAt: '2026-06-01T00:00:00.000Z',
-			audit: []
+			audit: [],
+			fields: {
+				reason: '远端B',
+				urgency: 'normal',
+				legs: [],
+				budget: { transport: 0, hotel: 0, allowance: 0, other: 0 },
+				budgetNote: ''
+			}
 		}
 	];
 }
