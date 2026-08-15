@@ -70,8 +70,16 @@ npm run dev
 发起向导独立为 `/apply/[type]/[step]`。三者**平铺为顶级路由**，职责彼此独立，
 便于按角色逐项做权限控制，也让每个页面只对自己负责。
 
-这样划分的收益是可扩展：未来接入第二条业务线（如报销），
-与 `/travel` 平级新增即可，既有路径无需改动。
+这样划分的收益是可扩展：发起向导是**类型无关的通用骨架**，
+新增一种申请只需在 `src/lib/domain/applicationTypes.ts` 的注册表里声明
+步骤与字段，**无需改动路由、向导外壳与渲染组件**；既有差旅路径也无需改动。
+当前 `travel`（差旅）与 `leave`（请假）均已注册，`seed.json` 演示数据目前仅含差旅单。
+
+注册表同时驱动 **UI 渲染与 Zod 校验**：一份 `FieldDef` 既生成动态表单，
+也通过 `schemaConfig.ts` 推导出逐步与整单的校验 schema，两者天然不漂移。
+通用的 `Request` 模型用 `type` 判别字段，业务字段统一放在 `fields: Record<string, unknown>`
+里（差旅特化类型 `TravelRequest = Request & { fields: TravelFields }` 仅用于既有差旅组件的强类型读取），
+状态机、仓储、统计等下游全部基于这个统一模型工作。
 
 路径统一由 SvelteKit 的 `resolve()` 生成，它接受 route ID 并做类型检查，
 路由拼错或缺少参数在编译期就会报错 —— 比自行维护一份路径常量更可靠。

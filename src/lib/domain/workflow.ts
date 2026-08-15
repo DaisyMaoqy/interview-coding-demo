@@ -1,9 +1,9 @@
 import type {
 	AuditAction,
 	AuditEntry,
+	Request,
 	RequestStatus,
 	Transport,
-	TravelRequest,
 	Urgency,
 	User
 } from './types';
@@ -135,10 +135,9 @@ export type TransitionFailureCode =
 	| 'comment_too_long';
 
 export type TransitionResult =
-	| { ok: true; request: TravelRequest }
-	| { ok: false; code: TransitionFailureCode; message: string };
+	{ ok: true; request: Request } | { ok: false; code: TransitionFailureCode; message: string };
 
-function canActAs(rule: ActorRule, actor: User, request: TravelRequest): boolean {
+function canActAs(rule: ActorRule, actor: User, request: Request): boolean {
 	switch (rule) {
 		case 'applicant':
 			return actor.id === request.applicantId;
@@ -152,7 +151,7 @@ function canActAs(rule: ActorRule, actor: User, request: TravelRequest): boolean
 }
 
 /** 当前用户在当前状态下可执行的动作，用于决定按钮显示哪些 */
-export function availableActions(request: TravelRequest, actor: User): AuditAction[] {
+export function availableActions(request: Request, actor: User): AuditAction[] {
 	return (Object.keys(TRANSITIONS) as AuditAction[]).filter((action) =>
 		TRANSITIONS[action].some(
 			(rule) => rule.from === request.status && canActAs(rule.actor, actor, request)
@@ -173,7 +172,7 @@ export function availableActions(request: TravelRequest, actor: User): AuditActi
  * 注意查看权限与操作权限（availableActions）是两回事：能看不代表能审批，
  * 审批仍受「不能自审」等流转表规则约束。
  */
-export function canViewRequest(request: TravelRequest, viewer: User): boolean {
+export function canViewRequest(request: Request, viewer: User): boolean {
 	if (request.applicantId === viewer.id) return true;
 	const applicant = findUser(request.applicantId);
 	if (viewer.role === 'manager') {
@@ -186,17 +185,17 @@ export function canViewRequest(request: TravelRequest, viewer: User): boolean {
 }
 
 /** 是否可编辑内容：只有草稿可改 */
-export function isEditable(request: TravelRequest, actor: User): boolean {
+export function isEditable(request: Request, actor: User): boolean {
 	return request.status === 'draft' && actor.id === request.applicantId;
 }
 
 /** 是否可删除：只有本人的草稿可删 */
-export function isDeletable(request: TravelRequest, actor: User): boolean {
+export function isDeletable(request: Request, actor: User): boolean {
 	return isEditable(request, actor);
 }
 
 export interface TransitionInput {
-	request: TravelRequest;
+	request: Request;
 	action: AuditAction;
 	actor: User;
 	comment?: string;

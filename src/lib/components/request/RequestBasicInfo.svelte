@@ -13,11 +13,11 @@
 
 <section>
 	{#snippet reasonValue()}
-		{request.reason}
+		{request.fields.reason}
 	{/snippet}
 
 	{#snippet urgencyValue()}
-		{#if request.urgency === 'urgent'}
+		{#if request.fields.urgency === 'urgent'}
 			<span class="urgent-tag">{URGENCY_LABELS.urgent}</span>
 		{:else}
 			{URGENCY_LABELS.normal}

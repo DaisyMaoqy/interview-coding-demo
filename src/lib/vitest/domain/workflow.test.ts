@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EMPLOYEE_ID, FINANCE_ID, MANAGER_ID, requireUser, USERS } from '../../domain/org';
-import type { AuditAction, RequestStatus, TravelRequest } from '../../domain/types';
+import type { AuditAction, RequestStatus, TravelFields, TravelRequest } from '../../domain/types';
 import {
 	actionRequiresComment,
 	availableActions,
@@ -19,30 +19,37 @@ const wangfang = USERS.find((u) => u.name === '王芳')!;
 
 const NOW = new Date('2026-03-10T02:00:00.000Z');
 
-function makeRequest(overrides: Partial<TravelRequest> = {}): TravelRequest {
+function makeRequest(
+	overrides: Partial<Omit<TravelRequest, 'fields'>> & { fields?: Partial<TravelFields> } = {}
+): TravelRequest {
+	const { fields: fieldOverrides, ...rest } = overrides;
 	return {
 		id: 'TR-0001',
+		type: 'travel',
 		applicantId: zhangsan.id,
 		applicantName: zhangsan.name,
 		department: zhangsan.department,
-		reason: '赴上海参加客户现场技术支持',
-		urgency: 'normal',
-		legs: [
-			{
-				id: 'leg-1',
-				from: '北京',
-				to: '上海',
-				departDate: '2026-03-15',
-				returnDate: '2026-03-17',
-				transport: 'train'
-			}
-		],
-		budget: { transport: 120000, hotel: 240000, allowance: 60000, other: 8000 },
 		status: 'draft',
 		createdAt: '2026-03-01T02:00:00.000Z',
 		updatedAt: '2026-03-01T02:00:00.000Z',
 		audit: [],
-		...overrides
+		fields: {
+			reason: '赴上海参加客户现场技术支持',
+			urgency: 'normal',
+			legs: [
+				{
+					id: 'leg-1',
+					from: '北京',
+					to: '上海',
+					departDate: '2026-03-15',
+					returnDate: '2026-03-17',
+					transport: 'train'
+				}
+			],
+			budget: { transport: 120000, hotel: 240000, allowance: 60000, other: 8000 },
+			...fieldOverrides
+		},
+		...rest
 	};
 }
 
