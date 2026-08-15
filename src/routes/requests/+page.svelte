@@ -77,9 +77,16 @@
 		})()
 	);
 
-	// 状态 tab：数量徽标只看状态分布，不受搜索词影响（FilterTabs 直接吃 count）
+	// 状态 tab：数量徽标只看「状态分布」，但需跟随其余正交筛选维度
+	// （类型 / 年 / 月）——否则按类型或年月收窄列表时，徽标数字仍按全量算，
+	// 会出现「全部: N」却只列出部分单子的对不上的情况；
+	// 不受搜索词影响（清空关键字即可看到这些单子），与列表其它维度的行为保持一致。
 	const filterOptions = $derived(
-		FILTERS.map((f) => ({ ...f, count: filterByStatus(mine, f.value).length }))
+		FILTERS.map((f) => {
+			const byType = typeFilter === 'all' ? mine : filterByType(mine, typeFilter);
+			const byDate = filterByDate(byType, year, month);
+			return { ...f, count: filterByStatus(byDate, f.value).length };
+		})
 	);
 	const yearOptions = $derived<ReadonlyArray<{ value: number | 'all'; label: string }>>([
 		{ value: 'all', label: '全部' },
