@@ -42,7 +42,7 @@ export interface NavSection {
 	items: readonly NavItem[];
 }
 
-const REQUESTS = resolve('/travel/requests');
+const REQUESTS = resolve('/requests');
 
 export const NAV_SECTIONS: readonly NavSection[] = [
 	{
@@ -59,7 +59,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 				icon: 'inbox'
 			},
 			{
-				href: resolve('/travel/approvals'),
+				href: resolve('/approvals'),
 				label: '待我审批',
 				description: '等待我处理的申请',
 				icon: 'check',
@@ -108,30 +108,30 @@ const APPLY_BASIC = resolve('/apply/[type]/[step]', { type: 'travel', step: firs
 /**
  * 判断导航项是否处于选中态。
  *
- * 用前缀匹配而非全等，详情页 `/travel/requests/TR-0001`
+ * 用前缀匹配而非全等，详情页 `/requests/TR-0001`
  * `search` 参数中的 `?from=approvals`用于标记「申请详情从哪个入口点击进入」
- * 此时URL虽在 `/travel/requests` 下
+ * 此时URL虽在 `/requests` 下
  * 但语义归属「待我审批」——点亮该项、熄掉「我的申请」，两侧互斥，避免同时高亮两个入口。
  */
 export function isActive(itemHref: string, pathname: string, search = ''): boolean {
 	// 编辑态：向导内带 ?edit=ID，语义归属「我的申请」——
 	// 点亮该项、熄掉「发起申请」，与详情页 ?from=approvals 的处理思路一致。
 	if (search.includes('edit=')) {
-		if (itemHref === resolve('/travel/requests')) return true;
+		if (itemHref === resolve('/requests')) return true;
 		// 兼容旧路由 /travel/apply 与新路由 /apply/[type]/[step]
 		if (itemHref === resolve('/travel/apply') || itemHref === APPLY_BASIC) return false;
 	}
 
 	if (search.includes('from=approvals')) {
-		const underRequests = pathname.startsWith(`${resolve('/travel/requests')}/`);
-		if (itemHref === resolve('/travel/approvals')) return underRequests;
-		if (itemHref === resolve('/travel/requests')) return !underRequests;
+		const underRequests = pathname.startsWith(`${resolve('/requests')}/`);
+		if (itemHref === resolve('/approvals')) return underRequests;
+		if (itemHref === resolve('/requests')) return !underRequests;
 	}
 
 	if (search.includes('from=reports')) {
-		const underRequests = pathname.startsWith(`${resolve('/travel/requests')}/`);
+		const underRequests = pathname.startsWith(`${resolve('/requests')}/`);
 		if (itemHref === resolve('/reports')) return underRequests;
-		if (itemHref === resolve('/travel/requests')) return !underRequests;
+		if (itemHref === resolve('/requests')) return !underRequests;
 	}
 
 	// 新建/编辑向导（/apply/<type>/<step> 任意类型）点亮「发起申请」

@@ -73,7 +73,7 @@
 			resetRequestListFilters('draft');
 			// 返回列表时带上类型，列表按该类型筛选
 			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			await goto(`${resolve('/travel/requests')}?type=${type}`);
+			await goto(`${resolve('/requests')}?type=${type}`);
 		} catch {
 			savingDraft = false;
 		}
@@ -109,7 +109,7 @@
 			resetRequestListFilters();
 			// 返回列表时带上类型，列表按该类型筛选
 			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			await goto(`${resolve('/travel/requests')}?type=${type}`);
+			await goto(`${resolve('/requests')}?type=${type}`);
 		} catch {
 			submitting = false;
 		}

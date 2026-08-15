@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import RejectDialog from '../../../components/RejectDialog.svelte';
+	import RejectDialog from '$lib/components/RejectDialog.svelte';
 	import {
 		ACTION_LABELS,
 		actionRequiresComment,

@@ -3,7 +3,7 @@
 	import EmptyState from '$lib/components/common/EmptyState.svelte';
 	import Pagination from '$lib/components/form/Pagination.svelte';
 	import ApprovalCard from './components/ApprovalCard.svelte';
-	import RejectDialog from '../components/RejectDialog.svelte';
+	import RejectDialog from '$lib/components/RejectDialog.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { requestsStore, updateRequest, sortBySubmittedAtDesc } from '$lib/data/requests';
 	import { canViewRequest, transition } from '$lib/domain/workflow';

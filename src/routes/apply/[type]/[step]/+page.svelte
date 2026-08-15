@@ -70,7 +70,7 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -->
 {#if isEditing}
-	<a class="edit-back" href={`${resolve('/travel/requests')}?type=${type}`} onclick={backToRequests}
+	<a class="edit-back" href={`${resolve('/requests')}?type=${type}`} onclick={backToRequests}
 		>← 返回我的申请</a
 	>
 {/if}

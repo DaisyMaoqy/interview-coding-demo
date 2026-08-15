@@ -52,7 +52,7 @@
 				? type === 'all'
 					? resolve('/reports')
 					: `${resolve('/reports')}?type=${type}`
-				: `${resolve('/travel/requests')}?type=${type}`;
+				: `${resolve('/requests')}?type=${type}`;
 		// 需附带 query 参数，resolve 写在模板字符串内，故逐行豁免该规则
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		goto(target);

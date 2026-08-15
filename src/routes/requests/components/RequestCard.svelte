@@ -19,7 +19,7 @@
 	const metric = $derived(requestMetric(request));
 </script>
 
-<a class="request-card" href={resolve(`/travel/requests/${request.id}?from=requests`)}>
+<a class="request-card" href={resolve(`/requests/${request.id}?from=requests`)}>
 	<div class="request-card__top">
 		<div class="request-card__main">
 			<p class="request-card__reason">

@@ -52,10 +52,7 @@
 	</div>
 
 	<div class="approval-card__body">
-		<a
-			class="approval-card__reason"
-			href={resolve(`/travel/requests/${request.id}?from=approvals`)}
-		>
+		<a class="approval-card__reason" href={resolve(`/requests/${request.id}?from=approvals`)}>
 			<span class="approval-card__type">{APPLICATION_TYPE_LABELS[request.type]}</span>
 			{String(request.fields.reason ?? '')}
 		</a>

@@ -34,18 +34,18 @@ describe('visibleSections', () => {
 });
 
 describe('isActive', () => {
-	const requests = resolve('/travel/requests');
+	const requests = resolve('/requests');
 
 	it('路径完全相同时选中', () => {
 		expect(isActive(requests, requests)).toBe(true);
 	});
 
 	it('详情页让所属列表项保持选中', () => {
-		expect(isActive(requests, resolve('/travel/requests/[id]', { id: 'TR-0001' }))).toBe(true);
+		expect(isActive(requests, resolve('/requests/[id]', { id: 'TR-0001' }))).toBe(true);
 	});
 
 	it('不会误匹配前缀相同的兄弟路径', () => {
-		// 若用裸 startsWith，'/travel/requests-archive' 会错误地点亮「我的申请」
+		// 若用裸 startsWith，'/requests-archive' 会错误地点亮「我的申请」
 		expect(isActive(requests, `${requests}-archive`)).toBe(false);
 	});
 
@@ -54,8 +54,8 @@ describe('isActive', () => {
 	});
 
 	describe('申请详情的入口归属', () => {
-		const detail = resolve('/travel/requests/[id]', { id: 'TR-0001' });
-		const approvals = resolve('/travel/approvals');
+		const detail = resolve('/requests/[id]', { id: 'TR-0001' });
+		const approvals = resolve('/approvals');
 		const reports = resolve('/reports');
 
 		it('不带 from 时详情归属「我的申请」', () => {

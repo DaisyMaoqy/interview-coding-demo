@@ -10,4 +10,4 @@ import { resolve } from '$app/paths';
  * SvelteKit 的 `resolve` 接受 route ID 并做类型检查，路由拼错或缺少参数
  * 都会在编译期报错。自己维护一份字符串常量反倒会丢掉这层保护。
  */
-export const HOME = resolve('/travel/requests');
+export const HOME = resolve('/requests');

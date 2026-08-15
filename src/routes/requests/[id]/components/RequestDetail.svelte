@@ -33,7 +33,7 @@
 	// 直接输入 URL（无 from）时按身份兜底：审批人回待我审批，员工回我的申请
 	const isApprover = $derived(actor.role === 'manager' || actor.role === 'finance');
 	// 「我的申请」返回带上类型，回到对应类型的列表筛选态
-	const myRequestsHref = $derived(`${resolve('/travel/requests')}?type=${request.type}`);
+	const myRequestsHref = $derived(`${resolve('/requests')}?type=${request.type}`);
 	// 由统计报表进入时，回链带上 URL 上的 ?type=，回到对应类型的报表视图
 	const reportsTypeQuery = $derived(page.url.searchParams.get('type') ?? '');
 	const reportsBackHref = $derived(
@@ -41,13 +41,13 @@
 	);
 	const backHref = $derived(
 		from === 'approvals'
-			? resolve('/travel/approvals')
+			? resolve('/approvals')
 			: from === 'requests'
 				? myRequestsHref
 				: from === 'reports'
 					? reportsBackHref
 					: isApprover
-						? resolve('/travel/approvals')
+						? resolve('/approvals')
 						: myRequestsHref
 	);
 	const backLabel = $derived(

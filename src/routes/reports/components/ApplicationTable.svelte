@@ -57,10 +57,7 @@
 							<td><StatusBadge status={req.status} /></td>
 							<td class="app-table__amount">{metric.value}</td>
 							<td>
-								<a
-									href={resolve(`/travel/requests/${req.id}?from=reports${typeQuery}`)}
-									class="view-link"
-								>
+								<a href={resolve(`/requests/${req.id}?from=reports${typeQuery}`)} class="view-link">
 									查看
 								</a>
 							</td>

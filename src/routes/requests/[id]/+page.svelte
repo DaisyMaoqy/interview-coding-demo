@@ -31,7 +31,7 @@
 		<!-- 返回地址含 ?type= 查询参数，resolve 无法内联生成，故豁免该规则 -->
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
-			href={`${resolve('/travel/requests')}?type=${request.type}`}
+			href={`${resolve('/requests')}?type=${request.type}`}
 			class="notice-card__action btn btn--primary"
 		>
 			返回我的申请

@@ -4,7 +4,7 @@ import * as workflow from '$lib/domain/workflow';
 import { setActiveEditId, getActiveEditId, stepHref } from '$lib/domain/wizard';
 import { goto } from '$app/navigation';
 import { updateRequest, deleteRequest } from '$lib/data/requests';
-import RequestActions from '../../../../routes/travel/requests/[id]/components/RequestActions.svelte';
+import RequestActions from '../../../../routes/requests/[id]/components/RequestActions.svelte';
 import type { Request, TravelRequest, User } from '$lib/domain/types';
 
 // 模块级 mock：把「会改外部状态 / 会跳转」的依赖替换成可观测的替身，

@@ -12,14 +12,14 @@
 
 	let { children } = $props();
 
-	// 申请详情（/travel/requests/[id]）为只读视角，隐藏角色切换开关，避免误切身份
-	const showSwitch = $derived(!page.url.pathname.startsWith('/travel/requests/'));
+	// 申请详情（/requests/[id]）为只读视角，隐藏角色切换开关，避免误切身份
+	const showSwitch = $derived(!page.url.pathname.startsWith('/requests/'));
 
 	// 统计报表页面仅主管可见，员工与财务均不可切换
 	const disabledRoles = $derived.by<Role[]>(() => {
 		const path = page.url.pathname;
 		if (path === '/reports') return ['employee', 'finance'];
-		if (path === '/travel/approvals') return ['employee'];
+		if (path === '/approvals') return ['employee'];
 		return [];
 	});
 
