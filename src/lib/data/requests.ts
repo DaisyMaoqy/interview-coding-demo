@@ -32,10 +32,14 @@ export type StatusFilter = 'all' | RequestStatus | 'pending';
  * 数据获取策略（单一变化点，页面层不关心数据从哪来）：
  *
  * 1. 工作数据集 `requestsStore` 初始为「localStorage 缓存 → seed.json 兜底」。
- * 2. 应用启动（浏览器端 `loadRequests()`）尝试从 Apifox 云端 Mock 拉取
- *    `GET {PUBLIC_MOCK_BASE_URL}/api/travel/applications`，**3 秒超时**。
+ * 2. 应用启动（浏览器端 `loadRequests()`）尝试从云端 Mock 拉取
+ *    `GET {PUBLIC_MOCK_BASE_URL}/api/requests`，**3 秒超时**。
  * 3. 成功：写入 localStorage 缓存，替换工作数据集。
  * 4. 超时 / 失败：回退到 localStorage 缓存，再不行用 seed.json。
+ *
+ * 接口契约为「类型可选」：`/api/requests` 不带 `type` 返回全部；带 `?type=leave`
+ * 仅返回该类型。这是为了后续接入真后端时按类型分接口，前端统一 store + 客户端
+ * `filterByType` 筛选的现状保持不变 —— 真后端只需支持「无 type = 全部」即可。
  *
  * 写操作（新建 / 流转）目前只落到 `requestsStore` + localStorage，不回写 Mock。
  * 注意返回的是引用共享的数组，调用方若需要不可变语义请自行浅拷贝。
@@ -80,23 +84,43 @@ export function sortBySubmittedAtDesc(requests: readonly Request[]): Request[] {
 	return [...requests].sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''));
 }
 
-/** 启动加载：Apifox Mock → localStorage 缓存 → seed.json 兜底 */
-export async function loadRequests(): Promise<void> {
+/**
+ * 启动加载 / 按类型刷新：`/api/requests`（不带 type 取全部；带 `?type=` 取单类型）。
+ *
+ * 统一 store 策略下，带 type 的调用会把远端返回**并入**现有数据集（按 id 去重），
+ * 保留其它类型，避免「待我审批 / 报表全量」等跨类型视图被一次单类型请求清空；
+ * 不带 type 的启动调用则整体替换（与缓存策略一致）。
+ */
+export async function loadRequests(type?: ApplicationType): Promise<void> {
 	const base = PUBLIC_MOCK_BASE_URL;
 	if (!base) {
 		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
 		return;
 	}
 
+	const endpoint = `${base.replace(/\/$/, '')}/api/requests`;
+	const url = new URL(endpoint);
+	if (type) url.searchParams.set('type', type);
+
 	const controller = new AbortController();
 	const timer = setTimeout(() => controller.abort(), 3000);
 	try {
-		const res = await fetch(`${base}/api/travel/applications`, { signal: controller.signal });
-		if (!res.ok) throw new Error(`Mock 接口返回 ${res.status}`);
+		const res = await fetch(url, { signal: controller.signal });
+		if (!res.ok) throw new Error(`接口返回 ${res.status}`);
 		const data = (await res.json()) as Request[];
 		const sorted = [...data].sort(byUpdatedDesc);
-		writeStorage(sorted);
-		requestsStore.set(sorted);
+
+		if (type) {
+			// 按类型拉取：并入统一 store（按 id 去重），保留其它类型数据。
+			requestsStore.update((list) => {
+				const byId = new Map(list.map((r) => [r.id, r]));
+				for (const r of sorted) byId.set(r.id, r);
+				return [...byId.values()].sort(byUpdatedDesc);
+			});
+		} else {
+			requestsStore.set(sorted);
+		}
+		writeStorage(get(requestsStore));
 	} catch {
 		// 超时（AbortError）或网络错误：降级到缓存 / seed，保证页面永远有数据
 		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));

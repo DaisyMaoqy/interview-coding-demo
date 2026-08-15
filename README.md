@@ -124,7 +124,7 @@ npm run dev
 
 ### 数据来源与离线兜底
 
-申请数据读取自 Apifox 云端 Mock（`GET /api/travel/applications`），
+申请数据读取自 Apifox 云端 Mock（`GET /api/requests`，可按 `?type=` 过滤单类型），
 请求失败或超时会自动降级到本地 `src/lib/data/seed.json`，
 因此**离线、未配置环境变量的情况下应用依然可以完整运行**。
 所有写操作落在 localStorage。

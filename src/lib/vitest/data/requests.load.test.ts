@@ -97,4 +97,55 @@ describe('loadRequests', () => {
 		expect(getAllRequests().length).toBe(SEED.length);
 		expect(getRequestById('TR-REMOTE-A')).toBeUndefined();
 	});
+
+	it('带 type 时请求带 ?type= 查询参数，并把结果并入统一 store（保留其它类型）', async () => {
+		// 先放一条存量（模拟 store 里已有其它类型数据）
+		requestsStore.set([
+			{
+				id: 'LV-EXISTING',
+				type: 'leave',
+				applicantId: 'u-1',
+				applicantName: '甲',
+				department: '部门',
+				status: 'approved',
+				createdAt: '2026-02-01T00:00:00.000Z',
+				updatedAt: '2026-02-01T00:00:00.000Z',
+				audit: [],
+				fields: {
+					leaveType: 'annual',
+					leaveStart: '2026-02-02',
+					leaveEnd: '2026-02-03',
+					reason: '存量'
+				}
+			} as unknown as Request
+		]);
+
+		const data = remoteData(); // 两条 travel
+		vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => data } as Response);
+
+		await loadRequests('travel');
+
+		// URL 带 ?type=travel
+		const calledUrl = vi.mocked(fetch).mock.calls[0][0] as URL;
+		expect(calledUrl.searchParams.get('type')).toBe('travel');
+
+		const list = getAllRequests();
+		// 并入而非替换：存量 leave 仍在，travel 也已写入
+		expect(list.find((r) => r.id === 'LV-EXISTING')).toBeDefined();
+		expect(list.find((r) => r.id === 'TR-REMOTE-A')).toBeDefined();
+	});
+
+	it('不带 type 时整体替换 store（启动加载语义）', async () => {
+		requestsStore.set([{ id: 'STALE' } as unknown as Request]);
+
+		const data = remoteData();
+		vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => data } as Response);
+
+		await loadRequests();
+
+		const calledUrl = vi.mocked(fetch).mock.calls[0][0] as URL;
+		expect(calledUrl.search).toBe('');
+		expect(getAllRequests().find((r) => r.id === 'STALE')).toBeUndefined();
+		expect(getAllRequests()).toHaveLength(2);
+	});
 });

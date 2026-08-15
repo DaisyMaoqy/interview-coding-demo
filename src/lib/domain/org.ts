@@ -4,7 +4,7 @@ import type { Role, User, UserId } from './types';
  * 组织架构。
  *
  * 这是演示用的固定编制，不随业务流转变化，因此作为本地常量而非远程数据 ——
- * 远程只提供会变的申请单列表（GET /api/travel/applications）。
+ * 远程只提供会变的申请单列表（GET /api/requests，可按 ?type= 过滤单类型）。
  *
  * 主键用 UUID 且写死而非运行时 `randomUUID()` 生成：seed.json 里的
  * `applicantId` 引用了这些值，每次启动都换一批 ID 会让存量数据全部失联。
