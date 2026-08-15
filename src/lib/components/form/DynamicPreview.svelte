@@ -17,6 +17,14 @@
 	}
 
 	function display(field: FieldDef, val: unknown): string {
+		// dateRange 的值写在 fromKey/toKey 上，field.key 本身永远是 undefined，
+		// 不能走下面的「val 为空即返回占位符」判断，否则会提前 return '—' 而不展示日期。
+		if (field.kind === 'dateRange') {
+			const from = value[field.fromKey];
+			const to = value[field.toKey];
+			if (!from && !to) return '—';
+			return `${from ?? '—'} 至 ${to ?? '—'}`;
+		}
 		if (val === undefined || val === null || val === '') return '—';
 		switch (field.kind) {
 			case 'number':
@@ -24,11 +32,6 @@
 			case 'select':
 			case 'radio':
 				return optionLabel(field, val);
-			case 'dateRange': {
-				const from = value[field.fromKey];
-				const to = value[field.toKey];
-				return `${from ?? '—'} 至 ${to ?? '—'}`;
-			}
 			default:
 				return String(val);
 		}
