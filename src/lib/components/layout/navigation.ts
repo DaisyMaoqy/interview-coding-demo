@@ -18,9 +18,9 @@ export interface NavItem {
 	/** 基础路径，用于 `isActive` 的精确匹配（不带 query，保证跨类型一致） */
 	href: string;
 	/**
-	 * 实际跳转链接：默认用 `href`，需要携带 `?type=` 或指向当前类型向导时提供。
-	 * 只有「我的申请」「发起申请」「统计报表」这类与申请类型绑定的入口才需要，
-	 * 其余（如待我审批）保持基础路径即可。
+	 * 实际跳转链接：默认用 `href`；只有「发起申请」这类本身类型化的入口才需要，
+	 * 指向当前持久化类型的向导首步。其余（我的申请 / 待我审批 / 统计报表）保持基础
+	 * 路径——不再附带 `?type=`，以免点导航时把全局申请类型切走。
 	 */
 	hrefFor?: (type: ApplicationType) => string;
 	label: string;
@@ -52,8 +52,6 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 		items: [
 			{
 				href: REQUESTS,
-				// 进入「我的申请」默认按当前类型筛选（列表页读取 ?type=）
-				hrefFor: (type) => `${REQUESTS}?type=${type}`,
 				label: '我的申请',
 				description: '我发起的全部申请',
 				icon: 'inbox'
@@ -69,7 +67,8 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 			},
 			{
 				href: resolve('/apply/[type]/[step]', { type: 'travel', step: firstStep('travel') }),
-				// 「发起申请」跳当前类型的向导首步（travel/leave 首步 slug 不同）
+				// 「发起申请」指向当前持久化类型的向导首步（travel/leave 首步 slug 不同）；
+				// 它专属带类型，因为向导本身是类型化的；其余导航项不带 ?type=，避免点导航切类型
 				hrefFor: (type) => resolve('/apply/[type]/[step]', { type, step: firstStep(type) }),
 				label: '发起申请',
 				description: '填写新的申请',
@@ -82,12 +81,11 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 		items: [
 			{
 				href: resolve('/reports'),
-				// 统计报表也按类型聚合，导航进入时带上当前类型
-				hrefFor: (type) => `${resolve('/reports')}?type=${type}`,
 				label: '统计报表',
 				description: '团队申请统计与审批效率',
 				icon: 'chart',
-				// 统计报表是面向领导（主管）的管理视图，员工与财务无需也无法查看
+				// 统计报表是面向领导（主管）的管理视图，员工与财务无需也无法查看；
+				// 进入时不带 ?type=，类型由全局持久化类型决定，点导航不会切走类型
 				visibleTo: ['manager']
 			}
 		]

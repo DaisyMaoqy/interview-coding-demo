@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { HOME } from '$lib/core/routes';
 	import { useIdentity } from '$lib/state/identity.svelte';
+	import { useApplicationType } from '$lib/state/applicationType.svelte';
 	import Icon from '$lib/components/common/Icon.svelte';
 	import { isActive, visibleSections } from './navigation';
 	import {
@@ -14,22 +15,13 @@
 	import { APPLICATION_TYPES } from '$lib/domain/applicationTypes';
 
 	const identity = useIdentity();
+	const appType = useApplicationType();
 
 	// 角色变化时菜单自动增删「待我审批」
 	const sections = $derived(visibleSections(identity.role));
 
-	// 当前申请类型：优先取 /apply/[type] 路径段；列表页等通过 ?type= 透传时也认；
-	// 都不存在（或值非法）时默认差旅
-	const currentType = $derived.by(() => {
-		const path = page.url.pathname;
-		if (path.startsWith('/apply/')) {
-			const seg = path.split('/')[2];
-			if (seg && APPLICATION_TYPE_VALUES.includes(seg as ApplicationType)) return seg;
-		}
-		const t = page.url.searchParams.get('type');
-		if (t && APPLICATION_TYPE_VALUES.includes(t as ApplicationType)) return t;
-		return 'travel';
-	});
+	// 当前申请类型来自持久化 store（localStorage），不随 URL 变化；只有侧栏下拉会改它
+	const currentType = $derived(appType.value);
 
 	// 当前类型的配置（标记字、名称等），品牌区随切换实时变化
 	const currentDef = $derived(APPLICATION_TYPES[currentType as keyof typeof APPLICATION_TYPES]);
@@ -39,23 +31,22 @@
 		return titleFor ? titleFor(currentType as ApplicationType) : title;
 	}
 
-	// 实际跳转链接：类型绑定项（我的申请/发起申请/统计报表）带上当前类型
+	// 实际跳转链接：仅「发起申请」需要带上当前类型指向对应向导；
+	// 「我的申请」「统计报表」不再附带 ?type=，避免点导航就把类型切走
 	function linkHref(item: { href: string; hrefFor?: (type: ApplicationType) => string }): string {
 		return item.hrefFor ? item.hrefFor(currentType as ApplicationType) : item.href;
 	}
 
-	// 切换类型：在报表页时停留报表页并重算统计；其余页面默认进入「我的申请」按该类型筛选
+	// 切换类型：仅此处会改持久化的申请类型；写入即存 localStorage。
+	// 已在报表页则停留本页、由各页面从 store 读取重算；在请求列表页靠 effect 同步；
+	// 其它页面（首页 / 待我审批）跳到「我的申请」展示该类型
 	function switchType(event: Event): void {
-		const type = (event.currentTarget as HTMLSelectElement).value;
-		const target =
-			page.url.pathname === resolve('/reports')
-				? type === 'all'
-					? resolve('/reports')
-					: `${resolve('/reports')}?type=${type}`
-				: `${resolve('/requests')}?type=${type}`;
-		// 需附带 query 参数，resolve 写在模板字符串内，故逐行豁免该规则
-		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		goto(target);
+		const type = (event.currentTarget as HTMLSelectElement).value as ApplicationType;
+		appType.switchTo(type);
+		if (page.url.pathname === resolve('/reports')) return;
+		if (page.url.pathname.startsWith(`${resolve('/requests')}`)) return;
+		// 当前不在请求 / 报表页，跳到「我的申请」展示该类型
+		goto(resolve('/requests'));
 	}
 </script>
 
