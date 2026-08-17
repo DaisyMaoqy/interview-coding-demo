@@ -4,12 +4,12 @@
 但**每条规则只有一处定义**，本文是它们的索引而非副本 —— 改规则请改代码，
 本文随之更新。
 
-| 层次             | 位置                         | 职责                           |
-| ---------------- | ---------------------------- | ------------------------------ |
-| 输入归一化       | `src/lib/domain/money.ts`    | 把用户敲进来的文本清洗成规范值 |
-| 字段与跨字段校验 | `src/lib/domain/schema.ts`   | 表单内容是否合法               |
-| 状态机校验       | `src/lib/domain/workflow.ts` | 这个人此刻能不能做这个动作     |
-| 导航校验         | `src/lib/domain/wizard.ts`   | 用户能不能走到这一步           |
+| 层次             | 位置                                                   | 职责                                        |
+| ---------------- | ------------------------------------------------------ | ------------------------------------------- |
+| 输入归一化       | `src/lib/domain/money.ts`                              | 把用户敲进来的文本清洗成规范值              |
+| 字段与跨字段校验 | `src/lib/domain/schemaConfig.ts`（由 `FieldDef` 推导） | 表单内容是否合法（原子 Zod 在 `schema.ts`） |
+| 状态机校验       | `src/lib/domain/workflow.ts`                           | 这个人此刻能不能做这个动作                  |
+| 导航校验         | `src/lib/domain/wizard.ts`                             | 用户能不能走到这一步                        |
 
 ---
 
@@ -47,7 +47,21 @@ yuanToCents(19.99); // 1999，而非浮点直乘得到的 1998.9999999999998
 
 ## 二、字段与跨字段校验
 
-### 步骤 1 — 基本信息
+校验规则不再散落在各步骤组件，而是集中在 `src/lib/domain/applicationTypes.ts` 的
+`FieldDef` 声明里，由 `src/lib/domain/schemaConfig.ts` 推导出逐步（`buildStepSchema`）
+与整单（`buildTypeSchema`，含类型级 `typeRefine`）的 Zod schema。一套配置同时驱动
+UI 渲染与校验，二者天然不漂移。当前 `travel`（差旅）与 `leave`（请假）字段不同，
+下面按类型分述。
+
+### 通用：实时校验交互
+
+错误在后台始终计算，但只有「被用户交互过（touched）」或「点击过下一步/提交（attempted）」
+的字段才展示；`touched` 在 `oninput` 与 `onblur` 都会标记，所以错误在**输入过程中**
+就实时出现，不必等失焦。
+
+### 差旅（travel）
+
+**步骤 1 — 基本信息**
 
 | 字段               | 规则                    | 提示文案                    |
 | ------------------ | ----------------------- | --------------------------- |
@@ -123,6 +137,29 @@ yuanToCents(19.99); // 1999，而非浮点直乘得到的 1998.9999999999998
 
 ---
 
+### 请假（leave）
+
+**步骤 1 — 基本信息**
+
+| 字段                 | 规则                              | 提示文案                    |
+| -------------------- | --------------------------------- | --------------------------- |
+| `reason` 请假事由    | trim 后 ≥ 5 字                    | 请假事由请不少于 5 个字     |
+|                      | ≤ 200 字                          | 请假事由请控制在 200 字以内 |
+| `leaveType` 请假类型 | 枚举 `annual \| sick \| personal` | 请选择请假类型              |
+
+**步骤 2 — 请假时间**
+
+| 字段                          | 规则                                    | 提示文案                 |
+| ----------------------------- | --------------------------------------- | ------------------------ |
+| `leaveRange` 请假时间（区间） | 起止两端都必填；任一为空 → `请选择日期` | 请选择日期               |
+|                               | 结束日期不早于开始日期                  | 结束日期不能早于开始日期 |
+| `note` 备注                   | ≤ 200 字                                | 备注请控制在 200 字以内  |
+
+> `leaveRange` 的值写在 `fromKey` / `toKey`（`leaveStart` / `leaveEnd`）上，而非 `field.key`；
+> 跨字段 refine 在两端都填后校验 `end >= start`，空值由 `dateStringSchema` 的「请选择日期」统一兜住。
+
+---
+
 ## 三、状态机校验
 
 ```html
@@ -166,7 +203,7 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 | 场景                                        | 结果                             |
 | ------------------------------------------- | -------------------------------- |
 | 自己的单（任意状态）                        | 可看                             |
-| 经理看员工的**非草稿**单（含已审批/已驳回） | 可看（便于主管掌握团队差旅进展） |
+| 经理看员工的**非草稿**单（含已审批/已驳回） | 可看（便于主管掌握团队申请进展） |
 | 财务看**待财务审批**的单                    | 可看（财务的二审队列）           |
 | 员工看他人或领导的单                        | 不可看                           |
 | 经理看员工的草稿                            | 不可看（草稿仅申请人自己可见）   |
@@ -199,15 +236,14 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 
 ## 五、校验规则的复用
 
-同一份 schema 在三处被调用，规则只定义一次，三处不会漂移：
+同一份推导出的 schema 在两处被调用，规则只定义一次，不会漂移：
 
-| 调用方                           | 作用                               |
-| -------------------------------- | ---------------------------------- |
-| `+page.server.ts` 的 form action | 浏览器禁用 JS 时的服务端兜底       |
-| 客户端 `use:enhance`             | 即时的字段级反馈                   |
-| localStorage 草稿回读            | 结构变更或被手改过的脏数据一律丢弃 |
+| 调用方                    | 作用                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 客户端向导 `StepRenderer` | 「下一步 / 提交」时 `validate(schema, draft)` 一次性校验，错误按字段路径展示，配合 `touched` / `attempted` 实时提示 |
+| localStorage 草稿回读     | 结构变更或被手改过的脏数据一律丢弃                                                                                  |
 
-类型由 `z.infer` 从 schema 推导，改规则时 TypeScript 类型自动跟随，不会各自为政。
+字段类型由 `FieldDef` 驱动、Zod schema 由 `schemaConfig` 推导，改配置时校验自动跟随，不会各自为政。
 
 ### 错误结构
 
@@ -227,16 +263,19 @@ draft ──submit──▶ pending_manager ──approve──▶ pending_finan
 | 测试文件                                                   | 用例数 | 覆盖内容                                                                                                          |
 | ---------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
 | `src/lib/vitest/domain/schema.test.ts`                     | 30     | 字段边界、跨字段规则、整单组合                                                                                    |
-| `src/lib/vitest/domain/workflow.test.ts`                   | 36     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限、提交时间                                                  |
-| `src/lib/vitest/domain/money.test.ts`                      | 23     | 精度、输入归一化、格式化                                                                                          |
-| `src/lib/vitest/domain/wizard.test.ts`                     | 18     | 步骤顺序、可达性、路由守卫                                                                                        |
+| `src/lib/vitest/domain/schemaConfig.test.ts`               | 6      | 由 `FieldDef` 推导的逐步/整单 schema；dateRange 空值与「结束早于开始」等边界                                      |
+| `src/lib/vitest/domain/workflow.test.ts`                   | 55     | 状态流转矩阵、操作人资格、必填意见、意见长度、查看权限、提交时间                                                  |
+| `src/lib/vitest/domain/money.test.ts`                      | 46     | 精度、输入归一化、格式化                                                                                          |
+| `src/lib/vitest/domain/wizard.test.ts`                     | 21     | 步骤顺序、可达性、路由守卫                                                                                        |
 | `src/lib/vitest/data/seed.test.ts`                         | 12     | 演示数据的结构、场景覆盖、审批留痕                                                                                |
 | `src/lib/vitest/components/request/RequestActions.test.ts` | 6      | 审批操作编排：提交成功/失败早返回、重新编辑（驳回走状态机 + 草稿原地编辑）、删除、提交后跳转与 `onsubmitted` 回调 |
 | `src/lib/vitest/data/requests.filter.test.ts`              | 17     | 申请单筛选、搜索、日期过滤、年度去重、聚合等 8 个纯函数                                                           |
-| `src/lib/vitest/data/requests.load.test.ts`                | 3      | `loadRequests` 远程读取、失败/网络异常降级到 seed                                                                 |
+| `src/lib/vitest/data/requests.load.test.ts`                | 5      | `loadRequests` 远程读取、失败/网络异常降级到 seed                                                                 |
+| `src/lib/vitest/components/form/DynamicField.test.ts`      | 6      | 动态字段实时校验：oninput 即标记 touched、失焦兜底、dateRange 双端点                                              |
+| `src/lib/vitest/components/form/DynamicPreview.test.ts`    | 3      | 预览渲染：dateRange（请假时间）按 fromKey/toKey 展示、空值占位                                                    |
 
 `seed.test.ts` 中「每张单都能通过整单 schema 校验」这一条，
-让上述全部规则一次性作用于 40 条真实数据 —— 生成脚本若产出非法数据会立刻暴露。
+让上述全部规则一次性作用于 59 条真实数据（差旅 40 + 请假 19）—— 生成脚本若产出非法数据会立刻暴露。
 
 `RequestActions.test.ts` 与 `requests.filter.test.ts` / `requests.load.test.ts` 补齐了
 原先薄弱的两个维度：审批操作编排（状态机、仓储读写、失败分支与跳转的串联）与
