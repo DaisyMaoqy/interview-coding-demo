@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { EChartsOption } from 'echarts';
-	import type * as echarts from 'echarts';
 	import type { ApplicationType, RequestStatus } from '$lib/domain/types';
 	import type { Request } from '$lib/domain/types';
 	import {
@@ -18,10 +16,12 @@
 		type DatePreset
 	} from '$lib/domain/dashboard';
 	import Panel from '$lib/components/common/Panel.svelte';
-	import Chart from '$lib/components/common/Chart.svelte';
 	import StatCard from '$lib/components/common/StatCard.svelte';
 	import DateFilter from './DateFilter.svelte';
 	import ApplicationTable from './ApplicationTable.svelte';
+	import StatusDistributionChart from './charts/StatusDistributionChart.svelte';
+	import LeaveTypeBarChart from './charts/LeaveTypeBarChart.svelte';
+	import ApplicationTrendChart from './charts/ApplicationTrendChart.svelte';
 
 	let {
 		requests,
@@ -96,21 +96,23 @@
 	const overview = $derived(managerOverview(dateFiltered));
 	const leave = $derived(leaveOverview(dateFiltered));
 
-	// 饼图数据：请假视图看「请假类型分布」，其余看「申请状态分布」
-	const pieSlices = $derived(
-		isLeave
-			? leaveTypeDistribution(dateFiltered).map((s) => ({
-					name: s.name,
-					value: s.count,
-					key: s.value,
-					color: LEAVE_TYPE_COLORS[s.value] ?? CHART_COLORS[0]
-				}))
-			: statusDistribution(dateFiltered).map((s) => ({
-					name: s.name,
-					value: s.value,
-					key: s.status,
-					color: STATUS_COLORS[s.status]
-				}))
+	// 状态分布（差旅视图用饼图、请假视图用环形图，共用同一份聚合）
+	const statusSlices = $derived(
+		statusDistribution(dateFiltered).map((s) => ({
+			name: s.name,
+			value: s.value,
+			key: s.status,
+			color: STATUS_COLORS[s.status]
+		}))
+	);
+	// 请假类型分布（请假视图用横向条形图，与状态环形图形成形状对比）
+	const leaveTypeSlices = $derived(
+		leaveTypeDistribution(dateFiltered).map((s) => ({
+			name: s.name,
+			value: s.count,
+			key: s.value,
+			color: LEAVE_TYPE_COLORS[s.value] ?? CHART_COLORS[0]
+		}))
 	);
 
 	// 趋势：请假视图看「请假天数」，其余看「申请量」
@@ -120,80 +122,31 @@
 	const trendName = $derived(isLeave ? '请假天数' : '申请量');
 	const trendUnit = $derived(isLeave ? '天' : '单');
 
-	const statusOption = $derived<EChartsOption>({
-		color: pieSlices.map((s) => s.color),
-		tooltip: {
-			trigger: 'item',
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			formatter: (p: any) => `${p.name}：${p.value} ${trendUnit}（${p.percent ?? 0}%）`
-		},
-		legend: { bottom: 0, textStyle: { color: '#64748b' } },
-		series: [
-			{
-				type: 'pie',
-				radius: ['42%', '68%'],
-				center: ['50%', '45%'],
-				label: { formatter: '{b}\n{d}%' },
-				data: pieSlices.map((s) => ({ name: s.name, value: s.value }))
-			}
-		]
-	});
-
-	const trendOption = $derived<EChartsOption>({
-		color: CHART_COLORS,
-		tooltip: { trigger: 'axis', valueFormatter: (v) => `${v as number} ${trendUnit}` },
-		grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
-		xAxis: {
-			type: 'category',
-			data: trend.map((p) => p.month),
-			axisLabel: { color: '#64748b' },
-			axisLine: { lineStyle: { color: '#e2e8f0' } }
-		},
-		yAxis: {
-			type: 'value',
-			minInterval: 1,
-			axisLabel: { formatter: (v: number) => String(v) },
-			splitLine: { lineStyle: { color: '#f1f5f9' } }
-		},
-		series: [
-			{
-				name: trendName,
-				type: 'line',
-				smooth: true,
-				showSymbol: false,
-				areaStyle: { opacity: 0.12 },
-				data: trend.map((p) => p.amount)
-			}
-		]
-	});
-
-	// ---- 图表点击交互 ----
-	function onPieReady(chart: echarts.ECharts): void {
-		chart.on('click', (params: { name?: string }) => {
-			const slice = pieSlices.find((s) => s.name === params.name);
-			if (!slice) return;
-			if (isLeave) {
-				selectedLeaveType = selectedLeaveType === slice.key ? null : slice.key;
-				selectedStatus = null;
-			} else {
-				selectedStatus =
-					selectedStatus === (slice.key as RequestStatus) ? null : (slice.key as RequestStatus);
-				selectedLeaveType = null;
-			}
-			selectedMonth = null;
-			resetDateFilter();
-		});
+	// ---- 图表点击交互（子组件回传分类名，这里按维度筛选下方申请记录） ----
+	function handleStatusSelect(name: string): void {
+		const slice = statusSlices.find((s) => s.name === name);
+		if (!slice) return;
+		selectedStatus =
+			selectedStatus === (slice.key as RequestStatus) ? null : (slice.key as RequestStatus);
+		selectedLeaveType = null;
+		selectedMonth = null;
+		resetDateFilter();
 	}
 
-	function onLineReady(chart: echarts.ECharts): void {
-		chart.on('click', (params: { name?: string }) => {
-			const month = params.name as string;
-			if (!month) return;
-			selectedMonth = selectedMonth === month ? null : month;
-			selectedStatus = null;
-			selectedLeaveType = null;
-			resetDateFilter();
-		});
+	function handleLeaveTypeSelect(name: string): void {
+		const slice = leaveTypeSlices.find((s) => s.name === name);
+		if (!slice) return;
+		selectedLeaveType = selectedLeaveType === slice.key ? null : slice.key;
+		selectedStatus = null;
+		selectedMonth = null;
+		resetDateFilter();
+	}
+
+	function handleMonthSelect(month: string): void {
+		selectedMonth = selectedMonth === month ? null : month;
+		selectedStatus = null;
+		selectedLeaveType = null;
+		resetDateFilter();
 	}
 </script>
 
@@ -207,12 +160,34 @@
 </div>
 
 <div class="grid">
-	<Panel title={isLeave ? '请假类型分布' : '申请状态分布'}>
-		<Chart option={statusOption} onReady={onPieReady} />
-	</Panel>
-	<Panel title={isLeave ? '近 12 个月请假天数趋势' : '近 12 个月申请量趋势'}>
-		<Chart option={trendOption} onReady={onLineReady} />
-	</Panel>
+	{#if isLeave}
+		<Panel title="请假类型分布">
+			<LeaveTypeBarChart slices={leaveTypeSlices} onSelect={handleLeaveTypeSelect} />
+		</Panel>
+		<Panel title="申请状态分布">
+			<StatusDistributionChart slices={statusSlices} variant="donut" onSelect={handleStatusSelect} />
+		</Panel>
+		<Panel title="近 12 个月请假天数趋势">
+			<ApplicationTrendChart
+				points={trend}
+				name={trendName}
+				unit={trendUnit}
+				onSelect={handleMonthSelect}
+			/>
+		</Panel>
+	{:else}
+		<Panel title="申请状态分布">
+			<StatusDistributionChart slices={statusSlices} variant="pie" onSelect={handleStatusSelect} />
+		</Panel>
+		<Panel title="近 12 个月申请量趋势">
+			<ApplicationTrendChart
+				points={trend}
+				name={trendName}
+				unit={trendUnit}
+				onSelect={handleMonthSelect}
+			/>
+		</Panel>
+	{/if}
 </div>
 
 <Panel title="申请记录" actions={header}>
