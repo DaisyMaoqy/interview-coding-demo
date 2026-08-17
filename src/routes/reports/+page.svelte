@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { useApplicationType } from '$lib/state/applicationType.svelte';
@@ -48,11 +47,6 @@
 			showAll = true;
 		}
 	}
-
-	// URL 直达时自动纠正非主管身份，无需手动点切换按钮
-	onMount(() => {
-		if (!identity.isManager) identity.switchTo('manager');
-	});
 </script>
 
 {#if identity.isManager}
