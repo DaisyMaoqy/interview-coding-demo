@@ -61,6 +61,8 @@
 		const end = customEnd ? new Date(customEnd) : undefined;
 		return computeDateRange(preset, start, end);
 	});
+	// 日期筛选变化 → 重挂载环形图以重播入场动画（仅日期维度，不含状态/月份点击）
+	const dateKey = $derived(`${preset}:${customStart}:${customEnd}`);
 
 	// ---- 筛选 & 排序 ----
 	const dateFiltered = $derived(filterByDateRange(requests, dateRange));
@@ -165,7 +167,13 @@
 			<LeaveTypeBarChart slices={leaveTypeSlices} onSelect={handleLeaveTypeSelect} />
 		</Panel>
 		<Panel title="申请状态分布">
-			<StatusDistributionChart slices={statusSlices} variant="donut" onSelect={handleStatusSelect} />
+			{#key dateKey}
+				<StatusDistributionChart
+					slices={statusSlices}
+					variant="donut"
+					onSelect={handleStatusSelect}
+				/>
+			{/key}
 		</Panel>
 		<Panel title="近 12 个月请假天数趋势">
 			<ApplicationTrendChart
