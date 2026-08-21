@@ -22,6 +22,11 @@
 	--color-brand-800: oklch(0.42 0.166 265.6);
 	--color-brand-900: oklch(0.38 0.13 265.5);
 
+	/* 登录页 */
+	--color-brand:   oklch(0.5032 0.1827 292.26); /* 主品牌色（紫） #6b46c1 */
+	--color-brand-2: oklch(0.6846 0.1482 237.15); /* 辅助品牌色（青） #0ea5e9 */
+	--color-ink:     oklch(0.1728 0.0343 269.25); /* 深色背景 #0a0f1f */
+
 	/* 状态色：与审批状态机一一对应，保证列表 / 详情 / 图表三处用色一致 */
 	--color-status-draft: oklch(0.55 0.014 264.4);
 	--color-status-pending: oklch(0.68 0.157 65.5);

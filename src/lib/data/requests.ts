@@ -18,6 +18,35 @@ import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
 import { toLocalISO } from '$lib/format/date';
 
 /**
+ * [占位] 联调开关。
+ *
+ * 置为 `true` 后，`loadRequests` 改为请求后端 `/aws/v1` 并在请求头携带
+ * `Authorization: Bearer <Qy_token>`（token 取自已持久化的 `Qy_token`）。
+ * 置为 `false`（默认）时沿用原有 Apifox Mock 演示数据，逻辑完全不变。
+ *
+ * 后续与后端联调时，只需把 `USE_BACKEND` 改成 `true` 即可切换数据源，
+ * 无需改动下方任何原有 Mock 代码。
+ */
+const USE_BACKEND = true;
+const BACKEND_BASE = '/aws/v1';
+
+/** 组装请求头：联调模式下附加 Bearer token，其余情况仅基础头 */
+function buildApiHeaders(): HeadersInit {
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (USE_BACKEND) {
+		const token =
+			typeof localStorage !== 'undefined' ? localStorage.getItem('Qy_token') : null;
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+	}
+	return headers;
+}
+
+/** 解析数据基址：联调模式用后端 /aws/v1，否则用原有 Mock base */
+function resolveBaseUrl(): string {
+	return USE_BACKEND ? BACKEND_BASE : PUBLIC_MOCK_BASE_URL;
+}
+
+/**
  * 列表筛选维度。
  *
  * - `'all'`：不限制状态
@@ -92,20 +121,23 @@ export function sortBySubmittedAtDesc(requests: readonly Request[]): Request[] {
  * 不带 type 的启动调用则整体替换（与缓存策略一致）。
  */
 export async function loadRequests(type?: ApplicationType): Promise<void> {
-	const base = PUBLIC_MOCK_BASE_URL;
+	const base = resolveBaseUrl();
 	if (!base) {
 		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
 		return;
 	}
 
-	const endpoint = `${base.replace(/\/$/, '')}/api/requests`;
+	// 联调模式走 /aws/v1/requests，否则沿用原 Mock 的 /api/requests
+	const endpoint = USE_BACKEND
+		? `${base}/requests`
+		: `${base.replace(/\/$/, '')}/api/requests`;
 	const url = new URL(endpoint);
 	if (type) url.searchParams.set('type', type);
 
 	const controller = new AbortController();
 	const timer = setTimeout(() => controller.abort(), 3000);
 	try {
-		const res = await fetch(url, { signal: controller.signal });
+		const res = await fetch(url, { headers: buildApiHeaders(), signal: controller.signal });
 		if (!res.ok) throw new Error(`接口返回 ${res.status}`);
 		const data = (await res.json()) as Request[];
 		const sorted = [...data].sort(byUpdatedDesc);
