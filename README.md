@@ -141,6 +141,27 @@ localStorage 草稿回读时，结构变更或被手动改动的脏数据会被�
 
 配置方式：复制 `.env.example` 为 `.env`，按需修改 `PUBLIC_MOCK_BASE_URL`。
 
+### 统一的请求层（core/http）
+
+所有对后端的调用（含未来的申请单写操作、审批动作、报表、登录）都只经由
+`src/lib/core/http.ts` 一个出口，职责按层划分、互不越界：
+
+- **`src/lib/core/http.ts` —— 全局请求基础设施**：负责请求拦截（按 `USE_BACKEND`
+  拼接 Mock `/api` 或后端 `/aws/v1` base、附加 `Content-Type` 与
+  `Authorization: Bearer <Qy_token>`）、响应拦截（联调模式拆统一信封
+  `{ code, data, message }` 仅返回 `data`）、以及统一的错误处理（抛 `ApiError`，
+  区分网络 / 超时 / HTTP / 业务码，401 自动清 token 并跳登录）。业务模块不重复拼
+  URL、拼头、解析信封。暴露 `apiGet / apiPost / apiPut / apiPatch / apiDelete` 与
+  联调总开关 `USE_BACKEND`。
+- **`src/lib/data/requests.ts` —— 领域数据仓**：只关心申请单的读取、筛选、本地回退
+  与 store；通过 `apiGet('/requests')` 消费 `core/http` 的返回值（兼容「数组」与
+  「分页包 `{ list, total, page, pageSize }``），自身不再直接 `fetch`。
+- **`src/lib/state/auth.svelte.ts` —— 登录态**：持有后端签发的 `Qy_token` 并持久化到
+  `localStorage`；`core/http` 从中读取 token 组装鉴权头，二者通过同一个 key 解耦。
+
+> **联调开关**：`core/http.ts` 中的 `USE_BACKEND` 置 `true` 即整体切到后端 `/aws/v1`，
+> 置 `false` 沿用 Apifox Mock；请求失败 / 超时 / 401 均按既有策略降级，保证页面始终有数据。
+
 ### 演示数据
 
 `npm run seed` 生成的数据具备三个特性：
@@ -166,6 +187,7 @@ src/
 │   ├── domain/         领域层：类型与注册表、状态机、校验 schema、金额与聚合（纯函数，无 UI 依赖）
 │   ├── data/           数据层：远程读取、离线兜底、localStorage 仓储
 │   ├── state/          客户端状态：当前身份、申请类型（持久化）、草稿、列表筛选
+│   ├── core/           全局基础设施：统一请求客户端（请求/响应拦截 + 错误处理）、路由常量
 │   ├── components/
 │   │   ├── layout/     全局壳：侧栏导航（含类型切换）、身份切换、页头
 │   │   ├── common/     通用件：面板、弹窗、筛选、图标等，与业务无关

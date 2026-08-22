@@ -10,7 +10,7 @@ export default defineConfig({
 			'^/aws': {
 				target: 'http://localhost:3000', // 后端服务器地址
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/aws/, ''),
+				rewrite: (path) => path.replace(/^/, ''),
 				// secure: false, // 如果目标服务器是 HTTPS 但证书无效，设置为 false
         		// ws: true, // 支持 WebSocket
 			}
