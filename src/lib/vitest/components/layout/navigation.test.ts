@@ -1,5 +1,6 @@
 import { resolve } from '$app/paths';
 import { describe, it, expect } from 'vitest';
+import { firstStep } from '$lib/domain/wizard';
 import { isActive, visibleSections } from '../../../components/layout/navigation';
 
 describe('visibleSections', () => {
@@ -81,7 +82,7 @@ describe('isActive', () => {
 	});
 
 	describe('编辑态的入口归属', () => {
-		const apply = resolve('/travel/apply');
+		const apply = resolve('/apply/[type]/[step]', { type: 'travel', step: firstStep('travel') });
 
 		it('?edit=ID 时点亮「我的申请」并熄掉「发起申请」', () => {
 			const search = '?edit=TR-0034';

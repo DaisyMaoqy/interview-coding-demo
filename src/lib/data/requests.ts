@@ -14,8 +14,11 @@ import { budgetTotal, formatYuan } from '$lib/domain/money';
 import { transition } from '$lib/domain/workflow';
 import type { TripLeg } from '$lib/domain/types';
 import { writable, get } from 'svelte/store';
-import { PUBLIC_MOCK_BASE_URL } from '$env/static/public';
 import { toLocalISO } from '$lib/format/date';
+import { apiGet, USE_BACKEND } from '$lib/core/http';
+
+// 统一请求客户端（src/lib/core/http.ts）已持有联调开关 USE_BACKEND、base 解析、
+// 请求/响应拦截与错误处理。此处不再重复实现，仅消费客户端返回的数组/分页包。
 
 /**
  * 列表筛选维度。
@@ -92,22 +95,15 @@ export function sortBySubmittedAtDesc(requests: readonly Request[]): Request[] {
  * 不带 type 的启动调用则整体替换（与缓存策略一致）。
  */
 export async function loadRequests(type?: ApplicationType): Promise<void> {
-	const base = PUBLIC_MOCK_BASE_URL;
-	if (!base) {
-		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
-		return;
-	}
-
-	const endpoint = `${base.replace(/\/$/, '')}/api/requests`;
-	const url = new URL(endpoint);
-	if (type) url.searchParams.set('type', type);
-
-	const controller = new AbortController();
-	const timer = setTimeout(() => controller.abort(), 3000);
+	// 联调模式走 /aws/v1/requests，否则沿用原 Mock 的 /api/requests
+	const path = USE_BACKEND ? '/requests' : '/api/requests';
 	try {
-		const res = await fetch(url, { signal: controller.signal });
-		if (!res.ok) throw new Error(`接口返回 ${res.status}`);
-		const data = (await res.json()) as Request[];
+		// 客户端已处理 base / 鉴权头 / 信封拆包；这里兼容「数组」与「分页包」
+		const payload = await apiGet<Request[] | { list: Request[] }>(
+			path,
+			type ? { type } : undefined
+		);
+		const data = Array.isArray(payload) ? payload : payload.list;
 		const sorted = [...data].sort(byUpdatedDesc);
 
 		if (type) {
@@ -122,10 +118,8 @@ export async function loadRequests(type?: ApplicationType): Promise<void> {
 		}
 		writeStorage(get(requestsStore));
 	} catch {
-		// 超时（AbortError）或网络错误：降级到缓存 / seed，保证页面永远有数据
+		// 超时 / 网络 / 业务错误：降级到缓存 / seed，保证页面永远有数据
 		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
-	} finally {
-		clearTimeout(timer);
 	}
 }
 

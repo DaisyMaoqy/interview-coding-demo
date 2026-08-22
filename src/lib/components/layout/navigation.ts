@@ -116,8 +116,8 @@ export function isActive(itemHref: string, pathname: string, search = ''): boole
 	// 点亮该项、熄掉「发起申请」，与详情页 ?from=approvals 的处理思路一致。
 	if (search.includes('edit=')) {
 		if (itemHref === resolve('/requests')) return true;
-		// 兼容旧路由 /travel/apply 与新路由 /apply/[type]/[step]
-		if (itemHref === resolve('/travel/apply') || itemHref === APPLY_BASIC) return false;
+		// 编辑态下「发起申请」不应高亮（归属「我的申请」）；新路由为 /apply/[type]/[step]
+		if (itemHref === APPLY_BASIC) return false;
 	}
 
 	if (search.includes('from=approvals')) {
