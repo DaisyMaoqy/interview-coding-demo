@@ -20,28 +20,41 @@
 		managerId: string | null;
 	}
 
-	async function handleSubmit({ username, password }: { username: string; password: string; }): Promise<void>{
+	async function handleSubmit({
+		username,
+		password
+	}: {
+		username: string;
+		password: string;
+	}): Promise<void> {
 		// error = '';
-		
+
 		try {
 			// [占位] 真实登录逻辑请复用另一前端项目的企业 SSO 实现；
 			// 下方为联调骨架：调用后端 POST /aws/v1/auth/login。
 
 			const res = await apiPost('/auth/login', {
-				'userId': username, password, tenantId
+				userId: username,
+				password,
+				tenantId
 			});
 			if (!res) {
 				// 后端约定：非 2xx 视为登录失败
 				throw new Error('登录失败，请检查账号');
 			}
-			const data = res as unknown as { token: string; user: LoginUser };
+			// http.ts 已拆统一信封，res 即 data；后端签发的令牌字段为 Qy_token（兼容 token）。
+			const data = res as unknown as { Qy_token?: string; token?: string; user?: LoginUser };
+			const token = data.Qy_token ?? data.token;
+			if (!token) throw new Error('登录失败：未返回令牌');
 
-			// 保存 Qy_token，供后续请求携带
-			auth.setToken(data.token);
+			// 保存 Qy_token，供后续请求以 Authorization: Bearer <Qy_token> 携带
+			auth.setToken(token);
 
 			// [占位] 后续联调：用后端返回的 user 替换演示身份（含真实 id/name/department/managerId）；
 			// 当前先按 role 切换演示身份，保持现有页面可用。
-			identity.switchTo(data.user.role as Role);
+			if (data.user) {
+				identity.switchTo(data.user.role as Role);
+			}
 
 			goto(HOME);
 		} catch (err) {
@@ -85,4 +98,3 @@
 		</button>
 	</form>
 </main> -->
-

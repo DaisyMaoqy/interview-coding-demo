@@ -2,6 +2,7 @@ import seed from './seed.json' with { type: 'json' };
 import { PENDING_STATUSES } from '$lib/domain/types';
 import type {
 	ApplicationType,
+	AuditAction,
 	Budget,
 	Request,
 	RequestStatus,
@@ -11,11 +12,21 @@ import type {
 } from '$lib/domain/types';
 import { APPLICATION_TYPES, LEAVE_TYPE_OPTIONS } from '$lib/domain/applicationTypes';
 import { budgetTotal, formatYuan } from '$lib/domain/money';
-import { transition } from '$lib/domain/workflow';
+import { transition, actionRequiresComment } from '$lib/domain/workflow';
 import type { TripLeg } from '$lib/domain/types';
 import { writable, get } from 'svelte/store';
 import { toLocalISO } from '$lib/format/date';
-import { apiGet, USE_BACKEND } from '$lib/core/http';
+import { apiGet, apiPost, apiPut, apiDelete, USE_BACKEND } from '$lib/core/http';
+
+// —— 联调说明（对照 backend/docs/API-ALIGNMENT.md §7）——
+// 以下「写操作」对外暴露两套实现：
+//   1) 同步本地函数（createRequest / createDraft / updateRequestFromDraft / deleteRequest）
+//      为「本地兜底」实现，联调模式下已被异步集成函数取代，保留仅用于单测溯源（已停用）。
+//   2) 异步集成函数（submitNewRequest / saveDraftRequest / resubmitRequest /
+//      removeRequest / applyAction）为联调入口：USE_BACKEND 为真时调后端
+//      `/aws/v1/<type>-requests` 及其 RPC 子路径，并把服务端返回值回写本地 store；
+//      后端不可用或抛错时降级到同名的本地兜底函数，保证页面始终可用。
+// 服务端统一信封 { code, data, msg }（成功 code:"200"）由 http.ts 自动拆包。
 
 // 统一请求客户端（src/lib/core/http.ts）已持有联调开关 USE_BACKEND、base 解析、
 // 请求/响应拦截与错误处理。此处不再重复实现，仅消费客户端返回的数组/分页包。
@@ -328,10 +339,10 @@ function buildBase(
 }
 
 /**
- * 由向导的整单表单数据新建一张申请并直接提交（draft → pending_manager）。
+ * [已停用·本地兜底] 由向导整单表单数据新建申请并直接提交（draft → pending_manager）。
  *
- * 内部走 workflow 的 submit 流转，自动追加首条 audit（记录提交人与提交时间），
- * 与「草稿再提交」共用同一套状态机，避免规则漂移。
+ * 联调模式下由 {@link submitNewRequest} 取代；此处保留仅用于单测溯源。
+ * 内部走 workflow 的 submit 流转，自动追加首条 audit（记录提交人与提交时间）。
  */
 export function createRequest(
 	type: ApplicationType,
@@ -345,10 +356,10 @@ export function createRequest(
 }
 
 /**
- * 由向导整单表单数据新建一条「草稿」申请，不提交（不走 submit 流转）。
+ * [已停用·本地兜底] 由向导整单表单数据新建一条「草稿」申请，不提交。
  *
+ * 联调模式下由 {@link saveDraftRequest} 取代；此处保留仅用于单测溯源。
  * 草稿不要求字段齐全，直接落当前填写内容；无审计、无提交时间，状态停 `draft`。
- * 用户可从「我的申请」的草稿卡片继续编辑。
  */
 export function createDraft(
 	type: ApplicationType,
@@ -368,11 +379,11 @@ export function addRequest(request: Request): void {
 }
 
 /**
- * 重新编辑后提交：在原有申请上套用新表单数据并走 submit 流转（draft → pending_manager）。
+ * [已停用·本地兜底] 重新编辑后提交：在原有申请上套用新表单数据并走 submit 流转。
  *
+ * 联调模式下由 {@link resubmitRequest} 取代；此处保留仅用于单测溯源。
  * 与 {@link createRequest} 的区别是**不生成新的编号** —— 保留原单号、申请人、
- * 创建时间、审计轨迹，只更新用户填写部分并追加一条新的提交审计。被驳回 → 草稿 →
- * 再提交的闭环由此闭合。
+ * 创建时间、审计轨迹，只更新用户填写部分并追加一条新的提交审计。
  */
 export function updateRequestFromDraft(
 	id: string,
@@ -390,6 +401,138 @@ export function updateRequestFromDraft(
 		updatedAt: now
 	};
 	const result = transition({ request: updated, action: 'submit', actor });
+	if (!result.ok) throw new Error(result.message);
+	updateRequest(result.request);
+	return result.request;
+}
+
+// ============ 联调集成层（异步；USE_BACKEND 时调后端，失败降级本地兜底）============
+//
+// 以下函数是对外（页面/组件）的「写操作」唯一入口。统一职责：
+// 1. 拼 `/aws/v1/<type>-requests` 资源路径与 RPC 子路径（submit/approve/reject/cancel/reedit）；
+// 2. 调 http.ts（自动带 Bearer、拆 {code,data,msg} 信封、成功 code:"200"）；
+// 3. 用服务端返回值回写本地 store（addRequest/updateRequest/deleteRequest），保证 UI 即时一致；
+// 4. 后端不可用或抛错时降级到上方「已停用·本地兜底」同步函数，页面始终可用。
+
+/** 资源路径：`/<type>-requests`（type 即 travel / leave） */
+function resourcePath(type: ApplicationType): string {
+	return `/${type}-requests`;
+}
+
+/**
+ * 新建并提交一张申请（联调入口，取代 {@link createRequest}）。
+ * 后端：POST /<type>-requests { fields } 拿到服务端单号 → POST /<type>-requests/:id/submit。
+ * 失败降级到本地 createRequest + addRequest。
+ */
+export async function submitNewRequest(
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	applicant: User
+): Promise<Request> {
+	if (USE_BACKEND) {
+		try {
+			const created = await apiPost<Request>(resourcePath(type), { fields });
+			const submitted = await apiPost<Request>(`${resourcePath(type)}/${created.id}/submit`, {});
+			addRequest(submitted);
+			return submitted;
+		} catch {
+			// 降级：后端不可用时走本地兜底
+		}
+	}
+	const local = createRequest(type, fields, applicant);
+	addRequest(local);
+	return local;
+}
+
+/**
+ * 仅存草稿（联调入口，取代 {@link createDraft}）。
+ * 后端：POST /<type>-requests { fields }。失败降级到本地 createDraft + addRequest。
+ */
+export async function saveDraftRequest(
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	applicant: User
+): Promise<Request> {
+	if (USE_BACKEND) {
+		try {
+			const created = await apiPost<Request>(resourcePath(type), { fields });
+			addRequest(created);
+			return created;
+		} catch {
+			// 降级
+		}
+	}
+	const local = createDraft(type, fields, applicant);
+	addRequest(local);
+	return local;
+}
+
+/**
+ * 编辑后重新提交（联调入口，取代 {@link updateRequestFromDraft}）。
+ * 后端：PUT /<type>-requests/:id { fields } → POST /<type>-requests/:id/submit。
+ * 失败降级到本地 updateRequestFromDraft。
+ */
+export async function resubmitRequest(
+	id: string,
+	type: ApplicationType,
+	fields: Record<string, unknown>,
+	actor: User
+): Promise<Request> {
+	if (USE_BACKEND) {
+		try {
+			await apiPut(`${resourcePath(type)}/${id}`, { fields });
+			const submitted = await apiPost<Request>(`${resourcePath(type)}/${id}/submit`, {});
+			updateRequest(submitted);
+			return submitted;
+		} catch {
+			// 降级
+		}
+	}
+	return updateRequestFromDraft(id, type, fields, actor);
+}
+
+/**
+ * 删除申请（联调入口）。
+ * 后端：DELETE /<type>-requests/:id；无论后端成败，本地 store 始终移除，保证 UI 一致。
+ */
+export async function removeRequest(id: string): Promise<void> {
+	const r = getRequestById(id);
+	const type = r?.type ?? 'travel';
+	if (USE_BACKEND) {
+		try {
+			await apiDelete(`${resourcePath(type)}/${id}`);
+		} catch {
+			// 后端删除失败也继续本地移除，避免脏数据
+		}
+	}
+	deleteRequest(id);
+}
+
+/**
+ * 执行一次状态流转（联调入口，取代 UI 里直接调 workflow.transition 的写法）。
+ * 后端：POST /<type>-requests/:id/<action> { comment? }，用返回值回写 store。
+ * 失败或后端不可用时降级到本地 transition + updateRequest。
+ */
+export async function applyAction(
+	request: Request,
+	action: AuditAction,
+	actor: User,
+	comment?: string
+): Promise<Request> {
+	if (USE_BACKEND) {
+		try {
+			const body = actionRequiresComment(action) ? { comment } : {};
+			const updated = await apiPost<Request>(
+				`${resourcePath(request.type)}/${request.id}/${action}`,
+				body
+			);
+			updateRequest(updated);
+			return updated;
+		} catch {
+			// 降级
+		}
+	}
+	const result = transition({ request, action, actor, comment });
 	if (!result.ok) throw new Error(result.message);
 	updateRequest(result.request);
 	return result.request;

@@ -65,7 +65,10 @@ afterEach(() => {
 describe('loadRequests', () => {
 	it('云端成功：写入工作数据集并按更新时间倒序', async () => {
 		const data = remoteData();
-		vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => data } as Response);
+		vi.mocked(fetch).mockResolvedValue({
+			ok: true,
+			json: async () => ({ code: '200', msg: 'ok', data })
+		} as Response);
 
 		await loadRequests();
 
@@ -121,12 +124,15 @@ describe('loadRequests', () => {
 		]);
 
 		const data = remoteData(); // 两条 travel
-		vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => data } as Response);
+		vi.mocked(fetch).mockResolvedValue({
+			ok: true,
+			json: async () => ({ code: '200', msg: 'ok', data })
+		} as Response);
 
 		await loadRequests('travel');
 
 		// URL 带 ?type=travel
-		const calledUrl = vi.mocked(fetch).mock.calls[0][0] as URL;
+		const calledUrl = new URL(vi.mocked(fetch).mock.calls[0][0] as string, 'http://localhost');
 		expect(calledUrl.searchParams.get('type')).toBe('travel');
 
 		const list = getAllRequests();
@@ -139,11 +145,14 @@ describe('loadRequests', () => {
 		requestsStore.set([{ id: 'STALE' } as unknown as Request]);
 
 		const data = remoteData();
-		vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => data } as Response);
+		vi.mocked(fetch).mockResolvedValue({
+			ok: true,
+			json: async () => ({ code: '200', msg: 'ok', data })
+		} as Response);
 
 		await loadRequests();
 
-		const calledUrl = vi.mocked(fetch).mock.calls[0][0] as URL;
+		const calledUrl = new URL(vi.mocked(fetch).mock.calls[0][0] as string, 'http://localhost');
 		expect(calledUrl.search).toBe('');
 		expect(getAllRequests().find((r) => r.id === 'STALE')).toBeUndefined();
 		expect(getAllRequests()).toHaveLength(2);

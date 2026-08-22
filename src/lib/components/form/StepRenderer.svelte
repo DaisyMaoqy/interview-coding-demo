@@ -8,12 +8,7 @@
 	import { draft, resetDraft } from '$lib/state/wizardDraft';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { useApplicationType } from '$lib/state/applicationType.svelte';
-	import {
-		addRequest,
-		createDraft,
-		createRequest,
-		updateRequestFromDraft
-	} from '$lib/data/requests';
+	import { saveDraftRequest, submitNewRequest, resubmitRequest } from '$lib/data/requests';
 	import { validate } from '$lib/domain/schema';
 	import { buildStepSchema, buildTypeSchema } from '$lib/domain/schemaConfig';
 	import { nextStep, prevStep, stepHref, setActiveEditId } from '$lib/domain/wizard';
@@ -69,7 +64,8 @@
 		if (editId) return;
 		savingDraft = true;
 		try {
-			addRequest(createDraft(type, $draft, identity.user));
+			// 联调：调后端 POST /<type>-requests { fields }，服务端返回值已回写本地 store
+			await saveDraftRequest(type, $draft, identity.user);
 			setActiveEditId(null);
 			resetDraft();
 			resetRequestListFilters('draft');
@@ -102,9 +98,11 @@
 		submitting = true;
 		try {
 			if (editId) {
-				updateRequestFromDraft(editId, type, $draft, identity.user);
+				// 联调：PUT /<type>-requests/:id { fields } → POST .../:id/submit
+				await resubmitRequest(editId, type, $draft, identity.user);
 			} else {
-				addRequest(createRequest(type, $draft, identity.user));
+				// 联调：POST /<type>-requests { fields } → POST .../:id/submit
+				await submitNewRequest(type, $draft, identity.user);
 			}
 			setActiveEditId(null);
 			resetDraft();

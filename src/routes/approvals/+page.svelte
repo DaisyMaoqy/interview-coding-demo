@@ -5,8 +5,8 @@
 	import ApprovalCard from './components/ApprovalCard.svelte';
 	import RejectDialog from '$lib/components/RejectDialog.svelte';
 	import { useIdentity } from '$lib/state/identity.svelte';
-	import { requestsStore, updateRequest, sortBySubmittedAtDesc } from '$lib/data/requests';
-	import { canViewRequest, transition } from '$lib/domain/workflow';
+	import { requestsStore, sortBySubmittedAtDesc, applyAction } from '$lib/data/requests';
+	import { canViewRequest } from '$lib/domain/workflow';
 	import type { RequestStatus } from '$lib/domain/types';
 	import type { Request } from '$lib/domain/types';
 
@@ -52,19 +52,21 @@
 	}
 
 	// 通过/驳回只描述意图，具体落到 pending_finance 还是 approved 由状态机决定。
-	// 主管通过停在待财务审批，财务通过才归档，见 workflow.ts 的 TRANSITIONS。
-	function approve(request: Request): void {
-		const res = transition({ request, action: 'approve', actor: identity.user });
-		if (res.ok) {
-			updateRequest(res.request);
+	// 联调入口 applyAction 在 USE_BACKEND 时调后端 RPC，否则降级本地状态机；
+	// 服务端返回值会回写本地 store。见 requests.ts 的 applyAction 注释。
+	async function approve(request: Request): Promise<void> {
+		try {
+			await applyAction(request, 'approve', identity.user);
 			selected = selected.filter((id) => id !== request.id);
+		} catch {
+			// 流转失败静默：列表项保留，待用户重试
 		}
 	}
 	function batchApprove(): void {
 		// 每张都按最新引用再流转，避免 store 更新后的 stale 引用
 		for (const id of selected) {
 			const found = $requestsStore.find((r) => r.id === id);
-			if (found) approve(found);
+			if (found) void approve(found);
 		}
 		selected = [];
 	}
@@ -81,19 +83,13 @@
 		rejectTarget = null;
 		rejectError = null;
 	}
-	function confirmReject(comment: string): void {
+	async function confirmReject(comment: string): Promise<void> {
 		if (!rejectTarget) return;
-		const res = transition({
-			request: rejectTarget,
-			action: 'reject',
-			actor: identity.user,
-			comment
-		});
-		if (res.ok) {
-			updateRequest(res.request);
+		try {
+			await applyAction(rejectTarget, 'reject', identity.user, comment);
 			closeReject();
-		} else {
-			rejectError = res.message;
+		} catch (err) {
+			rejectError = err instanceof Error ? err.message : '驳回失败';
 		}
 	}
 </script>
