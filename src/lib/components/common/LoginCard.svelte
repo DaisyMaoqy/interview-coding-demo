@@ -49,6 +49,7 @@
 				await new Promise((r) => setTimeout(r, 1200)); // 演示用
 			}
 		} catch (e) {
+			// 接收父组件的err信息
 			error = e instanceof Error ? e.message : '登录失败，请重试';
 		} finally {
 			loading = false;

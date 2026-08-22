@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import type { Role } from '$lib/domain/types';
 	import { HOME } from '$lib/core/routes';
+	import { apiPost, ApiError } from '$lib/core/http';
 	import { useIdentity } from '$lib/state/identity.svelte';
 	import { useAuth } from '$lib/state/auth.svelte';
 	import LoginCard from '$lib/components/common/LoginCard.svelte';
@@ -9,12 +10,7 @@
 	const identity = useIdentity();
 	const auth = useAuth();
 
-	let userId = $state('');
-	let username = $state('');
-	let password = $state('');
 	let tenantId = $state('tenant_001');
-	// let error = $state('');
-	// let loading = $state(false);
 
 	interface LoginUser {
 		id: string;
@@ -24,24 +20,21 @@
 		managerId: string | null;
 	}
 
-	async function handleSubmit({ username, password, remember }: { username: string; password: string; remember: boolean }): Promise<void>{
+	async function handleSubmit({ username, password }: { username: string; password: string; }): Promise<void>{
 		// error = '';
-		// loading = true;
 		
 		try {
 			// [占位] 真实登录逻辑请复用另一前端项目的企业 SSO 实现；
 			// 下方为联调骨架：调用后端 POST /aws/v1/auth/login。
-			const res = await fetch('/aws/v1/auth/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username, password, tenantId, remember})
+
+			const res = await apiPost('/auth/login', {
+				'userId': username, password, tenantId
 			});
-			if (!res.ok) {
+			if (!res) {
 				// 后端约定：非 2xx 视为登录失败
-				throw new Error('登录失败，请检查账号或租户');
+				throw new Error('登录失败，请检查账号');
 			}
-			
-			const data: { token: string; user: LoginUser } = await res.json();
+			const data = res as unknown as { token: string; user: LoginUser };
 
 			// 保存 Qy_token，供后续请求携带
 			auth.setToken(data.token);
@@ -52,9 +45,9 @@
 
 			goto(HOME);
 		} catch (err) {
-			// error = err instanceof Error ? err.message : '登录失败';
-		// } finally {
-		// 	loading = false;
+			// 处理登录错误并传给LoginCard
+			// error = err instanceof ApiError ? err.message; : '登录失败';
+			throw new Error(err instanceof ApiError ? err.message : '登录失败', { cause: err });
 		}
 	}
 </script>
