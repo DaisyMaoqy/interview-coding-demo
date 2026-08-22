@@ -1,5 +1,5 @@
 import seed from './seed.json' with { type: 'json' };
-import { PENDING_STATUSES } from '$lib/domain/types';
+import { PENDING_STATUSES, APPLICATION_TYPE_VALUES } from '$lib/domain/types';
 import type {
 	ApplicationType,
 	AuditAction,
@@ -132,6 +132,40 @@ export async function loadRequests(type?: ApplicationType): Promise<void> {
 		// 超时 / 网络 / 业务错误：降级到缓存 / seed，保证页面永远有数据
 		requestsStore.set(readStorage() ?? (seed as unknown as Request[]));
 	}
+}
+
+/**
+ * 按 id 拉取单条详情（联调模式）。
+ *
+ * 详情页深链直访时，store 可能尚未含此单（列表未加载 / 该单不在当前 scope 下）。
+ * USE_BACKEND 为真时依次尝试两个资源 `GET /aws/v1/<type>-requests>/<id>`，
+ * 命中即写回统一 store（按 id 去重）并回传；两个都失败（不存在 / 无权限 / 后端未起）
+ * 则降级到本地 store 查找（通常为 undefined，详情页据此走「未找到」分支）。
+ * 非联调模式直接读本地 store，不联网。
+ */
+export async function loadRequestById(targetId: string): Promise<Request | undefined> {
+	if (!USE_BACKEND) return getRequestById(targetId);
+
+	for (const type of APPLICATION_TYPE_VALUES) {
+		try {
+			const fetched = await apiGet<Request>(`${resourcePath(type)}/${targetId}`);
+			if (fetched) {
+				// 按 id 去重写回 store：已存在则替换，否则置顶插入
+				requestsStore.update((list) => {
+					const exists = list.some((r) => r.id === fetched.id);
+					const next = exists
+						? list.map((r) => (r.id === fetched.id ? fetched : r))
+						: [fetched, ...list];
+					writeStorage(next);
+					return next;
+				});
+				return fetched;
+			}
+		} catch {
+			// 该类型下不存在（404 或后端未实现），尝试下一个类型
+		}
+	}
+	return getRequestById(targetId);
 }
 
 /** 全部申请单（按更新时间倒序，与 Mock 响应约定一致） */
